@@ -1,0 +1,6 @@
+SUBDIRS = po nautilus-srm
+
+ACLOCAL_AMFLAGS = -I m4
+
+EXTRA_DIST = m4/na-nautilus-extdir.m4 \
+             build-aux/config.rpath

@@ -1,0 +1,9 @@
+*~
+Makefile
+Makefile.in
+stamp-*
+config.*
+
+# perhaps remove these if we make a heavy use of m4 and co.
+build-aux/
+*.m4
