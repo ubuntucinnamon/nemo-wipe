@@ -434,19 +434,6 @@ typedef struct _SrmChildInfo {
   GtkWindow *parent_window;
 } SrmChildInfo;
 
-static void
-dump_srm_child_info (SrmChildInfo *info)
-{
-  printf ("=== SrmChildInfo dump ===\n"
-          "info.argv   = %p\n"
-          "info.fd_out = %d\n"
-          "info.fd_err = %d\n"
-          "info.pid    = %d\n"
-          "info.parent_window = %p\n"
-          "======= dump  end =======\n",
-          info->argv, info->fd_out, info->fd_err, info->pid, info->parent_window);
-}
-
 /* waits for the child process to finish and display a dialog on error
  * It also display a progress dialog for the user to know something is
  * happening.
