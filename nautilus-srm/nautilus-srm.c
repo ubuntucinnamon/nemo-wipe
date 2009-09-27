@@ -443,7 +443,7 @@ static gboolean
 wait_srm_child (gpointer data)
 {
   SrmChildInfo *child_info = data;
-  gboolean finished = FALSE;
+  gboolean finished = TRUE;
   gboolean success  = FALSE;
   int      exit_status;
   pid_t    wait_rv;
@@ -460,8 +460,8 @@ wait_srm_child (gpointer data)
   } else if (G_LIKELY (wait_rv == 0)) {
     /* nothing to do, just wait until next call */
     gtk_progress_bar_pulse (child_info->progress_dialog->progress_bar);
+    finished = FALSE;
   } else {
-    finished = TRUE;
     if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0) {
       success = TRUE;
       g_message ("Subprocess succeed.");
