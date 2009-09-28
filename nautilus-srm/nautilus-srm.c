@@ -320,6 +320,18 @@ typedef struct _ProgressDialog {
   GtkProgressBar *progress_bar;
 } ProgressDialog;
 
+static void
+progress_dialog_set_fraction (ProgressDialog *dialog,
+                              gdouble         fraction)
+{
+  gchar *text;
+  
+  gtk_progress_bar_set_fraction (dialog->progress_bar, fraction);
+  text = g_strdup_printf ("%.0f%%", fraction * 100);
+  gtk_progress_bar_set_text (dialog->progress_bar, text);
+  g_free (text);
+}
+
 static ProgressDialog *
 build_progress_dialog (const gchar *title,
                        GtkWindow   *parent,
@@ -343,7 +355,7 @@ build_progress_dialog (const gchar *title,
   gtk_container_set_border_width (GTK_CONTAINER (dialog->window), 10);
   
   dialog->progress_bar = GTK_PROGRESS_BAR (gtk_progress_bar_new ());
-  gtk_progress_bar_set_pulse_step (dialog->progress_bar, 0.1);
+  progress_dialog_set_fraction (dialog, 0.0);
   
   va_start (ap, format);
   text = g_strdup_vprintf (format, ap);
@@ -424,6 +436,85 @@ readstrdup (int     fd,
   return buf;
 }
 
+/* fd_read_is_ready:
+ * @fd: a file descriptor
+ * @error: return location for an error string on error, or NULL to ignore
+ *         errors.
+ * 
+ * Gets whether a file descriptor is ready to be read or not. Ready means that
+ * rading data from it would not be blocking, as there is data to be read.
+ * 
+ * Returns: %TRUE if the file is read, %FALSE otherwise.
+ */
+static gboolean
+fd_read_is_ready (int           fd,
+                  const gchar **error)
+{
+  gboolean ready = FALSE;
+  
+  if (G_LIKELY (fd > 0)) {
+    fd_set          rfds;
+    struct timeval  tv = {0, 0};
+    
+    FD_ZERO (&rfds);
+    FD_SET (fd, &rfds);
+    switch (select (fd + 1, &rfds, NULL, NULL, &tv)) {
+      case -1:
+        if (error) {
+          *error = g_strerror (errno);
+        }
+        break;
+      
+      case 0:
+        break;
+      
+      default:
+        ready = TRUE;
+    }
+  }
+  
+  return ready;
+}
+
+/* get_srm_progress:
+ * 
+ * @fd: The SRM child standard output file descriptor.
+ * @error: return location for an error string, or NULL to ignore errors.
+ * 
+ * Reads the SRM output if data present, and report the progress since last
+ * call in the SRM instance units (may be 38, or less depending on the options
+ * passed to SRM).
+ * 
+ * Returns: the progress step since the last call.
+ */
+static gsize
+get_srm_progress (int           fd,
+                  const gchar **error)
+{
+  gsize progress = 0;
+  
+  if (G_UNLIKELY (fd_read_is_ready (fd, error))) {
+    gchar buf[16];
+    int   read_rv;
+    
+    do {
+      read_rv = read (fd, buf, 16);
+      if (read_rv < 0) {
+        if (error) *error = g_strerror (errno);
+      } else {
+        gsize i;
+        
+        for (i = 0; i < read_rv; i++) {
+          if (buf[i] == '*')
+            progress ++;
+        }
+      }
+    } while (read_rv == 16);
+  }
+  
+  return progress;
+}
+
 typedef struct _SrmChildInfo {
   gchar **argv; /* just to be able to free it */
   gint    fd_out;
@@ -432,6 +523,9 @@ typedef struct _SrmChildInfo {
   
   ProgressDialog *progress_dialog;
   GtkWindow *parent_window;
+  
+  gsize   n_passes;
+  gsize   pass;
 } SrmChildInfo;
 
 /* waits for the child process to finish and display a dialog on error
@@ -459,11 +553,28 @@ wait_srm_child (gpointer data)
     }
   } else if (G_LIKELY (wait_rv == 0)) {
     /* nothing to do, just wait until next call */
-    gtk_progress_bar_pulse (child_info->progress_dialog->progress_bar);
+    /*gtk_progress_bar_pulse (child_info->progress_dialog->progress_bar);*/
+    gsize         progress;
+    const gchar  *error = NULL;
+    
+    progress = get_srm_progress (child_info->fd_out, &error);
+    if (error) {
+      g_warning ("%s", error);
+    }
+    if (progress > 0) {
+      double fraction;
+      
+      child_info->pass += progress;
+      fraction = child_info->pass / (child_info->n_passes * 1.0);
+      g_message ("progress is now %zu of %zu (%.0f%%).",
+                 child_info->pass, child_info->n_passes, fraction * 100);
+      progress_dialog_set_fraction (child_info->progress_dialog, fraction);
+    }
     finished = FALSE;
   } else {
     if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0) {
       success = TRUE;
+      progress_dialog_set_fraction (child_info->progress_dialog, 1.0);
       g_message ("Subprocess succeed.");
     } else {
       g_message ("Subprocess failed.");
@@ -513,10 +624,11 @@ do_srm (GList      *files,
   gchar   **argv;
   int       i = 0;
   gboolean  success = TRUE;
+  gsize     n_files = 0;
   
   argv = g_new0 (gchar *, g_list_length (files) + 1 + 1 /* number of args */ + 1);
   argv[i++] = g_strdup ("srm");
-  argv[i++] = g_strdup ("-r");
+  argv[i++] = g_strdup ("-vr");
   
   for (file = files; success && file != NULL; file = g_list_next (file))
   {
@@ -534,6 +646,7 @@ do_srm (GList      *files,
       
       g_free (escaped_uri);
       g_free (uri);
+      n_files ++;
     } else {
       g_set_error (error, NAUTILUS_SRM_ERROR, NAUTILUS_SRM_ERROR_UNSUPPORTED_LOCATION,
                    _("Unsupported location type: %s"), scheme);
@@ -553,6 +666,11 @@ do_srm (GList      *files,
     child_info->fd_out = -1;
     child_info->fd_err = -1;
     child_info->parent_window = g_object_ref (parent_window);
+    /* FIXME: 38 is the standard SRM pass number, but may change with options
+     * like -l. If we support it one day, we need to fix this value (by getting
+     * the one SRM reports) in order to get a meaningful progress information */
+    child_info->n_passes = 38 * n_files;
+    child_info->pass = 0;
     
     if (! g_spawn_async_with_pipes (NULL, argv, NULL,
                                     G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
