@@ -29,10 +29,7 @@
 #include <glib/gi18n-lib.h>
 #include <gtk/gtk.h>
 
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <errno.h>
+#include <gsecuredelete/gsecuredelete.h>
 
 /* if GLib doesn't provide g_dngettext(), wrap it from dngettext() */
 #if (! GLIB_CHECK_VERSION (2, 18, 0) && ! defined (g_dngettext))
@@ -381,238 +378,82 @@ destroy_progress_dialog (ProgressDialog *dialog)
 }
 
 
-/* readstrdup:
- * 
- * @fd: a file descriptor
- * @n_bytes: number of bytes to read from @fd, or -1 to read all @fd
- * 
- * Reads content of a file as a C string (0-terminated).
- * 
- * Returns: a newly allocated string containing data in @fd that should be freed
- *          when no longer needed using g_free().
- */
-static gchar *
-readstrdup (int     fd,
-            gssize  n_bytes)
-{
-  gchar *buf = NULL;
-  
-  if (n_bytes > 0) {
-    gssize n_read;
-    
-    buf = g_malloc (n_bytes + 1);
-    n_read = read (fd, buf, n_bytes);
-    if (n_read < 0) {
-      g_free (buf), buf = NULL;
-    } else {
-      buf[n_read] = 0;
-    }
-  } else {
-    static const gsize packet_size = 64;
-    gsize              n_read = 0;
-    gssize read_rv;
-    
-    n_bytes = 0;
-    do {
-      buf = g_realloc (buf, n_bytes + packet_size + 1);
-      
-      read_rv = read (fd, &buf[n_bytes], packet_size);
-      if (read_rv >= 0) {
-        n_read += read_rv;
-      }
-      
-      n_bytes += packet_size;
-    } while (n_bytes > 0 /* don't underflow */ &&
-             read_rv >= 0 &&
-             read_rv == packet_size);
-    
-    if (read_rv < 0) {
-      g_free (buf), buf = NULL;
-    } else {
-      buf[n_read] = 0;
-    }
-  }
-  
-  return buf;
-}
-
-/* fd_read_is_ready:
- * @fd: a file descriptor
- * @error: return location for an error string on error, or NULL to ignore
- *         errors.
- * 
- * Gets whether a file descriptor is ready to be read or not. Ready means that
- * rading data from it would not be blocking, as there is data to be read.
- * 
- * Returns: %TRUE if the file is read, %FALSE otherwise.
- */
-static gboolean
-fd_read_is_ready (int           fd,
-                  const gchar **error)
-{
-  gboolean ready = FALSE;
-  
-  if (G_LIKELY (fd > 0)) {
-    fd_set          rfds;
-    struct timeval  tv = {0, 0};
-    
-    FD_ZERO (&rfds);
-    FD_SET (fd, &rfds);
-    switch (select (fd + 1, &rfds, NULL, NULL, &tv)) {
-      case -1:
-        if (error) {
-          *error = g_strerror (errno);
-        }
-        break;
-      
-      case 0:
-        break;
-      
-      default:
-        ready = TRUE;
-    }
-  }
-  
-  return ready;
-}
-
-/* get_srm_progress:
- * 
- * @fd: The SRM child standard output file descriptor.
- * @error: return location for an error string, or NULL to ignore errors.
- * 
- * Reads the SRM output if data present, and report the progress since last
- * call in the SRM instance units (may be 38, or less depending on the options
- * passed to SRM).
- * 
- * Returns: the progress step since the last call.
- */
-static gsize
-get_srm_progress (int           fd,
-                  const gchar **error)
-{
-  gsize progress = 0;
-  
-  if (G_UNLIKELY (fd_read_is_ready (fd, error))) {
-    gchar buf[16];
-    int   read_rv;
-    
-    do {
-      read_rv = read (fd, buf, 16);
-      if (read_rv < 0) {
-        if (error) *error = g_strerror (errno);
-      } else {
-        gsize i;
-        
-        for (i = 0; i < read_rv; i++) {
-          if (buf[i] == '*')
-            progress ++;
-        }
-      }
-    } while (read_rv == 16);
-  }
-  
-  return progress;
-}
-
-typedef struct _SrmChildInfo {
-  gchar **argv; /* just to be able to free it */
-  gint    fd_out;
-  gint    fd_err;
-  GPid    pid;
-  
+typedef struct _SrmCbData {
   ProgressDialog *progress_dialog;
-  GtkWindow *parent_window;
-  
-  gsize   n_passes;
-  gsize   pass;
-} SrmChildInfo;
+  GtkWindow      *parent_window;
+} SrmCbData;
 
-/* waits for the child process to finish and display a dialog on error
- * It also display a progress dialog for the user to know something is
- * happening.
- * 
- * This function is designed to be used as a GSourceFunc function. */
-static gboolean
-wait_srm_child (gpointer data)
+/* callback for progress notification */
+static void
+operation_progress (SecureDeleteDeleteOperation  *operation,
+                    gdouble                       progress,
+                    SrmCbData                    *cbdata)
 {
-  SrmChildInfo *child_info = data;
-  gboolean finished = TRUE;
-  gboolean success  = FALSE;
-  int      exit_status;
-  pid_t    wait_rv;
-  
-  wait_rv = waitpid (child_info->pid, &exit_status, WNOHANG);
-  if (G_UNLIKELY (wait_rv < 0)) {
-    g_warning ("waitpid() failed: %s", g_strerror (errno));
-    /* if we cannot watch the child, try to kill it */
-    if (kill (child_info->pid, 15) < 0) {
-      g_warning ("kill() failed: %s", g_strerror (errno));
-    } else {
-      g_message ("Subprocess killed.");
-    }
-  } else if (G_LIKELY (wait_rv == 0)) {
-    /* nothing to do, just wait until next call */
-    /*gtk_progress_bar_pulse (child_info->progress_dialog->progress_bar);*/
-    gsize         progress;
-    const gchar  *error = NULL;
+  /*g_message ("progress is now %.0f%%.", progress * 100);*/
+  progress_dialog_set_fraction (cbdata->progress_dialog, progress);
+}
+
+/* callback for the finished signal */
+static void
+operation_finished (SecureDeleteDeleteOperation  *operation,
+                    gboolean                      success,
+                    const gchar                  *error_message,
+                    SrmCbData                    *cbdata)
+{
+  destroy_progress_dialog (cbdata->progress_dialog);
+  if (! success) {
+    GtkWidget *dialog;
+    gchar     *error_output = NULL;
     
-    progress = get_srm_progress (child_info->fd_out, &error);
-    if (error) {
-      g_warning ("%s", error);
-    }
-    if (progress > 0) {
-      double fraction;
+    dialog = gtk_message_dialog_new (cbdata->parent_window, 
+                                     GTK_DIALOG_MODAL,
+                                     GTK_MESSAGE_ERROR,
+                                     GTK_BUTTONS_CLOSE,
+                                     _("Suppression failed"));
+    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                              "%s", error_message);
+    gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+  }
+  /* cleanup */
+  g_object_unref (cbdata->parent_window);
+  g_free (cbdata);
+}
+
+/* Adds the file_infos to the operation. Fails if not supported. */
+static gboolean
+add_nautilus_file_infos (SecureDeleteDeleteOperation *operation,
+                         GList                       *file_infos,
+                         GError                     **error)
+{
+  gboolean  success = TRUE;
+  GList    *info;
+  
+  for (info = file_infos; success && info != NULL; info = g_list_next (info))
+  {
+    gchar *scheme;
+    
+    scheme = nautilus_file_info_get_uri_scheme (info->data);
+    if (strcmp (scheme, "file") == 0) {
+      gchar *escaped_uri;
+      gchar *uri;
       
-      child_info->pass += progress;
-      fraction = child_info->pass / (child_info->n_passes * 1.0);
-      g_message ("progress is now %zu of %zu (%.0f%%).",
-                 child_info->pass, child_info->n_passes, fraction * 100);
-      progress_dialog_set_fraction (child_info->progress_dialog, fraction);
-    }
-    finished = FALSE;
-  } else {
-    if (WIFEXITED (exit_status) && WEXITSTATUS (exit_status) == 0) {
-      success = TRUE;
-      progress_dialog_set_fraction (child_info->progress_dialog, 1.0);
-      g_message ("Subprocess succeed.");
+      uri = nautilus_file_info_get_uri (info->data);
+      escaped_uri = g_uri_unescape_string (uri, NULL);
+      /* strlen (file://) = 7 */
+      secure_delete_delete_operation_add_path (operation, &escaped_uri[7]);
+      
+      g_free (escaped_uri);
+      g_free (uri);
     } else {
-      g_message ("Subprocess failed.");
+      g_set_error (error, NAUTILUS_SRM_ERROR, NAUTILUS_SRM_ERROR_UNSUPPORTED_LOCATION,
+                   _("Unsupported location type: %s"), scheme);
+      success = FALSE;
     }
+    g_free (scheme);
   }
   
-  if (G_UNLIKELY (finished)) {
-    destroy_progress_dialog (child_info->progress_dialog);
-    
-    if (! success) {
-      GtkWidget *dialog;
-      gchar     *error_output = NULL;
-      
-      error_output = readstrdup (child_info->fd_err, -1);
-      
-      dialog = gtk_message_dialog_new (child_info->parent_window, 
-                                       GTK_DIALOG_MODAL,
-                                       GTK_MESSAGE_ERROR,
-                                       GTK_BUTTONS_CLOSE,
-                                       _("Suppression failed"));
-      gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                                                "%s", error_output);
-      gtk_dialog_run (GTK_DIALOG (dialog));
-      gtk_widget_destroy (dialog);
-      
-      g_free (error_output);
-    }
-    
-    /* cleanup */
-    g_spawn_close_pid (child_info->pid);
-    close (child_info->fd_err);
-    close (child_info->fd_out);
-    g_strfreev (child_info->argv);
-    g_object_unref (child_info->parent_window);
-    g_free (child_info);
-  }
-  
-  return ! finished;
+  return success;
 }
 
 static gboolean
@@ -621,88 +462,45 @@ do_srm (GList      *files,
         GError    **error)
 {
   GList    *file;
-  gchar   **argv;
   int       i = 0;
   gboolean  success = TRUE;
-  gsize     n_files = 0;
+  SecureDeleteDeleteOperation *operation;
   
-  argv = g_new0 (gchar *, g_list_length (files) + 1 + 1 /* number of args */ + 1);
-  argv[i++] = g_strdup ("srm");
-  argv[i++] = g_strdup ("-vr");
-  
-  for (file = files; success && file != NULL; file = g_list_next (file))
-  {
-    gchar *scheme;
-    
-    scheme = nautilus_file_info_get_uri_scheme (file->data);
-    if (strcmp (scheme, "file") == 0) {
-      gchar *escaped_uri;
-      gchar *uri;
-      
-      uri = nautilus_file_info_get_uri (file->data);
-      escaped_uri = g_uri_unescape_string (uri, NULL);
-      /* strlen (file://) = 7 */
-      argv[i++] = g_strdup (&escaped_uri[7]);
-      
-      g_free (escaped_uri);
-      g_free (uri);
-      n_files ++;
-    } else {
-      g_set_error (error, NAUTILUS_SRM_ERROR, NAUTILUS_SRM_ERROR_UNSUPPORTED_LOCATION,
-                   _("Unsupported location type: %s"), scheme);
-      success = FALSE;
-    }
-    g_free (scheme);
-  }
-  argv[i] = NULL;
-  
+  operation = secure_delete_delete_operation_new ();
+  success = add_nautilus_file_infos (operation, files, error);
   if (success) {
     GError *err = NULL;
-    SrmChildInfo *child_info;
+    SrmCbData *cbdata;
     
-    child_info = g_new0 (SrmChildInfo, 1);
-    child_info->argv = argv; /* we let the child free its args as the GLib
-                              * doesn't seems to manage or free it */
-    child_info->fd_out = -1;
-    child_info->fd_err = -1;
-    child_info->parent_window = g_object_ref (parent_window);
-    /* FIXME: 38 is the standard SRM pass number, but may change with options
-     * like -l. If we support it one day, we need to fix this value (by getting
-     * the one SRM reports) in order to get a meaningful progress information */
-    child_info->n_passes = 38 * n_files;
-    child_info->pass = 0;
+    cbdata = g_new0 (SrmCbData, 1);
+    cbdata->parent_window = g_object_ref (parent_window);
+    cbdata->progress_dialog = build_progress_dialog (_("Progress"),
+                                                     parent_window,
+                                                     _("Removing files..."));
+    gtk_widget_show (GTK_WIDGET (cbdata->progress_dialog->window));
     
-    if (! g_spawn_async_with_pipes (NULL, argv, NULL,
-                                    G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
-                                    NULL, NULL,
-                                    &child_info->pid,
-                                    NULL,
-                                    &child_info->fd_out, &child_info->fd_err,
-                                    &err)) {
+    g_signal_connect (operation, "finished", operation_finished, cbdata);
+    g_signal_connect (operation, "progress", operation_progress, cbdata);
+    
+    if (! secure_delete_secure_delete_operation_run (
+            SECURE_DELETE_SECURE_DELETE_OPERATION (operation),
+            100,
+            &err)) {
       g_set_error (error, NAUTILUS_SRM_ERROR, NAUTILUS_SRM_ERROR_SPAWN_FAILED,
                    _("Failed to spawn subprocess: %s"),
                    err->message);
       g_error_free (err);
       success = FALSE;
-    } else {
+    } /*else {
       g_message ("Suppressing...");
-      
-      child_info->progress_dialog = build_progress_dialog (_("Progress"), parent_window, _("Removing files..."));
-      gtk_widget_show (GTK_WIDGET (child_info->progress_dialog->window));
-      /* add timeout function */
-      g_timeout_add (100, wait_srm_child, child_info);
-    }
+    }*/
     
     if (! success) {
-      g_free (child_info);
+      destroy_progress_dialog (cbdata->progress_dialog);
+      g_object_unref (cbdata->parent_window);
+      g_free (cbdata);
     }
   }
-  
-  if (! success) {
-    g_strfreev (argv);
-  }
-  
-  g_message ("end of caller");
   
   return success;
 }

@@ -5,4 +5,4 @@ nautilus_extension_LTLIBRARIES = libnautilus-srm.la
 libnautilus_srm_la_SOURCES = nautilus-srm.c \
                              nautilus-srm.h
 
-libnautilus_srm_la_LDFLAGS = -module -avoid-version
+libnautilus_srm_la_LDFLAGS = $(AM_LIBS) -module -avoid-version
