@@ -385,7 +385,7 @@ typedef struct _SrmCbData {
 
 /* callback for progress notification */
 static void
-operation_progress (SecureDeleteDeleteOperation  *operation,
+operation_progress (GsdDeleteOperation  *operation,
                     gdouble                       progress,
                     SrmCbData                    *cbdata)
 {
@@ -395,10 +395,10 @@ operation_progress (SecureDeleteDeleteOperation  *operation,
 
 /* callback for the finished signal */
 static void
-operation_finished (SecureDeleteDeleteOperation  *operation,
-                    gboolean                      success,
-                    const gchar                  *error_message,
-                    SrmCbData                    *cbdata)
+operation_finished (GsdDeleteOperation *operation,
+                    gboolean            success,
+                    const gchar        *error_message,
+                    SrmCbData          *cbdata)
 {
   destroy_progress_dialog (cbdata->progress_dialog);
   if (! success) {
@@ -422,9 +422,9 @@ operation_finished (SecureDeleteDeleteOperation  *operation,
 
 /* Adds the file_infos to the operation. Fails if not supported. */
 static gboolean
-add_nautilus_file_infos (SecureDeleteDeleteOperation *operation,
-                         GList                       *file_infos,
-                         GError                     **error)
+add_nautilus_file_infos (GsdDeleteOperation  *operation,
+                         GList               *file_infos,
+                         GError             **error)
 {
   gboolean  success = TRUE;
   GList    *info;
@@ -441,7 +441,7 @@ add_nautilus_file_infos (SecureDeleteDeleteOperation *operation,
       uri = nautilus_file_info_get_uri (info->data);
       escaped_uri = g_uri_unescape_string (uri, NULL);
       /* strlen (file://) = 7 */
-      secure_delete_delete_operation_add_path (operation, &escaped_uri[7]);
+      gsd_delete_operation_add_path (operation, &escaped_uri[7]);
       
       g_free (escaped_uri);
       g_free (uri);
@@ -464,9 +464,9 @@ do_srm (GList      *files,
   GList    *file;
   int       i = 0;
   gboolean  success = TRUE;
-  SecureDeleteDeleteOperation *operation;
+  GsdDeleteOperation *operation;
   
-  operation = secure_delete_delete_operation_new ();
+  operation = gsd_delete_operation_new ();
   success = add_nautilus_file_infos (operation, files, error);
   if (success) {
     GError *err = NULL;
@@ -482,10 +482,8 @@ do_srm (GList      *files,
     g_signal_connect (operation, "finished", operation_finished, cbdata);
     g_signal_connect (operation, "progress", operation_progress, cbdata);
     
-    if (! secure_delete_secure_delete_operation_run (
-            SECURE_DELETE_SECURE_DELETE_OPERATION (operation),
-            100,
-            &err)) {
+    if (! gsd_secure_delete_operation_run (GSD_SECURE_DELETE_OPERATION (operation),
+                                           100, &err)) {
       g_set_error (error, NAUTILUS_SRM_ERROR, NAUTILUS_SRM_ERROR_SPAWN_FAILED,
                    _("Failed to spawn subprocess: %s"),
                    err->message);
