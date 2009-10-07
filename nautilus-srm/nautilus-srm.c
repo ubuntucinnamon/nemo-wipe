@@ -418,6 +418,7 @@ operation_finished (GsdDeleteOperation *operation,
   /* cleanup */
   g_object_unref (cbdata->parent_window);
   g_free (cbdata);
+  g_object_unref (G_OBJECT (operation));
 }
 
 /* Adds the file_infos to the operation. Fails if not supported. */
@@ -497,6 +498,7 @@ do_srm (GList      *files,
       destroy_progress_dialog (cbdata->progress_dialog);
       g_object_unref (cbdata->parent_window);
       g_free (cbdata);
+      g_object_unref (operation);
     }
   }
   
