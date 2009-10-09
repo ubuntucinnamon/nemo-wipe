@@ -1,4 +1,3 @@
-* Have a true progress bar showing the current deletion status
 * Better progress dialog, perhaps as a derivated widget allowing:
    * Setting the current progress status;
    * Setting the current status message;
