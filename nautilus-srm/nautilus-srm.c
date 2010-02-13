@@ -324,8 +324,39 @@ nautilus_srm_get_background_items (NautilusMenuProvider *provider,
   return items;
 }
 
-static gboolean
-ask_user_for_deletion (NautilusSrm *srm)
+static void
+confirm_dialog_response_cb (GtkDialog  *dialog,
+                            gint        response,
+                            gpointer    data)
+{
+  NautilusSrm *srm = NAUTILUS_SRM (data);
+  
+  gtk_widget_destroy (GTK_WIDGET (dialog));
+  if (response == GTK_RESPONSE_YES) {
+    NautilusSrmPrivate *priv = GET_PRIVATE (srm);
+    GtkWidget          *dialog;
+    GError             *err = NULL;
+    
+    if (! do_srm (priv->files, priv->parent_window, &err)) {
+      dialog = gtk_message_dialog_new (priv->parent_window,
+                                       GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                       GTK_MESSAGE_ERROR,
+                                       GTK_BUTTONS_CLOSE,
+                                       g_dngettext (NULL, "Failed to delete file",
+                                                          "Failed to delete some files",
+                                                          g_list_length (priv->files)));
+      gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                                "%s", err->message);
+      g_signal_connect (dialog, "response", G_CALLBACK (gtk_widget_destroy), NULL);
+      gtk_widget_show (dialog);
+      g_error_free (err);
+    }
+  }
+}
+
+static void
+menu_activate_cb (NautilusMenuItem *menu,
+                  NautilusSrm      *srm)
 {
   NautilusSrmPrivate *priv = GET_PRIVATE (srm);
   GtkWidget          *dialog;
@@ -363,40 +394,11 @@ ask_user_for_deletion (NautilusSrm *srm)
                           GTK_STOCK_CANCEL, GTK_RESPONSE_NO,
                           GTK_STOCK_DELETE, GTK_RESPONSE_YES,
                           NULL);
-  /* Ask the user */
-  user_response = gtk_dialog_run (GTK_DIALOG (dialog));
-  /* Finally destroy everything */
-  gtk_widget_destroy (dialog);
+  /* Ask the user (asynchronously) */
+  g_signal_connect (dialog, "response", G_CALLBACK (confirm_dialog_response_cb), srm);
+  gtk_widget_show (GTK_WIDGET (dialog));
+  /* Cleanup */
   g_free (files_names_str);
-  
-  return user_response == GTK_RESPONSE_YES;
-}
-
-static void
-menu_activate_cb (NautilusMenuItem *menu,
-                  NautilusSrm      *srm)
-{
-  if (ask_user_for_deletion (srm)) {
-    NautilusSrmPrivate *priv = GET_PRIVATE (srm);
-    GtkWidget          *dialog;
-    GError             *err = NULL;
-    
-    if (! do_srm (priv->files, priv->parent_window, &err)) {
-      dialog = gtk_message_dialog_new (priv->parent_window, 
-                                       GTK_DIALOG_MODAL,
-                                       GTK_MESSAGE_ERROR,
-                                       GTK_BUTTONS_CLOSE,
-                                       g_dngettext (NULL, "Failed to delete file",
-                                                          "Failed to delete some files",
-                                                          g_list_length (priv->files)));
-      gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                                                "%s", err->message);
-      gtk_dialog_run (GTK_DIALOG (dialog));
-      gtk_widget_destroy (dialog);
-      
-      g_error_free (err);
-    }
-  }
 }
 
 
@@ -499,17 +501,16 @@ operation_finished (GsdDeleteOperation *operation,
   destroy_progress_dialog (cbdata->progress_dialog);
   if (! success) {
     GtkWidget *dialog;
-    gchar     *error_output = NULL;
     
     dialog = gtk_message_dialog_new (cbdata->parent_window, 
-                                     GTK_DIALOG_MODAL,
+                                     GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
                                      GTK_MESSAGE_ERROR,
                                      GTK_BUTTONS_CLOSE,
                                      _("Deletion failed"));
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                               "%s", error_message);
-    gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
+    g_signal_connect (dialog, "response", G_CALLBACK (gtk_widget_destroy), NULL);
+    gtk_widget_show (dialog);
   }
   /* cleanup */
   g_object_unref (cbdata->parent_window);
