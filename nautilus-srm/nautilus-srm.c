@@ -324,60 +324,71 @@ nautilus_srm_get_background_items (NautilusMenuProvider *provider,
   return items;
 }
 
-static void
-menu_srm_cb (NautilusMenuItem *menu,
-             NautilusSrm      *srm)
+static gboolean
+ask_user_for_deletion (NautilusSrm *srm)
 {
   NautilusSrmPrivate *priv = GET_PRIVATE (srm);
-  GtkWidget *dialog;
-  GList *list_item;
-  GString *files_names = g_string_new ("");
-  gchar *files_names_str;
-  int user_response;
-  gint n_files = 0;
-    
-  for (list_item = priv->files; list_item != NULL; list_item = g_list_next (list_item))
-  {
+  GtkWidget          *dialog;
+  GList              *list_item;
+  GString            *files_names = g_string_new ("");
+  gchar              *files_names_str;
+  gint                user_response;
+  guint               n_files = 0;
+  
+  /* Build a string holding the list of files to delete */
+  for (list_item = priv->files; list_item != NULL; list_item = g_list_next (list_item)) {
     gchar *name;
     
     name = nautilus_file_info_get_name (list_item->data);
     g_string_append (files_names, name);
-    if (list_item->next != NULL)
-      g_string_append (files_names, ", ");
+    if (list_item->next != NULL) {
+      /* Translators: separators between filenames */
+      g_string_append (files_names, _(", "));
+    }
     g_free (name);
     n_files ++;
   }
   files_names_str = g_string_free (files_names, FALSE);
-  
+  /* Build the dialog */
   dialog = gtk_message_dialog_new (priv->parent_window, 
-                                   GTK_DIALOG_MODAL,
+                                   GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_WARNING,
                                    GTK_BUTTONS_NONE,
     g_dngettext(NULL, "Are you sure you want to securely and definitely delete the following file?",
                       "Are you sure you want to securely and definitely delete the following files?",
                       n_files));
   gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                                            "%s",
-                                            files_names_str);
+                                            "%s", files_names_str);
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
                           GTK_STOCK_CANCEL, GTK_RESPONSE_NO,
                           GTK_STOCK_DELETE, GTK_RESPONSE_YES,
                           NULL);
+  /* Ask the user */
   user_response = gtk_dialog_run (GTK_DIALOG (dialog));
+  /* Finally destroy everything */
   gtk_widget_destroy (dialog);
+  g_free (files_names_str);
   
-  if (user_response == GTK_RESPONSE_YES)
-  {
-    GError *err = NULL;
+  return user_response == GTK_RESPONSE_YES;
+}
+
+static void
+menu_activate_cb (NautilusMenuItem *menu,
+                  NautilusSrm      *srm)
+{
+  if (ask_user_for_deletion (srm)) {
+    NautilusSrmPrivate *priv = GET_PRIVATE (srm);
+    GtkWidget          *dialog;
+    GError             *err = NULL;
     
     if (! do_srm (priv->files, priv->parent_window, &err)) {
       dialog = gtk_message_dialog_new (priv->parent_window, 
                                        GTK_DIALOG_MODAL,
                                        GTK_MESSAGE_ERROR,
                                        GTK_BUTTONS_CLOSE,
-                                       g_dngettext(NULL, "Failed to delete file",
-                                                         "Failed to delete some files",
-                                                         n_files));
+                                       g_dngettext (NULL, "Failed to delete file",
+                                                          "Failed to delete some files",
+                                                          g_list_length (priv->files)));
       gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                                 "%s", err->message);
       gtk_dialog_run (GTK_DIALOG (dialog));
@@ -386,8 +397,6 @@ menu_srm_cb (NautilusMenuItem *menu,
       g_error_free (err);
     }
   }
-  
-  g_free (files_names_str);
 }
 
 
@@ -473,8 +482,8 @@ typedef struct _SrmCbData {
 /* callback for progress notification */
 static void
 operation_progress (GsdDeleteOperation  *operation,
-                    gdouble                       progress,
-                    SrmCbData                    *cbdata)
+                    gdouble              progress,
+                    SrmCbData           *cbdata)
 {
   /*g_message ("progress is now %.0f%%.", progress * 100);*/
   progress_dialog_set_fraction (cbdata->progress_dialog, progress);
@@ -517,8 +526,7 @@ add_nautilus_file_infos (GsdDeleteOperation  *operation,
   gboolean  success = TRUE;
   GList    *info;
   
-  for (info = file_infos; success && info != NULL; info = g_list_next (info))
-  {
+  for (info = file_infos; success && info != NULL; info = g_list_next (info)) {
     gchar *scheme;
     
     scheme = nautilus_file_info_get_uri_scheme (info->data);
@@ -567,8 +575,8 @@ do_srm (GList      *files,
                                                      _("Removing files..."));
     gtk_widget_show (GTK_WIDGET (cbdata->progress_dialog->window));
     
-    g_signal_connect (operation, "finished", operation_finished, cbdata);
-    g_signal_connect (operation, "progress", operation_progress, cbdata);
+    g_signal_connect (operation, "finished", G_CALLBACK (operation_finished), cbdata);
+    g_signal_connect (operation, "progress", G_CALLBACK (operation_progress), cbdata);
     
     if (! gsd_secure_delete_operation_run (GSD_SECURE_DELETE_OPERATION (operation),
                                            100, &err)) {
