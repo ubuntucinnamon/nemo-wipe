@@ -41,6 +41,7 @@
 struct _NautilusSrmPrivate {
   GtkWindow *parent_window;
   GList     *files;
+  GList     *folders;
 };
 typedef struct _NautilusSrmPrivate NautilusSrmPrivate;
 
@@ -105,30 +106,53 @@ static void
 nautilus_srm_menu_provider_iface_init (NautilusMenuProviderIface *iface)
 {
   iface->get_file_items = nautilus_srm_get_file_items;
+  iface->get_background_items = nautilus_srm_get_background_items;
 }
 
 /* re-sets ths private data. If new value is NULL, the value is only freed */
 static inline void
-nautilus_srm_reset_private (NautilusSrm *srm,
-                            GtkWindow   *window,
-                            GList       *files)
+nautilus_srm_set_window (NautilusSrm      *srm,
+                         GtkWindow        *window)
 {
   NautilusSrmPrivate *priv = GET_PRIVATE (srm);
   
-  /* unset */
   if (priv->parent_window) {
     /*g_object_unref (priv->parent_window);*/
     priv->parent_window = NULL;
   }
+  if (window) {
+    priv->parent_window = /*g_object_ref*/ (window);
+  }
+}
+
+/* re-sets ths private data. If new value is NULL, the value is only freed */
+static inline void
+nautilus_srm_set_files (NautilusSrm      *srm,
+                        GList            *files,)
+                            //NautilusFileInfo *folder)
+{
+  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
+
   if (priv->files) {
     nautilus_file_info_list_free (priv->files);
     priv->files = NULL;
   }
-  /* then set */
-  if (window) {
-    priv->parent_window = /*g_object_ref*/ (window);
-  }
   if (files) {
+    priv->files = nautilus_file_info_list_copy (files);
+  }
+}
+
+static inline void
+nautilus_srm_set_folders (NautilusSrm      *srm,
+                          GList            *folder)
+{
+  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
+
+  if (priv->folder) {
+    nautilus_file_info_list_free (priv->folder);
+    priv->folder = NULL;
+  }
+  if (folder) {
     priv->files = nautilus_file_info_list_copy (files);
   }
 }
@@ -146,7 +170,17 @@ nautilus_srm_instance_init (NautilusSrm *srm)
 static void 
 nautilus_srm_instance_finalize (GObject *object)
 {
-  nautilus_srm_reset_private (NAUTILUS_SRM (object), NULL, NULL);
+  NautilusSrmPrivate *priv = GET_PRIVATE (object);
+
+  /*if (priv->parent_window) {
+    g_object_unref (priv->parent_window);
+  }*/
+  if (priv->files) {
+    nautilus_file_info_list_free (priv->files);
+  }
+  if (priv->folder) {
+    g_object_unref (priv->folder);
+  }
   g_message ("Object [%p] finalized", object);
 }
 
@@ -213,41 +247,86 @@ nautilus_srm_register_type (GTypeModule *module)
 
 /*=== Actual extension ===*/
 
-static void     menu_activate_cb             (NautilusMenuItem  *menu,
+static void     menu_srm_cb                  (NautilusMenuItem  *menu,
+                                              NautilusSrm *srm);
+static void     menu_sfill_cb                (NautilusMenuItem  *menu,
                                               NautilusSrm *srm);
 static gboolean do_srm                       (GList      *files,
                                               GtkWindow  *parent_window,
                                               GError    **error);
 
+static NautilusMenuItem *
+nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
+                            GtkWidget            *window,
+                            GList                *files)
+{
+  NautilusMenuItem *item;
+  
+  item = nautilus_menu_item_new ("NautilusSrm::srm_item",
+                                 _("Definitely delete"),
+                                 g_dngettext (NULL, "Definitely delete the selected file",
+                                                    "Definitely delete the selected files",
+                                                    g_list_length (files)),
+                                 GTK_STOCK_DELETE);
+  
+  /* fill the object's private fields */
+  nautilus_srm_set_file (NAUTILUS_SRM (provider), files);
+  nautilus_srm_set_window (NAUTILUS_SRM (provider), GTK_WINDOW (window);
+  
+  g_signal_connect (item, "activate", G_CALLBACK (menu_srm_cb), provider);
+  
+  return item;
+}
+
+static NautilusMenuItem *
+nautilus_srm_menu_item_sfill (NautilusMenuProvider *provider,
+                             GtkWidget            *window,
+                             GList                *files)
+{
+  item = nautilus_menu_item_new ("NautilusSrm::sfill_item",
+                                 _("Override free space here"),
+                                 _("Wipe free space in the device containing this file"),
+                                 GTK_STOCK_DELETE);
+  
+  /* fill the object's private fields */
+  nautilus_srm_set_folder (NAUTILUS_SRM (provider), folder);
+  nautilus_srm_set_window (NAUTILUS_SRM (provider), GTK_WINDOW (window);
+  
+  g_signal_connect (item, "activate", G_CALLBACK (menu_sfill_cb), provider);
+  
+  return item;
+}
 
 static GList *
 nautilus_srm_get_file_items (NautilusMenuProvider *provider,
                              GtkWidget            *window,
                              GList                *files)
 {
-  NautilusMenuItem *item;
-  GList            *items = NULL;
-  
-  item = nautilus_menu_item_new ("NautilusSrm::srm_file_item",
-                                 _("Definitely delete"),
-                                 g_dngettext (NULL, "Definitely delete the selected file",
-                                                    "Definitely delete the selected files",
-                                                    g_list_length (files)),
-                                 GTK_STOCK_DELETE);
-  items = g_list_append (items, item);
-  
-  /* fill the object's private fields */
-  nautilus_srm_reset_private (NAUTILUS_SRM (provider),
-                              GTK_WINDOW (window), files);
-  
-  g_signal_connect (item, "activate", G_CALLBACK (menu_activate_cb), provider);
+  GList *items = NULL;
+  items = g_list_append (items, nautilus_srm_menu_item_srm (provider,
+                                                         window, files);
+  items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
+                                                         window, files);
   
   return items;
 }
 
+static GList *
+nautilus_srm_get_background_items (NautilusMenuProvider *provider,
+                                   GtkWidget            *window,
+                                   NautilusFileInfo     *current_folder)
+{
+  GList *items = NULL;
+  GList *files = g_list_append (NULL, current_folder);
+  
+  items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
+                                                         window, files);
+  return items;
+}
+
 static void
-menu_activate_cb (NautilusMenuItem *menu,
-                  NautilusSrm      *srm)
+menu_srm_cb (NautilusMenuItem *menu,
+             NautilusSrm      *srm)
 {
   NautilusSrmPrivate *priv = GET_PRIVATE (srm);
   GtkWidget *dialog;
@@ -309,6 +388,14 @@ menu_activate_cb (NautilusMenuItem *menu,
   }
   
   g_free (files_names_str);
+}
+
+
+static void
+menu_sfill_cb (NautilusMenuItem *menu,
+               NautilusSrm      *srm)
+{
+  g_message ("To be implemented");
 }
 
 
