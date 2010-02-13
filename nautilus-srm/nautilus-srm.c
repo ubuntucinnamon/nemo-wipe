@@ -263,9 +263,9 @@ nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
   NautilusMenuItem *item;
   
   item = nautilus_menu_item_new ("NautilusSrm::srm_item",
-                                 _("Definitely delete"),
-                                 g_dngettext (NULL, "Definitely delete the selected file",
-                                                    "Definitely delete the selected files",
+                                 _("Delete and override content"),
+                                 g_dngettext (NULL, "Delete the selected file and override its data",
+                                                    "Delete the selected files and override their data",
                                                     g_list_length (files)),
                                  GTK_STOCK_DELETE);
   
@@ -285,7 +285,7 @@ nautilus_srm_menu_item_sfill (NautilusMenuProvider *provider,
 {
   item = nautilus_menu_item_new ("NautilusSrm::sfill_item",
                                  _("Override free space here"),
-                                 _("Wipe free space in the device containing this file"),
+                                 _("Override free space in the device containing this file"),
                                  GTK_STOCK_DELETE);
   
   /* fill the object's private fields */
@@ -354,8 +354,8 @@ ask_user_for_deletion (NautilusSrm *srm)
                                    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_WARNING,
                                    GTK_BUTTONS_NONE,
-    g_dngettext(NULL, "Are you sure you want to securely and definitely delete the following file?",
-                      "Are you sure you want to securely and definitely delete the following files?",
+    g_dngettext(NULL, "Are you sure you want delete the following file and to override its content?",
+                      "Are you sure you want delete the following files and to override their content?",
                       n_files));
   gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                             "%s", files_names_str);
@@ -505,7 +505,7 @@ operation_finished (GsdDeleteOperation *operation,
                                      GTK_DIALOG_MODAL,
                                      GTK_MESSAGE_ERROR,
                                      GTK_BUTTONS_CLOSE,
-                                     _("Suppression failed"));
+                                     _("Deletion failed"));
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                               "%s", error_message);
     gtk_dialog_run (GTK_DIALOG (dialog));
@@ -572,7 +572,7 @@ do_srm (GList      *files,
     cbdata->parent_window = g_object_ref (parent_window);
     cbdata->progress_dialog = build_progress_dialog (_("Progress"),
                                                      parent_window,
-                                                     _("Removing files..."));
+                                                     _("Overwriting files..."));
     gtk_widget_show (GTK_WIDGET (cbdata->progress_dialog->window));
     
     g_signal_connect (operation, "finished", G_CALLBACK (operation_finished), cbdata);
@@ -586,7 +586,7 @@ do_srm (GList      *files,
       g_error_free (err);
       success = FALSE;
     } /*else {
-      g_message ("Suppressing...");
+      g_message ("Deleting...");
     }*/
     
     if (! success) {
