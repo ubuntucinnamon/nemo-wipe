@@ -1,7 +1,7 @@
 /*
  *  nautilus-srm - a nautilus extension to wipe file(s) with srm
  * 
- *  Copyright (C) 2009 Colomban Wendling <ban@herbesfolles.org>
+ *  Copyright (C) 2009-2010 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
