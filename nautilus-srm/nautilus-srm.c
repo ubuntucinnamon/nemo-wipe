@@ -334,9 +334,12 @@ nautilus_srm_get_background_items (NautilusMenuProvider *provider,
 }
 
 static void
-confirm_dialog_srm_cb (GtkDialog  *dialog,
-                            gint        response,
-                            gpointer    data)
+confirm_dialog_cb (GtkDialog  *dialog,
+                   gint        response,
+                   gpointer    data,
+                   gchar      *fail_message,
+                   GCallback   action,
+                   GList      *data)
 {
   NautilusSrm *srm = NAUTILUS_SRM (data);
   
@@ -346,21 +349,33 @@ confirm_dialog_srm_cb (GtkDialog  *dialog,
     GtkWidget          *dialog;
     GError             *err = NULL;
     
-    if (! do_srm (priv->files, priv->parent_window, &err)) {
+    if (! action (data, priv->parent_window, &err)) {
       dialog = gtk_message_dialog_new (priv->parent_window,
                                        GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
                                        GTK_MESSAGE_ERROR,
                                        GTK_BUTTONS_CLOSE,
-                                       g_dngettext (NULL, "Failed to delete file",
-                                                          "Failed to delete some files",
-                                                          g_list_length (priv->files)));
+                                       fail_message);
       gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                                 "%s", err->message);
-      g_signal_connect (dialog, "response", G_CALLBACK (gtk_widget_destroy), NULL);
+      g_signal_connect (dialog, "response",
+                        G_CALLBACK (gtk_widget_destroy), NULL);
       gtk_widget_show (dialog);
       g_error_free (err);
     }
   }
+}
+
+static void
+confirm_dialog_srm_cb (GtkDialog  *dialog,
+                            gint        response,
+                            gpointer    data)
+{
+  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
+  confirm_dialog_cb (dialog, response, data, 
+                     g_dngettext (NULL, "Failed to delete file",
+                                  "Failed to delete some files",
+                                  g_list_length (priv->files)),
+                     priv->files)
 }
 
 static gchar*
@@ -536,32 +551,13 @@ get_devices_to_sfill (GList* files)
 
 static void
 confirm_dialog_sfill_cb (GtkDialog  *dialog,
-                            gint        response,
-                            gpointer    data)
+                         gint        response,
+                         gpointer    data)
 {
-  NautilusSrm *srm = NAUTILUS_SRM (data);
-  
-  gtk_widget_destroy (GTK_WIDGET (dialog));
-  if (response == GTK_RESPONSE_YES) {
-    NautilusSrmPrivate *priv = GET_PRIVATE (srm);
-    GtkWidget          *dialog;
-    GError             *err = NULL;
-    
-    if (! do_sfill (get_devices_to_sfill (priv->folders),
-                    priv->parent_window,
-                    &err)) {
-      dialog = gtk_message_dialog_new (priv->parent_window,
-                                       GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                       GTK_MESSAGE_ERROR,
-                                       GTK_BUTTONS_CLOSE,
-                                       _("Failed to override free space"));
-      gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                                                "%s", err->message);
-      g_signal_connect (dialog, "response", G_CALLBACK (gtk_widget_destroy), NULL);
-      gtk_widget_show (dialog);
-      g_error_free (err);
-    }
-  }
+  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
+  confirm_dialog_cb (dialog, response, data, 
+                     _("Failed to override free space"),
+                     get_devices_to_sfill (priv->folders))
 }
 
 static void
