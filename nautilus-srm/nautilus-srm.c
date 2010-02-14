@@ -403,8 +403,10 @@ file_list_to_string (GList *files_list)
 }
 
 static void
-menu_srm_cb (NautilusMenuItem *menu,
-             NautilusSrm      *srm)
+menu_gsd_cb (NautilusMenuItem *menu,
+             NautilusSrm      *srm,
+             gchar            *confirmation_message,
+             GCallback        *confirm_dialog_cb)
 {
   NautilusSrmPrivate *priv = GET_PRIVATE (srm);
   GtkWidget          *dialog;
@@ -419,9 +421,7 @@ menu_srm_cb (NautilusMenuItem *menu,
                                    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_WARNING,
                                    GTK_BUTTONS_NONE,
-    g_dngettext(NULL, "Are you sure you want delete the following file and to override its content?",
-                      "Are you sure you want delete the following files and to override their content?",
-                      g_list_length(priv->files)));
+                                   confirmation_message);
   gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                             "%s", files_names_str);
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
@@ -429,10 +429,22 @@ menu_srm_cb (NautilusMenuItem *menu,
                           GTK_STOCK_DELETE, GTK_RESPONSE_YES,
                           NULL);
   /* Ask the user (asynchronously) */
-  g_signal_connect (dialog, "response", G_CALLBACK (confirm_dialog_srm_cb), srm);
+  g_signal_connect (dialog, "response", G_CALLBACK (confirm_dialog_cb), srm);
   gtk_widget_show (GTK_WIDGET (dialog));
   /* Cleanup */
   g_free (files_names_str);
+}
+
+
+static void
+menu_srm_cb (NautilusMenuItem *menu,
+             NautilusSrm      *srm)
+{
+  menu_gsd_cb (menu, srm, 
+    g_dngettext(NULL, "Are you sure you want delete the following file and to override its content?",
+                      "Are you sure you want delete the following files and to override their content?",
+                      g_list_length(priv->files)),
+    G_CALLBACK (confirm_dialog_srm_cb),);
 }
 
 
@@ -564,6 +576,12 @@ static void
 menu_sfill_cb (NautilusMenuItem *menu,
                NautilusSrm      *srm)
 {
+  menu_gsd_cb (menu, srm, 
+               _("Are you sure you want to override "
+                 "free space on the device(s) containing "
+                 "the following files?"),
+               G_CALLBACK (confirm_dialog_sfill_cb));
+
   NautilusSrmPrivate *priv = GET_PRIVATE (srm);
   GList* devices_to_fill;
   gchar* files_names_str;
@@ -576,9 +594,7 @@ menu_sfill_cb (NautilusMenuItem *menu,
                                    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_WARNING,
                                    GTK_BUTTONS_NONE,
-                                   _("Are you sure you want to override "
-                                   "free space on the device(s) containing "
-                                   "the following files?"));
+                                   );
   gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                             "%s", files_names_str);
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
