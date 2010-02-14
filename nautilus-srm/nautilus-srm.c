@@ -811,7 +811,16 @@ do_sfill (GList      *files,
           GtkWindow  *parent_window,
           GError    **error)
 {
-  g_set_error (error, NAUTILUS_SRM_ERROR,
-               NAUTILUS_SRM_ERROR_NOT_IMPLEMENTED,
-               "Sfill not yet implemented");
+  gboolean success;
+  GsdSecureDeleteOperation *operation;
+  
+  operation = GSD_SECURE_DELETE_OPERATION (gsd_fill_operation_new ());
+  success = do_gsd (files, parent_window, error, operation,
+                     _("Overwriting files..."));
+  
+  if (! success) {
+    g_object_unref (operation);
+  }
+
+  return success;
 }
