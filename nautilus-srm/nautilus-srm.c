@@ -741,16 +741,16 @@ add_nautilus_file_infos (GsdDeleteOperation  *operation,
 }
 
 static gboolean
-do_srm (GList      *files,
+do_gsd (GList      *files,
         GtkWindow  *parent_window,
-        GError    **error)
+        GError    **error,
+        GsdSecureDeleteOperation *operation,
+        gchar      *info)
 {
   GList    *file;
   int       i = 0;
   gboolean  success = TRUE;
-  GsdDeleteOperation *operation;
   
-  operation = gsd_delete_operation_new ();
   success = add_nautilus_file_infos (operation, files, error);
   if (success) {
     GError *err = NULL;
@@ -760,14 +760,13 @@ do_srm (GList      *files,
     cbdata->parent_window = g_object_ref (parent_window);
     cbdata->progress_dialog = build_progress_dialog (_("Progress"),
                                                      parent_window,
-                                                     _("Overwriting files..."));
+                                                     info);
     gtk_widget_show (GTK_WIDGET (cbdata->progress_dialog->window));
     
     g_signal_connect (operation, "finished", G_CALLBACK (operation_finished), cbdata);
     g_signal_connect (operation, "progress", G_CALLBACK (operation_progress), cbdata);
     
-    if (! gsd_secure_delete_operation_run (GSD_SECURE_DELETE_OPERATION (operation),
-                                           100, &err)) {
+    if (! gsd_secure_delete_operation_run (operation, 100, &err)) {
       g_set_error (error, NAUTILUS_SRM_ERROR, NAUTILUS_SRM_ERROR_SPAWN_FAILED,
                    _("Failed to spawn subprocess: %s"),
                    err->message);
@@ -781,12 +780,31 @@ do_srm (GList      *files,
       destroy_progress_dialog (cbdata->progress_dialog);
       g_object_unref (cbdata->parent_window);
       g_free (cbdata);
-      g_object_unref (operation);
     }
   }
   
   return success;
 }
+
+static gboolean
+do_srm (GList      *files,
+        GtkWindow  *parent_window,
+        GError    **error)
+{
+  gboolean success;
+  GsdSecureDeleteOperation *operation;
+  
+  operation = GSD_SECURE_DELETE_OPERATION (gsd_delete_operation_new ());
+  success = do_gsd (files, parent_window, error, operation,
+                     _("Overwriting files..."));
+  
+  if (! success) {
+    g_object_unref (operation);
+  }
+
+  return success;
+}
+
 
 static gboolean
 do_sfill (GList      *files,
