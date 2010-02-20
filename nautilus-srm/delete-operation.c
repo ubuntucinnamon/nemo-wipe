@@ -23,6 +23,8 @@
 # include "config.h"
 #endif
 
+#include "delete-operation.h"
+
 #include <gsecuredelete/gsecuredelete.h>
 #include <libnautilus-extension/nautilus-file-info.h>
 

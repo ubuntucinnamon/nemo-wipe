@@ -23,6 +23,8 @@
 # include "config.h"
 #endif
 
+#include "fill-operation.h"
+
 #include <gio/gio.h>
 #if HAVE_GIO_UNIX
 # include <gio/gunixmounts.h>
