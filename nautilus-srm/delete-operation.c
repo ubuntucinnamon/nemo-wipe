@@ -51,32 +51,40 @@ nautilus_srm_delete_operation (GList    *files,
                                gpointer  data,
                                GError  **error)
 {
-  gboolean            success;
+  gboolean            success = TRUE;
   GsdDeleteOperation *operation;
   
   operation = gsd_delete_operation_new ();
-  for (; files; files = g_list_next (files)) {
+  for (; success && files; files = g_list_next (files)) {
     GFile *file = nautilus_file_info_get_location (files->data);
     gchar *path;
     
     path = g_file_get_path (file);
     if (! path) {
-      /* FIXME: */
+      gchar *uri = g_file_get_uri (file);
+      
+      success = FALSE;
+      /* FIXME: use correct error quark and code */
+      g_set_error (error, 0, 0, "Unsupported location: %s", uri);
+      g_free (uri);
     } else {
       gsd_delete_operation_add_path (operation, path);
     }
     g_free (path);
     g_object_unref (file);
   }
-  
-  g_signal_connect (operation, "progress", progress_handler, data);
-  g_signal_connect (operation, "finished", finished_handler, data);
-  /* unrefs the operation when done (notice that it is called after the default
-   * handler) */
-  g_signal_connect_after (operation, "finished",
-                          G_CALLBACK (g_object_unref), NULL);
-  success = gsd_secure_delete_operation_run (GSD_SECURE_DELETE_OPERATION (operation),
-                                             100, error);
+  /* if file addition succeeded, try to launch operation */
+  if (success) {
+    g_signal_connect (operation, "progress", progress_handler, data);
+    g_signal_connect (operation, "finished", finished_handler, data);
+    /* unrefs the operation when done (notice that it is called after the default
+     * handler) */
+    g_signal_connect_after (operation, "finished",
+                            G_CALLBACK (g_object_unref), NULL);
+    success = gsd_secure_delete_operation_run (GSD_SECURE_DELETE_OPERATION (operation),
+                                               100, error);
+  }
+  /* if something failed, abort */
   if (! success) {
     /* on failure here the callback will not be called, then unref right here */
     g_object_unref (operation);
