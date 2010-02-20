@@ -3,6 +3,7 @@ nautilus_extensiondir = $(NAUTILUS_EXTENSIONS_DIR)
 nautilus_extension_LTLIBRARIES = libnautilus-srm.la
 
 libnautilus_srm_la_SOURCES = nautilus-srm.c \
+                             operation-manager.c \
                              delete-operation.c \
                              fill-operation.c \
                              progress-dialog.c \
