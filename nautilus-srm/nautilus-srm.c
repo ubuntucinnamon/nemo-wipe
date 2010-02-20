@@ -190,7 +190,10 @@ static void       run_delete_operation  (GtkWindow *parent,
  * operations to the same window rather than the one that launched it. */
 struct ItemData
 {
-  GtkWindow *window;  /* parent window */
+  GtkWindow *window;  /* parent window
+                       * Note: don't ref or unref it, it seems to break
+                       * something in Nautilus (like the object being alive but
+                       * the widget destroyed... strange) */
   GList     *files;   /* list of selected NautilusFileInfos */
 };
 
@@ -198,7 +201,6 @@ struct ItemData
 static void
 item_data_free (struct ItemData *idata)
 {
-  g_object_unref (idata->window);
   nautilus_file_info_list_free (idata->files);
   g_slice_free1 (sizeof *idata, idata);
 }
@@ -215,7 +217,7 @@ add_item_data (NautilusMenuItem *item,
   struct ItemData *idata;
   
   idata = g_slice_alloc (sizeof *idata);
-  idata->window = g_object_ref (window);
+  idata->window = window;
   idata->files = nautilus_file_info_list_copy (files);
   g_object_set_data_full (G_OBJECT (item), "NautilusSrm::item-data",
                           idata, (GDestroyNotify)item_data_free);
