@@ -53,6 +53,7 @@ nautilus_srm_delete_operation (GList    *files,
 {
   gboolean            success = TRUE;
   GsdDeleteOperation *operation;
+  guint               n_files = 0;
   
   operation = gsd_delete_operation_new ();
   for (; success && files; files = g_list_next (files)) {
@@ -72,6 +73,12 @@ nautilus_srm_delete_operation (GList    *files,
     }
     g_free (path);
     g_object_unref (file);
+    n_files ++;
+  }
+  if (success && n_files < 1) {
+    /* FIXME: use correct error quark and code */
+    g_set_error (error, 0, 0, "Nothing to do!");
+    success = FALSE;
   }
   /* if file addition succeeded, try to launch operation */
   if (success) {

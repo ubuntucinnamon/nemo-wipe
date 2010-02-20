@@ -301,23 +301,31 @@ nautilus_srm_fill_operation (GList    *directories,
 {
   gboolean                  success = TRUE;
   struct FillOperationData *opdata;
+  GList                    *dirs;
   
-  opdata = g_slice_alloc (sizeof *opdata);
-  opdata->dir               = filter_dir_list (directories);
-  opdata->finished_handler  = (FillFinishedFunc)finished_handler;
-  opdata->progress_handler  = (FillProgressFunc)progress_handler;
-  opdata->cbdata            = data;
-  opdata->n_op              = g_list_length (opdata->dir);
-  opdata->n_op_done         = 0;
-  opdata->operation         = gsd_fill_operation_new ();
-  opdata->progress_hid = g_signal_connect (opdata->operation, "progress",
-                                           G_CALLBACK (nautilus_srm_fill_progress_handler), opdata);
-  opdata->finished_hid = g_signal_connect (opdata->operation, "finished",
-                                           G_CALLBACK (nautilus_srm_fill_finished_handler), opdata);
-  /* launches the operation */
-  success = do_sfill_operation (opdata, error);
-  if (! success) {
-    nautilus_srm_fill_cleanup (opdata);
+  dirs = filter_dir_list (directories);
+  if (! dirs) {
+    /* FIXME: use correct error quark and code */
+    g_set_error (error, 0, 0, "Nothing to do!");
+    success = FALSE;
+  } else {
+    opdata = g_slice_alloc (sizeof *opdata);
+    opdata->dir               = dirs;
+    opdata->finished_handler  = (FillFinishedFunc)finished_handler;
+    opdata->progress_handler  = (FillProgressFunc)progress_handler;
+    opdata->cbdata            = data;
+    opdata->n_op              = g_list_length (opdata->dir);
+    opdata->n_op_done         = 0;
+    opdata->operation         = gsd_fill_operation_new ();
+    opdata->progress_hid = g_signal_connect (opdata->operation, "progress",
+                                             G_CALLBACK (nautilus_srm_fill_progress_handler), opdata);
+    opdata->finished_hid = g_signal_connect (opdata->operation, "finished",
+                                             G_CALLBACK (nautilus_srm_fill_finished_handler), opdata);
+    /* launches the operation */
+    success = do_sfill_operation (opdata, error);
+    if (! success) {
+      nautilus_srm_fill_cleanup (opdata);
+    }
   }
   
   return success;
