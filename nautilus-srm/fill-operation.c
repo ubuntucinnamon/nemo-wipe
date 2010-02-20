@@ -25,11 +25,12 @@
 
 #include "fill-operation.h"
 
+#include <glib.h>
+#include <glib-object.h>
 #include <gio/gio.h>
 #if HAVE_GIO_UNIX
 # include <gio/gunixmounts.h>
 #endif
-
 #include <gsecuredelete/gsecuredelete.h>
 #include <libnautilus-extension/nautilus-file-info.h>
 

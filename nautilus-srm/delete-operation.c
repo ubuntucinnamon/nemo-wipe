@@ -25,6 +25,9 @@
 
 #include "delete-operation.h"
 
+#include <glib.h>
+#include <glib-object.h>
+#include <gio/gio.h>
 #include <gsecuredelete/gsecuredelete.h>
 #include <libnautilus-extension/nautilus-file-info.h>
 

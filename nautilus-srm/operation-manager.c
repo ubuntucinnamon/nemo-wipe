@@ -23,6 +23,7 @@
 
 #include <stdarg.h>
 #include <glib.h>
+#include <glib-object.h>
 #include <gtk/gtk.h>
 #include <gsecuredelete/gsecuredelete.h>
 
