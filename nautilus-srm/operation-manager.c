@@ -86,10 +86,11 @@ display_dialog (GtkWindow       *parent,
   }
   va_end (ap);
   /* show the dialog */
-  g_signal_connect (dialog, "response", G_CALLBACK (gtk_widget_destroy), NULL);
   if (wait_for_response) {
     response = gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
   } else {
+    g_signal_connect (dialog, "response", G_CALLBACK (gtk_widget_destroy), NULL);
     gtk_widget_show (dialog);
   }
   
