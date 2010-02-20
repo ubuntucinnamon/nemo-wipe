@@ -59,7 +59,6 @@ struct _NautilusSrmClass {
 
 GType   nautilus_srm_get_type      (void) G_GNUC_CONST;
 GQuark  nautilus_srm_error_quark   (void) G_GNUC_CONST;
-void    nautilus_srm_register_type (GTypeModule *module);
 
 G_END_DECLS
 

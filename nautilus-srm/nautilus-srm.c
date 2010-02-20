@@ -33,6 +33,10 @@
 
 #include <gsecuredelete/gsecuredelete.h>
 
+#include "operation-manager.h"
+#include "delete-operation.h"
+#include "fill-operation.h"
+
 /* if GLib doesn't provide g_dngettext(), wrap it from dngettext() */
 #if (! GLIB_CHECK_VERSION (2, 18, 0) && ! defined (g_dngettext))
 # include <libintl.h>
@@ -40,21 +44,11 @@
 #endif
 
 
-struct _NautilusSrmPrivate {
-  GtkWindow *parent_window;
-  GList     *files;
-  GList     *folders;
-};
-typedef struct _NautilusSrmPrivate NautilusSrmPrivate;
-
-#define GET_PRIVATE(obj)  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), NAUTILUS_TYPE_SRM, NautilusSrmPrivate))
-
 static GType provider_types[1];
 static GType nautilus_srm_type = 0;
 
 /* private prototypes */
-void          nautilus_module_initialize     (GTypeModule *module);
-void          nautilus_srm_register_type     (GTypeModule *module);
+static void   nautilus_srm_register_type     (GTypeModule *module);
 static GList *nautilus_srm_get_file_items    (NautilusMenuProvider *provider,
                                               GtkWidget            *window,
                                               GList                *files);
@@ -114,77 +108,15 @@ nautilus_srm_menu_provider_iface_init (NautilusMenuProviderIface *iface)
   iface->get_background_items = nautilus_srm_get_background_items;
 }
 
-/* re-sets ths private data. If new value is NULL, the value is only freed */
-static inline void
-nautilus_srm_set_window (NautilusSrm      *srm,
-                         GtkWindow        *window)
-{
-  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
-  
-  if (priv->parent_window) {
-    /*g_object_unref (priv->parent_window);*/
-    priv->parent_window = NULL;
-  }
-  if (window) {
-    priv->parent_window = /*g_object_ref*/ (window);
-  }
-}
-
-/* re-sets ths private data. If new value is NULL, the value is only freed */
-static inline void
-nautilus_srm_set_files (NautilusSrm      *srm,
-                        GList            *files)
-{
-  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
-
-  if (priv->files) {
-    nautilus_file_info_list_free (priv->files);
-    priv->files = NULL;
-  }
-  if (files) {
-    priv->files = nautilus_file_info_list_copy (files);
-  }
-}
-
-static inline void
-nautilus_srm_set_folders (NautilusSrm      *srm,
-                          GList            *folders)
-{
-  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
-
-  if (priv->folders) {
-    nautilus_file_info_list_free (priv->folders);
-    priv->folders = NULL;
-  }
-  if (folders) {
-    priv->folders = nautilus_file_info_list_copy (folders);
-  }
-}
-
 static void 
 nautilus_srm_instance_init (NautilusSrm *srm)
 {
-  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
-  
-  priv->parent_window = NULL;
-  priv->files = NULL;
   g_message ("Object [%p] initialized", srm);
 }
 
 static void 
 nautilus_srm_instance_finalize (GObject *object)
 {
-  NautilusSrmPrivate *priv = GET_PRIVATE (object);
-
-  /*if (priv->parent_window) {
-    g_object_unref (priv->parent_window);
-  }*/
-  if (priv->files) {
-    nautilus_file_info_list_free (priv->files);
-  }
-  if (priv->folders) {
-    g_object_unref (priv->folders);
-  }
   g_message ("Object [%p] finalized", object);
 }
 
@@ -194,8 +126,6 @@ nautilus_srm_class_init (NautilusSrmClass *class)
   GObjectClass *object_class = G_OBJECT_CLASS (class);
   
   object_class->finalize = nautilus_srm_instance_finalize;
-  
-  g_type_class_add_private (class, sizeof (NautilusSrmPrivate));
   
   g_message ("Class initialized");
 }
@@ -212,10 +142,8 @@ nautilus_srm_get_type (void)
   return nautilus_srm_type;
 }
 
-
-
 /* Register our type into glib */
-void
+static void
 nautilus_srm_register_type (GTypeModule *module)
 {
   static const GTypeInfo info = {
@@ -237,30 +165,81 @@ nautilus_srm_register_type (GTypeModule *module)
   };
   
   nautilus_srm_type = g_type_module_register_type (module,
-                                                    G_TYPE_OBJECT,
-                                                    "NautilusSrm",
-                                                    &info, 0);
-  
+                                                   G_TYPE_OBJECT,
+                                                   "NautilusSrm",
+                                                   &info, 0);
   g_type_module_add_interface (module, nautilus_srm_type,
                                NAUTILUS_TYPE_MENU_PROVIDER,
                                &menu_provider_iface_info);
-  
 }
 
 
 
 /*=== Actual extension ===*/
 
-static void     menu_srm_cb                  (NautilusMenuItem  *menu,
-                                              NautilusSrm *srm);
-static void     menu_sfill_cb                (NautilusMenuItem  *menu,
-                                              NautilusSrm *srm);
-static gboolean do_srm                       (GList      *files,
-                                              GtkWindow  *parent_window,
-                                              GError    **error);
-static gboolean do_sfill                     (GList      *files,
-                                              GtkWindow  *parent_window,
-                                              GError    **error);
+static void       run_fill_operation    (GtkWindow *parent,
+                                         GList     *files);
+static void       run_delete_operation  (GtkWindow *parent,
+                                         GList     *files);
+
+
+
+/* Data needed to be able to start an operation.
+ * We don't use private filed of the extension's object because there is only
+ * one extension object for more than one window. Actually, it would attach all
+ * operations to the same window rather than the one that launched it. */
+struct ItemData
+{
+  GtkWindow *window;  /* parent window */
+  GList     *files;   /* list of selected NautilusFileInfos */
+};
+
+/* Frees an #ItemData */
+static void
+item_data_free (struct ItemData *idata)
+{
+  g_object_unref (idata->window);
+  nautilus_file_info_list_free (idata->files);
+  g_slice_free1 (sizeof *idata, idata);
+}
+
+/*
+ * Attaches a new #ItemData to a #NautilusMenuItem.
+ * It is freed automatically when @item is destroyed.
+ */
+static void
+add_item_data (NautilusMenuItem *item,
+               GtkWindow        *window,
+               GList            *files)
+{
+  struct ItemData *idata;
+  
+  idata = g_slice_alloc (sizeof *idata);
+  idata->window = g_object_ref (window);
+  idata->files = nautilus_file_info_list_copy (files);
+  g_object_set_data_full (G_OBJECT (item), "NautilusSrm::item-data",
+                          idata, (GDestroyNotify)item_data_free);
+}
+
+/* Gets the #ItemData attached to @item */
+static struct ItemData *
+get_item_data (NautilusMenuItem *item)
+{
+  return g_object_get_data (G_OBJECT (item), "NautilusSrm::item-data");
+}
+
+
+/*= Menu items =*/
+
+/* srm item */
+static void
+menu_item_delete_activate_handler (NautilusMenuItem     *item,
+                                   NautilusMenuProvider *provider)
+{
+  struct ItemData *idata = get_item_data (item);
+  
+  run_delete_operation (idata->window, idata->files);
+}
 
 static NautilusMenuItem *
 nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
@@ -275,37 +254,44 @@ nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
                                                     "Delete the selected files and override their data",
                                                     g_list_length (files)),
                                  GTK_STOCK_DELETE);
-  
-  /* fill the object's private fields */
-  nautilus_srm_set_files (NAUTILUS_SRM (provider), files);
-  nautilus_srm_set_window (NAUTILUS_SRM (provider), GTK_WINDOW (window));
-  
-  g_signal_connect (item, "activate", G_CALLBACK (menu_srm_cb), provider);
+  add_item_data (item, GTK_WINDOW (window), files);
+  g_signal_connect (item, "activate",
+                    G_CALLBACK (menu_item_delete_activate_handler), provider);
   
   return item;
 }
 
+/* sfill item */
+static void
+menu_item_fill_activate_handler (NautilusMenuItem     *item,
+                                 NautilusMenuProvider *provider)
+{
+  struct ItemData *idata = get_item_data (item);
+  
+  run_fill_operation (idata->window, idata->files);
+}
+
 static NautilusMenuItem *
 nautilus_srm_menu_item_sfill (NautilusMenuProvider *provider,
-                             GtkWidget            *window,
-                             GList                *folders)
+                              GtkWidget            *window,
+                              GList                *folders)
 {
   NautilusMenuItem *item;
 
   item = nautilus_menu_item_new ("NautilusSrm::sfill_item",
                                  _("Override free space here"),
-                                 _("Override free space in the device containing this file"),
-                                 GTK_STOCK_DELETE);
-  
-  /* fill the object's private fields */
-  nautilus_srm_set_folders (NAUTILUS_SRM (provider), folders);
-  nautilus_srm_set_window (NAUTILUS_SRM (provider), GTK_WINDOW (window));
-  
-  g_signal_connect (item, "activate", G_CALLBACK (menu_sfill_cb), provider);
+                                 g_dngettext (NULL, "Override free space in the device containing this file",
+                                                    "Override free space in the device(s) containing this files",
+                                                    g_list_length (folders)),
+                                 NULL);
+  add_item_data (item, GTK_WINDOW (window), folders);
+  g_signal_connect (item, "activate",
+                    G_CALLBACK (menu_item_fill_activate_handler), provider);
   
   return item;
 }
 
+/* populates Nautilus' file menu */
 static GList *
 nautilus_srm_get_file_items (NautilusMenuProvider *provider,
                              GtkWidget            *window,
@@ -313,13 +299,14 @@ nautilus_srm_get_file_items (NautilusMenuProvider *provider,
 {
   GList *items = NULL;
   items = g_list_append (items, nautilus_srm_menu_item_srm (provider,
-                                                         window, files));
+                                                            window, files));
   items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
-                                                         window, files));
+                                                              window, files));
   
   return items;
 }
 
+/* populates Nautilus' background menu */
 static GList *
 nautilus_srm_get_background_items (NautilusMenuProvider *provider,
                                    GtkWidget            *window,
@@ -329,488 +316,93 @@ nautilus_srm_get_background_items (NautilusMenuProvider *provider,
   GList *files = g_list_append (NULL, current_folder);
   
   items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
-                                                         window, files));
+                                                              window, files));
+  g_list_free (files);
+  
   return items;
 }
 
-static void
-confirm_dialog_cb (NautilusSrm *srm,
-                   GtkDialog   *dialog,
-                   gint         response,
-                   const gchar *fail_message,
-                   gboolean   (*action) (GList *, GtkWindow *, GError **),
-                   GList       *files)
-{
-  gtk_widget_destroy (GTK_WIDGET (dialog));
-  if (response == GTK_RESPONSE_YES) {
-    NautilusSrmPrivate *priv = GET_PRIVATE (srm);
-    GtkWidget          *dialog;
-    GError             *err = NULL;
-    
-    if (! action (files, priv->parent_window, &err)) {
-      dialog = gtk_message_dialog_new (priv->parent_window,
-                                       GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                       GTK_MESSAGE_ERROR,
-                                       GTK_BUTTONS_CLOSE,
-                                       fail_message);
-      gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                                                "%s", err->message);
-      g_signal_connect (dialog, "response",
-                        G_CALLBACK (gtk_widget_destroy), NULL);
-      gtk_widget_show (dialog);
-      g_error_free (err);
-    }
-  }
-}
 
+
+/* Runs the srm operation */
 static void
-confirm_dialog_srm_cb (GtkDialog  *dialog,
-                       gint        response,
-                       gpointer    data)
+run_delete_operation (GtkWindow *parent,
+                      GList     *files)
 {
-  NautilusSrm        *srm  =NAUTILUS_SRM (data);
-  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
+  gchar  *confirm_primary_text = NULL;
+  guint   n_items;
   
-  confirm_dialog_cb (srm, dialog, response,
-                     g_dngettext (NULL, "Failed to delete file",
-                                  "Failed to delete some files",
-                                  g_list_length (priv->files)),
-                     do_srm, priv->files);
-}
-
-static gchar*
-file_list_to_string (GList *files_list)
-{
-  GString            *files_names = g_string_new ("");
-  gchar              *files_names_str;
-  GList              *list_item;
-
-  /* Build a string holding the list of files to delete */
-  for (list_item = files_list; list_item != NULL; list_item = g_list_next (list_item)) {
+  n_items = g_list_length (files);
+  /* FIXME: can't truly use g_dngettext since the args are not the same */
+  if (n_items > 1) {
+    confirm_primary_text = g_strdup_printf (_("Are you sure you want to delete and wipe "
+                                              "the %u selected items?"), n_items);
+  } else if (n_items > 0) {
     gchar *name;
     
-    name = nautilus_file_info_get_name (list_item->data);
-    g_string_append (files_names, name);
-    if (list_item->next != NULL) {
-      /* Translators: separators between filenames */
-      g_string_append (files_names, _(", "));
-    }
+    name = nautilus_file_info_get_name (files->data);
+    confirm_primary_text = g_strdup_printf (_("Are you sure you want to delete and wipe "
+                                              "\"%s\"?"),
+                                            name);
     g_free (name);
   }
-  files_names_str = g_string_free (files_names, FALSE);
-
-  return files_names_str;
+  nautilus_srm_operation_manager_run (
+    parent, files,
+    /* confirm dialog */
+    confirm_primary_text,
+    _("If you delete an item, it will not be recoverable."),
+    GTK_STOCK_DELETE,
+    /* progress dialog */
+    _("Deleting files..."),
+    /* operation launcher */
+    nautilus_srm_delete_operation,
+    /* failed dialog */
+    _("Deletion failed"),
+    /* success dialog */
+    _("Deletion succeeded"),
+    _("Files have been successfully deleted and wiped")
+  );
+  g_free (confirm_primary_text);
 }
 
+/* Runs the sfill operation */
 static void
-menu_gsd_cb (NautilusMenuItem *menu,
-             NautilusSrm      *srm,
-             const gchar      *confirmation_message,
-             GCallback         response_cb)
+run_fill_operation (GtkWindow *parent,
+                    GList     *files)
 {
-  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
-  GtkWidget          *dialog;
-  gchar              *files_names_str;
-  gint                user_response;
-  guint               n_files = 0;
-
-  files_names_str = file_list_to_string (priv->files);
-
-  /* Build the dialog */
-  dialog = gtk_message_dialog_new (priv->parent_window, 
-                                   GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                   GTK_MESSAGE_WARNING,
-                                   GTK_BUTTONS_NONE,
-                                   confirmation_message);
-  gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                                            "%s", files_names_str);
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-                          GTK_STOCK_CANCEL, GTK_RESPONSE_NO,
-                          GTK_STOCK_DELETE, GTK_RESPONSE_YES,
-                          NULL);
-  /* Ask the user (asynchronously) */
-  g_signal_connect (dialog, "response", G_CALLBACK (response_cb), srm);
-  gtk_widget_show (GTK_WIDGET (dialog));
-  /* Cleanup */
-  g_free (files_names_str);
-}
-
-
-static void
-menu_srm_cb (NautilusMenuItem *menu,
-             NautilusSrm      *srm)
-{
-  NautilusSrmPrivate *priv = GET_PRIVATE (srm);
+  gchar  *confirm_primary_text = NULL;
+  guint   n_items;
   
-  menu_gsd_cb (menu, srm, 
-    g_dngettext(NULL, "Are you sure you want delete the following file and to override its content?",
-                      "Are you sure you want delete the following files and to override their content?",
-                      g_list_length(priv->files)),
-    G_CALLBACK (confirm_dialog_srm_cb));
-}
-
-
-/*
- * get_underlying_mountpoint:
- * @file: the file to study
- * 
- * XXX: it doesn't work as expected : none is returned for / e.g.
- *
- * Returns: the path to the mountpoint of @file
- */
-static gchar*
-get_underlying_mountpoint (GFile *file)
-{
-  GMount *mount;
-  GFile *mountpoint;
-  GError *error = NULL;
-  gchar* mountpoint_path;
-
-  mount = g_file_find_enclosing_mount (file, NULL, &error);
-  if (! mount) {
-    g_warning ("%s", error->message);
-    g_error_free (error);
-  } else {
-    mountpoint =  g_mount_get_root (mount);
-    mountpoint_path = g_file_get_path (mountpoint);
-    g_object_unref (mount);
-    g_object_unref (mountpoint);
-  }
-  g_warning ("Mountpoint found for %s is %s", g_file_get_path (file),
-                                            mountpoint_path);
-
-  return mountpoint_path;
-}
-
-/*
- * get_underlying_device:
- * @file: the file to study
- * 
- * XXX: it's not what we want
- *
- * Returns: the device ID of @file
- */
-static guint32
-get_underlying_device (GFile *file)
-{
-  GFileInfo *device;
-  guint32 deviceid;
-  GError *error = NULL;
-
-  device = g_file_query_filesystem_info (file,
-                                         G_FILE_ATTRIBUTE_GVFS_BACKEND,
-                                         NULL, &error);
-  if (! device) {
-    g_warning ("%s", error->message);
-    g_error_free (error);
-  } else {
-    deviceid = g_file_info_get_attribute_uint32 (device,
-                                                 G_FILE_ATTRIBUTE_GVFS_BACKEND);
-    g_object_unref (device);
-  }
-  g_warning ("Device found for %s is %i", g_file_get_path (file),
-                                          device);
-
-  return deviceid;
-}
-
-/*
- * get_devices_to_sfill:
- * @files: a list of #NautilusFileInfo
- * 
- * Filter the input file list so that there remains only one path for
- * each filesystem.
- * 
- * Returns: A #GList of file pathes to actually work on. You should free
- *          each element with g_free() before freeing the list.
- */
-static GList*
-get_devices_to_sfill (GList* files)
-{
-  GHashTable* mountpoints_to_fill = g_hash_table_new_full (g_int_hash,
-                                             g_str_equal, g_free, NULL);
-  GList* paths_to_fill = NULL;
-  GList* list_item;
-  
-  for (list_item = files; list_item != NULL; list_item = g_list_next (list_item)) {
-    GFile* file;
-    gchar* mountpoint;
-
-    file = nautilus_file_info_get_location (list_item->data);
-    mountpoint = get_underlying_device (file);
-    if (! mountpoint) {
-      /* XXX: afficher un message */
-    } else {
-      if (! g_hash_table_lookup (mountpoints_to_fill, mountpoint)) {
-        gchar* path;
- 
-        g_hash_table_insert (mountpoints_to_fill, mountpoint, NULL);
-        path = g_file_get_path (file);
-        if (path) {
-          paths_to_fill = g_list_append (paths_to_fill, path);
-        } else {
-          /* XXX: This is not really clear... */
-          g_warning ("One file has no path, ignoring...");
-        }
-      } else {
-        g_free (mountpoint);
-      }
-    }
-    g_object_unref (file);
-  }
-  g_hash_table_destroy (mountpoints_to_fill);
-
-  return paths_to_fill;
-}
-
-static void
-confirm_dialog_sfill_cb (GtkDialog  *dialog,
-                         gint        response,
-                         gpointer    data)
-{
-  NautilusSrmPrivate *priv = GET_PRIVATE (data);
-  
-  confirm_dialog_cb (data, dialog, response, 
-                     _("Failed to override free space"),
-                     do_sfill, get_devices_to_sfill (priv->folders));
-}
-
-static void
-menu_sfill_cb (NautilusMenuItem *menu,
-               NautilusSrm      *srm)
-{
-  menu_gsd_cb (menu, srm, 
-               _("Are you sure you want to override "
-                 "free space on the device(s) containing "
-                 "the following files?"),
-               G_CALLBACK (confirm_dialog_sfill_cb));
-}
-
-
-typedef struct _ProgressDialog {
-  GtkWindow      *window;
-  GtkProgressBar *progress_bar;
-} ProgressDialog;
-
-static void
-progress_dialog_set_fraction (ProgressDialog *dialog,
-                              gdouble         fraction)
-{
-  gchar *text;
-  
-  gtk_progress_bar_set_fraction (dialog->progress_bar, fraction);
-  text = g_strdup_printf ("%.0f%%", fraction * 100);
-  gtk_progress_bar_set_text (dialog->progress_bar, text);
-  g_free (text);
-}
-
-static ProgressDialog *
-build_progress_dialog (const gchar *title,
-                       GtkWindow   *parent,
-                       const gchar *format,
-                       ...)
-{
-  ProgressDialog *dialog;
-  va_list         ap;
-  gchar          *text;
-  GtkWidget      *label;
-  GtkWidget      *box;
-  
-  dialog = g_new0 (ProgressDialog, 1);
-  dialog->window = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
-  gtk_window_set_title (dialog->window, title);
-  gtk_window_set_deletable (dialog->window, FALSE);
-  gtk_window_set_transient_for (dialog->window, parent);
-  gtk_window_set_position (dialog->window, GTK_WIN_POS_CENTER_ON_PARENT);
-  gtk_window_set_skip_pager_hint (dialog->window, TRUE);
-  gtk_window_set_skip_taskbar_hint (dialog->window, TRUE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog->window), 10);
-  
-  dialog->progress_bar = GTK_PROGRESS_BAR (gtk_progress_bar_new ());
-  progress_dialog_set_fraction (dialog, 0.0);
-  
-  va_start (ap, format);
-  text = g_strdup_vprintf (format, ap);
-  va_end (ap);
-  label = gtk_label_new (text);
-  g_free (text);
-  
-  box = gtk_vbox_new (FALSE, 10);
-  gtk_box_pack_start (GTK_BOX (box), label, TRUE, TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (box), GTK_WIDGET (dialog->progress_bar), FALSE, FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (dialog->window), box);
-  
-  gtk_widget_show_all (box);
-  
-  return dialog;
-}
-
-static void
-destroy_progress_dialog (ProgressDialog *dialog)
-{
-  gtk_widget_destroy (GTK_WIDGET (dialog->window));
-  g_free (dialog);
-}
-
-
-typedef struct _SrmCbData {
-  ProgressDialog *progress_dialog;
-  GtkWindow      *parent_window;
-} SrmCbData;
-
-/* callback for progress notification */
-static void
-operation_progress (GsdDeleteOperation  *operation,
-                    gdouble              progress,
-                    SrmCbData           *cbdata)
-{
-  /*g_message ("progress is now %.0f%%.", progress * 100);*/
-  progress_dialog_set_fraction (cbdata->progress_dialog, progress);
-}
-
-/* callback for the finished signal */
-static void
-operation_finished (GsdDeleteOperation *operation,
-                    gboolean            success,
-                    const gchar        *error_message,
-                    SrmCbData          *cbdata)
-{
-  destroy_progress_dialog (cbdata->progress_dialog);
-  if (! success) {
-    GtkWidget *dialog;
+  n_items = g_list_length (files);
+  /* FIXME: can't truly use g_dngettext since the args are not the same */
+  if (n_items > 1) {
+    confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe the free space "
+                                              "on the device(s) of the %u selected items?"),
+                                            n_items);
+  } else if (n_items > 0) {
+    gchar *name;
     
-    dialog = gtk_message_dialog_new (cbdata->parent_window, 
-                                     GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                     GTK_MESSAGE_ERROR,
-                                     GTK_BUTTONS_CLOSE,
-                                     _("Deletion failed"));
-    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                                              "%s", error_message);
-    g_signal_connect (dialog, "response", G_CALLBACK (gtk_widget_destroy), NULL);
-    gtk_widget_show (dialog);
+    name = nautilus_file_info_get_name (files->data);
+    confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe the free space "
+                                              "on the device of \"%s\"?"),
+                                            name);
+    g_free (name);
   }
-  /* cleanup */
-  g_object_unref (cbdata->parent_window);
-  g_free (cbdata);
-  g_object_unref (G_OBJECT (operation));
-}
-
-/* Adds the file_infos to the operation. Fails if not supported. */
-static gboolean
-add_nautilus_file_infos (GsdSecureDeleteOperation  *operation,
-                         GList                     *file_infos,
-                         GError                   **error)
-{
-  gboolean  success = TRUE;
-  GList    *info;
-  
-  for (info = file_infos; success && info != NULL; info = g_list_next (info)) {
-    gchar *scheme;
-    
-    scheme = nautilus_file_info_get_uri_scheme (info->data);
-    if (strcmp (scheme, "file") == 0) {
-      gchar *escaped_uri;
-      gchar *uri;
-      
-      uri = nautilus_file_info_get_uri (info->data);
-      escaped_uri = g_uri_unescape_string (uri, NULL);
-      /* strlen (file://) = 7 */
-      gsd_delete_operation_add_path (operation, &escaped_uri[7]);
-      
-      g_free (escaped_uri);
-      g_free (uri);
-    } else {
-      g_set_error (error, NAUTILUS_SRM_ERROR, NAUTILUS_SRM_ERROR_UNSUPPORTED_LOCATION,
-                   _("Unsupported location type: %s"), scheme);
-      success = FALSE;
-    }
-    g_free (scheme);
-  }
-  
-  return success;
-}
-
-static gboolean
-do_gsd (GList      *files,
-        GtkWindow  *parent_window,
-        GError    **error,
-        GsdSecureDeleteOperation *operation,
-        gchar      *info)
-{
-  GList    *file;
-  int       i = 0;
-  gboolean  success = TRUE;
-  
-  success = add_nautilus_file_infos (operation, files, error);
-  if (success) {
-    GError *err = NULL;
-    SrmCbData *cbdata;
-    
-    cbdata = g_new0 (SrmCbData, 1);
-    cbdata->parent_window = g_object_ref (parent_window);
-    cbdata->progress_dialog = build_progress_dialog (_("Progress"),
-                                                     parent_window,
-                                                     info);
-    gtk_widget_show (GTK_WIDGET (cbdata->progress_dialog->window));
-    
-    g_signal_connect (operation, "finished", G_CALLBACK (operation_finished), cbdata);
-    g_signal_connect (operation, "progress", G_CALLBACK (operation_progress), cbdata);
-    
-    if (! gsd_secure_delete_operation_run (operation, 100, &err)) {
-      g_set_error (error, NAUTILUS_SRM_ERROR, NAUTILUS_SRM_ERROR_SPAWN_FAILED,
-                   _("Failed to spawn subprocess: %s"),
-                   err->message);
-      g_error_free (err);
-      success = FALSE;
-    } /*else {
-      g_message ("Deleting...");
-    }*/
-    
-    if (! success) {
-      destroy_progress_dialog (cbdata->progress_dialog);
-      g_object_unref (cbdata->parent_window);
-      g_free (cbdata);
-    }
-  }
-  
-  return success;
-}
-
-static gboolean
-do_srm (GList      *files,
-        GtkWindow  *parent_window,
-        GError    **error)
-{
-  gboolean success;
-  GsdSecureDeleteOperation *operation;
-  
-  operation = GSD_SECURE_DELETE_OPERATION (gsd_delete_operation_new ());
-  success = do_gsd (files, parent_window, error, operation,
-                     _("Overwriting files..."));
-  
-  if (! success) {
-    g_object_unref (operation);
-  }
-
-  return success;
-}
-
-
-static gboolean
-do_sfill (GList      *files,
-          GtkWindow  *parent_window,
-          GError    **error)
-{
-  gboolean success;
-  GsdSecureDeleteOperation *operation;
-  
-  operation = GSD_SECURE_DELETE_OPERATION (gsd_fill_operation_new ());
-  success = do_gsd (files, parent_window, error, operation,
-                     _("Overwriting files..."));
-  
-  if (! success) {
-    g_object_unref (operation);
-  }
-
-  return success;
+  nautilus_srm_operation_manager_run (
+    parent, files,
+    /* confirm dialog */
+    confirm_primary_text,
+    _("This operation may take a while."),
+    _("Overwrite free space"),
+    /* progress dialog */
+    _("Wiping free space..."),
+    /* operation launcher */
+    nautilus_srm_fill_operation,
+    /* failed dialog */
+    _("Wipe failed"),
+    /* success dialog */
+    _("Wipe succeeded"),
+    _("Free space on the device(s) have been successfully wiped")
+  );
+  g_free (confirm_primary_text);
 }
