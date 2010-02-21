@@ -254,9 +254,9 @@ nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
   NautilusMenuItem *item;
   
   item = nautilus_menu_item_new ("NautilusSrm::srm_item",
-                                 _("Delete and override content"),
-                                 g_dngettext (NULL, "Delete the selected file and override its data",
-                                                    "Delete the selected files and override their data",
+                                 _("Delete and overwrite content"),
+                                 g_dngettext (NULL, "Delete the selected file and overwrite its data",
+                                                    "Delete the selected files and overwrite their data",
                                                     g_list_length (files)),
                                  GTK_STOCK_DELETE);
   add_item_data (item, window, files);
@@ -284,9 +284,9 @@ nautilus_srm_menu_item_sfill (NautilusMenuProvider *provider,
   NautilusMenuItem *item;
 
   item = nautilus_menu_item_new ("NautilusSrm::sfill_item",
-                                 _("Override free space here"),
-                                 g_dngettext (NULL, "Override free space in the device containing this file",
-                                                    "Override free space in the device(s) containing this files",
+                                 _("Overwrite free space here"),
+                                 g_dngettext (NULL, "Overwrite free space in the device containing this file",
+                                                    "Overwrite free space in the device(s) containing these files",
                                                     g_list_length (folders)),
                                  NULL);
   add_item_data (item, window, folders);
