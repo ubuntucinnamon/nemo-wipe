@@ -66,7 +66,12 @@ AC_SUBST([AM_CPPFLAGS],["${AM_CPPFLAGS} -DG_LOG_DOMAIN=\\\"${PACKAGE}\\\""])
 NA_NAUTILUS_EXTDIR
 
 # Checks for library functions.
+# If we are here we're sure we have libnautilus-extension, but we need this for
+# the check below to work (for the lib to be found).
+AC_CHECK_LIB([nautilus-extension], [nautilus_menu_provider_get_file_items])
+AC_CHECK_FUNCS([nautilus_file_info_get_location])
 
+# Output
 AC_CONFIG_FILES([Makefile po/Makefile.in
                  nautilus-srm/Makefile])
 AC_OUTPUT

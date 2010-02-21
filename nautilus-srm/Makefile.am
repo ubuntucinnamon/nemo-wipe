@@ -11,6 +11,7 @@ libnautilus_srm_la_SOURCES = nautilus-srm.c \
                              fill-operation.c \
                              fill-operation.h \
                              progress-dialog.c \
-                             progress-dialog.h
+                             progress-dialog.h \
+                             compat.h
 
 libnautilus_srm_la_LDFLAGS = $(AM_LIBS) -module -avoid-version

@@ -31,6 +31,8 @@
 #include <gsecuredelete/gsecuredelete.h>
 #include <libnautilus-extension/nautilus-file-info.h>
 
+#include "compat.h" /* for nautilus_file_info_get_location() */
+
 
 /*
  * nsrm_delete_operation:

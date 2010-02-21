@@ -25,10 +25,10 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include "compat.h" /* for gtk_dialog_get_action_area(),
+                     *     gtk_dialog_get_countent_area() and
+                     *     gtk_widget_get_sensitive() */
 
-#if ! GTK_CHECK_VERSION (2, 18, 0)
-# define gtk_widget_get_sensitive(w) (GTK_WIDGET_SENSITIVE (w))
-#endif
 
 
 struct _NautilusSrmProgressDialogPrivate {
