@@ -27,6 +27,7 @@
 #include <gtk/gtk.h>
 #include <gsecuredelete/gsecuredelete.h>
 
+#include "nautilus-srm.h"
 #include "progress-dialog.h"
 
 
@@ -229,7 +230,20 @@ nautilus_srm_operation_manager_run (GtkWindow                *parent,
                                    G_CALLBACK (operation_finished_handler),
                                    G_CALLBACK (operation_progress_handler),
                                    opdata, &err)) {
-      display_operation_error (opdata, err->message);
+      if (err->code == G_SPAWN_ERROR_NOENT) {
+        gchar *message;
+        
+        /* Merge the error message with our. Pretty much a hack, but should be
+         * correct and more precise. */
+        message = g_strdup_printf (_("%s. "
+                                     "Please make sure you have the secure-delete "
+                                     "package properly installed on your system."),
+                                   err->message);
+        display_operation_error (opdata, message);
+        g_free (message);
+      } else {
+        display_operation_error (opdata, err->message);
+      }
       g_error_free (err);
       gtk_widget_destroy (GTK_WIDGET (opdata->progress_dialog));
       free_opdata (opdata);
