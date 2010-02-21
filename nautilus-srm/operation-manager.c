@@ -47,6 +47,7 @@ static GtkResponseType  display_dialog     (GtkWindow       *parent,
  *                     gtk_dialog_run()), but allow to get the dialog's
  *                     response. If this options is %TRUE, this function will
  *                     always return %GTK_RESPONSE_NONE.
+ *                     Use this if you want a modal dialog.
  * @primary_text: GtkMessageDialog's primary text
  * @secondary_text: GtkMessageDialog's secondary text, or %NULL
  * @first_button_text: Text of the first button, or %NULL
@@ -70,7 +71,7 @@ display_dialog (GtkWindow       *parent,
   va_list         ap;
   
   dialog = gtk_message_dialog_new (parent,
-                                   GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                   GTK_DIALOG_DESTROY_WITH_PARENT,
                                    type, GTK_BUTTONS_NONE,
                                    "%s", primary_text);
   if (secondary_text) {
