@@ -1,0 +1,11 @@
+Dependancies
+============
+
+- libnautilus-extension
+- libgtk2.0
+- libgsecuredelete
+- make
+- autoconf
+- libtool
+- gcc
+
