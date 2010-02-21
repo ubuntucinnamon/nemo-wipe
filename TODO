@@ -3,3 +3,6 @@
    * Setting the current status message;
    * Connecting a signal to watch a user cancel;
 
+* Cleanup configure script
+   * Check minimal dependencies (minimal versions of libraries)
+
