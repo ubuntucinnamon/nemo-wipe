@@ -24,6 +24,14 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#define GETTEXT_PACKAGE "nautilus-srm"
+#include <glib/gi18n-lib.h>
+
+/* if GLib doesn't provide g_dngettext(), wrap it from dngettext() */
+#if (! GLIB_CHECK_VERSION (2, 18, 0) && ! defined (g_dngettext))
+# include <libintl.h>
+# define g_dngettext dngettext
+#endif
 
 G_BEGIN_DECLS
 

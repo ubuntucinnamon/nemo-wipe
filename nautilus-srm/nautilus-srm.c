@@ -25,8 +25,6 @@
 #include <libnautilus-extension/nautilus-file-info.h>
 
 #include <glib.h>
-#define GETTEXT_PACKAGE "nautilus-srm"
-#include <glib/gi18n-lib.h>
 #include <gtk/gtk.h>
 
 #include <gio/gio.h>
@@ -36,12 +34,6 @@
 #include "operation-manager.h"
 #include "delete-operation.h"
 #include "fill-operation.h"
-
-/* if GLib doesn't provide g_dngettext(), wrap it from dngettext() */
-#if (! GLIB_CHECK_VERSION (2, 18, 0) && ! defined (g_dngettext))
-# include <libintl.h>
-# define g_dngettext dngettext
-#endif
 
 
 static GType provider_types[1];
