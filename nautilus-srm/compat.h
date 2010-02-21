@@ -68,6 +68,31 @@ nautilus_file_info_get_location (NautilusFileInfo *nfi)
   
   return file;
 }
+
+/* 
+ * Workaround for the buggy behavior of g_file_get_path() on the GFile returned
+ * by our nautilus_file_info_get_location().
+ * Should be harmless in general, and at least for us.
+ * 
+ * The buggy behavior made g_file_get_path() return the remote path for remote
+ * locations, such as "/foo" for "ftp://name.domain.tld/foo", obviously leading
+ * to really bad things such as unexpected data loss (by using a local file when
+ * the user thinks we use the remote one).
+ */
+static gchar *
+NAUTILUS_SRM_g_file_get_path (GFile *file)
+{
+  gchar *path = NULL;
+  
+  if (g_file_has_uri_scheme (file, "file")) {
+    path = g_file_get_path (file);
+  }
+  
+  return path;
+}
+/* overwrite the GIO implementation */
+#define g_file_get_path NAUTILUS_SRM_g_file_get_path
+
 #endif /* HAVE_NAUTILUS_FILE_INFO_GET_LOCATION */
 
 
