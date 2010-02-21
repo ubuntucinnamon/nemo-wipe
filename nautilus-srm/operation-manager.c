@@ -102,6 +102,7 @@ display_dialog (GtkWindow       *parent,
 struct NautilusSrmOperationData
 {
   GtkWindow                  *window;
+  gulong                      window_destroy_hid;
   NautilusSrmProgressDialog  *progress_dialog;
   gchar                      *failed_primary_text;
   gchar                      *success_primary_text;
@@ -113,10 +114,24 @@ struct NautilusSrmOperationData
 static void
 free_opdata (struct NautilusSrmOperationData *opdata)
 {
+  if (opdata->window_destroy_hid) {
+    g_signal_handler_disconnect (opdata->window, opdata->window_destroy_hid);
+  }
   g_free (opdata->failed_primary_text);
   g_free (opdata->success_primary_text);
   g_free (opdata->success_secondary_text);
   g_slice_free1 (sizeof *opdata, opdata);
+}
+
+/* if the parent window get destroyed, we honor gently the thing and leave it
+ * to the death. doing this is useful not to have a bad window pointer later */
+static void
+opdata_window_destroy_handler (GtkObject                       *obj,
+                               struct NautilusSrmOperationData *opdata)
+{
+  g_signal_handler_disconnect (opdata->window, opdata->window_destroy_hid);
+  opdata->window_destroy_hid = 0;
+  opdata->window = NULL;
 }
 
 /* Displays an operation's error */
@@ -202,6 +217,8 @@ nautilus_srm_operation_manager_run (GtkWindow                *parent,
     
     opdata = g_slice_alloc (sizeof *opdata);
     opdata->window = parent;
+    opdata->window_destroy_hid = g_signal_connect (opdata->window, "destroy",
+                                                   G_CALLBACK (opdata_window_destroy_handler), opdata);
     opdata->progress_dialog = NAUTILUS_SRM_PROGRESS_DIALOG (nautilus_srm_progress_dialog_new (opdata->window, 0,
                                                                                               progress_dialog_text));
     opdata->failed_primary_text = g_strdup (failed_primary_text);
