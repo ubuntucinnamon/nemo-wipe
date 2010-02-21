@@ -211,13 +211,16 @@ item_data_free (struct ItemData *idata)
  */
 static void
 add_item_data (NautilusMenuItem *item,
-               GtkWindow        *window,
+               GtkWidget        *window,
                GList            *files)
 {
   struct ItemData *idata;
   
   idata = g_slice_alloc (sizeof *idata);
-  idata->window = window;
+  /* Nautilus 2.20 calls get_file_items() at startup with something not a
+   * GtkWindow. This would not be a problem since at this time the user will
+   * not (even be able to) activate our button. */
+  idata->window = GTK_IS_WINDOW (window) ? GTK_WINDOW (window) : NULL;
   idata->files = nautilus_file_info_list_copy (files);
   g_object_set_data_full (G_OBJECT (item), "NautilusSrm::item-data",
                           idata, (GDestroyNotify)item_data_free);
@@ -256,7 +259,7 @@ nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
                                                     "Delete the selected files and override their data",
                                                     g_list_length (files)),
                                  GTK_STOCK_DELETE);
-  add_item_data (item, GTK_WINDOW (window), files);
+  add_item_data (item, window, files);
   g_signal_connect (item, "activate",
                     G_CALLBACK (menu_item_delete_activate_handler), provider);
   
@@ -286,7 +289,7 @@ nautilus_srm_menu_item_sfill (NautilusMenuProvider *provider,
                                                     "Override free space in the device(s) containing this files",
                                                     g_list_length (folders)),
                                  NULL);
-  add_item_data (item, GTK_WINDOW (window), folders);
+  add_item_data (item, window, folders);
   g_signal_connect (item, "activate",
                     G_CALLBACK (menu_item_fill_activate_handler), provider);
   
