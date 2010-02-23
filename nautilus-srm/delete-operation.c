@@ -50,11 +50,14 @@
  *          operation started successfully.
  */
 gboolean
-nautilus_srm_delete_operation (GList    *files,
-                               GCallback finished_handler,
-                               GCallback progress_handler,
-                               gpointer  data,
-                               GError  **error)
+nautilus_srm_delete_operation (GList                       *files,
+                               gboolean                     fast,
+                               GsdSecureDeleteOperationMode mode,
+                               gboolean                     zeroise,
+                               GCallback                    finished_handler,
+                               GCallback                    progress_handler,
+                               gpointer                     data,
+                               GError                     **error)
 {
   gboolean            success = TRUE;
   GsdDeleteOperation *operation;
@@ -87,6 +90,9 @@ nautilus_srm_delete_operation (GList    *files,
   }
   /* if file addition succeeded, try to launch operation */
   if (success) {
+    gsd_secure_delete_operation_set_fast (GSD_SECURE_DELETE_OPERATION (operation), fast);
+    gsd_secure_delete_operation_set_mode (GSD_SECURE_DELETE_OPERATION (operation), mode);
+    gsd_zeroable_operation_set_zeroise (GSD_ZEROABLE_OPERATION (operation), zeroise);
     g_signal_connect (operation, "progress", progress_handler, data);
     g_signal_connect (operation, "finished", finished_handler, data);
     /* unrefs the operation when done (notice that it is called after the default

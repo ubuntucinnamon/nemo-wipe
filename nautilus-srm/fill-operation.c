@@ -296,11 +296,14 @@ filter_dir_list (GList *directories)
  *          operation started successfully.
  */
 gboolean
-nautilus_srm_fill_operation (GList    *directories,
-                             GCallback finished_handler,
-                             GCallback progress_handler,
-                             gpointer  data,
-                             GError  **error)
+nautilus_srm_fill_operation (GList                       *directories,
+                             gboolean                     fast,
+                             GsdSecureDeleteOperationMode mode,
+                             gboolean                     zeroise,
+                             GCallback                    finished_handler,
+                             GCallback                    progress_handler,
+                             gpointer                     data,
+                             GError                     **error)
 {
   gboolean                  success = TRUE;
   struct FillOperationData *opdata;
@@ -320,6 +323,9 @@ nautilus_srm_fill_operation (GList    *directories,
     opdata->n_op              = g_list_length (opdata->dir);
     opdata->n_op_done         = 0;
     opdata->operation         = gsd_fill_operation_new ();
+    gsd_secure_delete_operation_set_fast (GSD_SECURE_DELETE_OPERATION (opdata->operation), fast);
+    gsd_secure_delete_operation_set_mode (GSD_SECURE_DELETE_OPERATION (opdata->operation), mode);
+    gsd_zeroable_operation_set_zeroise (GSD_ZEROABLE_OPERATION (opdata->operation), zeroise);
     opdata->progress_hid = g_signal_connect (opdata->operation, "progress",
                                              G_CALLBACK (nautilus_srm_fill_progress_handler), opdata);
     opdata->finished_hid = g_signal_connect (opdata->operation, "finished",

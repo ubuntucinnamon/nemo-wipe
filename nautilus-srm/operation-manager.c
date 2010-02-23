@@ -29,6 +29,7 @@
 
 #include "nautilus-srm.h"
 #include "progress-dialog.h"
+#include "compat.h"
 
 
 static GtkResponseType  display_dialog     (GtkWindow       *parent,
@@ -179,6 +180,165 @@ operation_progress_handler (GsdDeleteOperation *operation,
                                              fraction);
 }
 
+/* sets @pref according to state of @toggle */
+static void
+pref_bool_toggle_changed_handler (GtkToggleButton *toggle,
+                                  gboolean        *pref)
+{
+  *pref = gtk_toggle_button_get_active (toggle);
+}
+
+/* sets @pref to the value of the selected row, column 0 of combo's model */
+static void
+pref_enum_combo_changed_handler (GtkComboBox *combo,
+                                 gint        *pref)
+{
+  GtkTreeIter   iter;
+  
+  if (gtk_combo_box_get_active_iter (combo, &iter)) {
+    GtkTreeModel *model = gtk_combo_box_get_model (combo);
+    
+    gtk_tree_model_get (model, &iter, 0, pref, -1);
+  }
+}
+
+/*
+ * operation_confirm_dialog:
+ * @parent: Parent window, or %NULL for none
+ * @primary_text: Dialog's primary text
+ * @secondary_text: Dialog's secondary text
+ * @confirm_button_text: Text of the button to hit in order to confirm (can be a
+ *                       stock item)
+ * @fast: return location for the Gsd.SecureDeleteOperation:fast setting, or
+ *        %NULL
+ * @delete_mode: return location for the Gsd.SecureDeleteOperation:mode setting,
+ *               or %NULL
+ * @zeroise: return location for the Gsd.ZeroableOperation:zeroise setting, or
+ *           %NULL
+ */
+static gboolean
+operation_confirm_dialog (GtkWindow                    *parent,
+                          const gchar                  *primary_text,
+                          const gchar                  *secondary_text,
+                          const gchar                  *confirm_button_text,
+                          gboolean                     *fast,
+                          GsdSecureDeleteOperationMode *delete_mode,
+                          gboolean                     *zeroise)
+{
+  GtkResponseType response = GTK_RESPONSE_NONE;
+  GtkWidget      *dialog;
+  
+  dialog = gtk_message_dialog_new (parent,
+                                   GTK_DIALOG_DESTROY_WITH_PARENT,
+                                   GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
+                                   "%s", primary_text);
+  if (secondary_text) {
+    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                              "%s", secondary_text);
+  }
+  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
+                          GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+                          confirm_button_text, GTK_RESPONSE_ACCEPT,
+                          NULL);
+  /* if we have settings to choose */
+  if (fast || delete_mode || zeroise) {
+    GtkWidget *content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+    GtkWidget *expander;
+    GtkWidget *box;
+    
+    expander = gtk_expander_new (_("Options"));
+    gtk_container_add (GTK_CONTAINER (content_area), expander);
+    box = gtk_vbox_new (FALSE, 0);
+    gtk_container_add (GTK_CONTAINER (expander), box);
+    /* fast option */
+    if (fast) {
+      GtkWidget *check;
+      
+      check = gtk_check_button_new_with_label (
+        _("Fast (and insecure) mode: no /dev/urandom, no synchronize mode")
+      );
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check), *fast);
+      g_signal_connect (check, "toggled",
+                        G_CALLBACK (pref_bool_toggle_changed_handler), fast);
+      gtk_box_pack_start (GTK_BOX (box), check, FALSE, TRUE, 0);
+    }
+    /* delete mode option */
+    if (delete_mode) {
+      GtkWidget        *hbox;
+      GtkWidget        *label;
+      GtkWidget        *combo;
+      GtkListStore     *store;
+      GtkCellRenderer  *renderer;
+      
+      hbox = gtk_hbox_new (FALSE, 5);
+      gtk_box_pack_start (GTK_BOX (box), hbox, FALSE, TRUE, 0);
+      label = gtk_label_new (_("Number of passes:"));
+      gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+      gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+      /* store columns: setting value     (enum)
+       *                number of passes  (int)
+       *                descriptive text  (string) */
+      store = gtk_list_store_new (3, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING);
+      combo = gtk_combo_box_new_with_model (GTK_TREE_MODEL (store));
+      /* number of passes column */
+      renderer = gtk_cell_renderer_spin_new ();
+      gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, FALSE);
+      gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer,
+                                      "text", 1, NULL);
+      /* comment column */
+      renderer = gtk_cell_renderer_text_new ();
+      gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, TRUE);
+      gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer,
+                                      "text", 2, NULL);
+      /* Adds an item.
+       * @value: the setting to return if selected
+       * @n_pass: the number of pass this setting shows
+       * @text: description text for this setting */
+      #define ADD_ITEM(value, n_pass, text)                                    \
+        G_STMT_START {                                                         \
+          GtkTreeIter iter;                                                    \
+                                                                               \
+          gtk_list_store_append (store, &iter);                                \
+          gtk_list_store_set (store, &iter, 0, value, 1, n_pass, 2, text, -1); \
+          if (value == *delete_mode) {                                         \
+              gtk_combo_box_set_active_iter (GTK_COMBO_BOX (combo), &iter);    \
+          }                                                                    \
+        } G_STMT_END
+      /* add items */
+      ADD_ITEM (GSD_SECURE_DELETE_OPERATION_MODE_NORMAL,
+                38, _("(secure, recommended)"));
+      ADD_ITEM (GSD_SECURE_DELETE_OPERATION_MODE_INSECURE,
+                2, _("(insecure, but faster)"));
+      ADD_ITEM (GSD_SECURE_DELETE_OPERATION_MODE_VERY_INSECURE,
+                1, _("(very insecure, but fastest)"));
+      
+      #undef ADD_ITEM
+      /* connect change & pack */
+      g_signal_connect (combo, "changed",
+                        G_CALLBACK (pref_enum_combo_changed_handler), delete_mode);
+      gtk_box_pack_start (GTK_BOX (hbox), combo, FALSE, TRUE, 0);
+    }
+    /* "zeroise" option */
+    if (zeroise) {
+      GtkWidget *check;
+      
+      check = gtk_check_button_new_with_label (
+        _("Wipe the last write with zeros instead of random data")
+      );
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check), *zeroise);
+      g_signal_connect (check, "toggled",
+                        G_CALLBACK (pref_bool_toggle_changed_handler), zeroise);
+      gtk_box_pack_start (GTK_BOX (box), check, FALSE, TRUE, 0);
+    }
+    gtk_widget_show_all (expander);
+  }
+  /* run the dialog */
+  response = gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+  
+  return response == GTK_RESPONSE_ACCEPT;
+}
+
 /* 
  * nautilus_srm_operation_manager_run:
  * @parent: Parent window for dialogs
@@ -209,11 +369,14 @@ nautilus_srm_operation_manager_run (GtkWindow                *parent,
                                     const gchar              *success_secondary_text)
 {
   /* if the user confirms, try to launch the operation */
-  if (display_dialog (parent, GTK_MESSAGE_QUESTION, TRUE,
-                      confirm_primary_text, confirm_secondary_text,
-                      GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-                      confirm_button_text, GTK_RESPONSE_ACCEPT,
-                      NULL) == GTK_RESPONSE_ACCEPT) {
+  gboolean                      fast        = FALSE;
+  GsdSecureDeleteOperationMode  delete_mode = GSD_SECURE_DELETE_OPERATION_MODE_NORMAL;
+  gboolean                      zeroise     = FALSE;
+  
+  if (operation_confirm_dialog (parent,
+                                confirm_primary_text, confirm_secondary_text,
+                                confirm_button_text,
+                                &fast, &delete_mode, &zeroise)) {
     GError                           *err = NULL;
     struct NautilusSrmOperationData  *opdata;
     
@@ -226,7 +389,7 @@ nautilus_srm_operation_manager_run (GtkWindow                *parent,
     opdata->failed_primary_text = g_strdup (failed_primary_text);
     opdata->success_primary_text = g_strdup (success_primary_text);
     opdata->success_secondary_text = g_strdup (success_secondary_text);
-    if (! operation_launcher_func (files,
+    if (! operation_launcher_func (files, fast, delete_mode, zeroise,
                                    G_CALLBACK (operation_finished_handler),
                                    G_CALLBACK (operation_progress_handler),
                                    opdata, &err)) {

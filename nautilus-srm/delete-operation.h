@@ -24,15 +24,19 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#include <gsecuredelete/gsecuredelete.h>
 
 G_BEGIN_DECLS
 
 
-gboolean        nautilus_srm_delete_operation     (GList    *files,
-                                                   GCallback finished_handler,
-                                                   GCallback progress_handler,
-                                                   gpointer  data,
-                                                   GError  **error);
+gboolean    nautilus_srm_delete_operation   (GList                       *files,
+                                             gboolean                     fast,
+                                             GsdSecureDeleteOperationMode mode,
+                                             gboolean                     zeroise,
+                                             GCallback                    finished_handler,
+                                             GCallback                    progress_handler,
+                                             gpointer                     data,
+                                             GError                     **error);
 
 
 G_END_DECLS

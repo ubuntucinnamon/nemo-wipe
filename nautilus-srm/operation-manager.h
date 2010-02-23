@@ -25,6 +25,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
+#include <gsecuredelete/gsecuredelete.h>
 
 G_BEGIN_DECLS
 
@@ -40,11 +41,14 @@ G_BEGIN_DECLS
  * 
  * Returns: %TRUE if operation successfully started, %FALSE otherwise.
  */
-typedef gboolean (*NautilusSrmOperationFunc)  (GList    *files,
-                                               GCallback finished_handler,
-                                               GCallback progress_handler,
-                                               gpointer  data,
-                                               GError  **error);
+typedef gboolean (*NautilusSrmOperationFunc)  (GList                       *files,
+                                               gboolean                     fast,
+                                               GsdSecureDeleteOperationMode mode,
+                                               gboolean                     zeroise,
+                                               GCallback                    finished_handler,
+                                               GCallback                    progress_handler,
+                                               gpointer                     data,
+                                               GError                     **error);
 
 void    nautilus_srm_operation_manager_run    (GtkWindow                *parent,
                                                GList                    *files,
