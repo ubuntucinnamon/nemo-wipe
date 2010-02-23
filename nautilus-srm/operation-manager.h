@@ -33,22 +33,27 @@ G_BEGIN_DECLS
 /**
  * NautilusSrmOperationFunc:
  * @files: Files to work on
+ * @fast: The Gsd.SecureDeleteOperation:fast setting
+ * @mode: The Gsd.SecureDeleteOperation:mode setting
+ * @zeroise: The Gsd.ZeroableOperation:zeroise setting
  * @finished_handler: Handler for GsdAsyncOperation::finished
  * @progress_handler: Handler for GsdAsyncOperation::progress
  * @data: User data for @finished_hanlder and @progress_handler
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * 
- * Returns: %TRUE if operation successfully started, %FALSE otherwise.
+ * Returns: The operation object that was launched, or %NULL on failure.
+ *          The operation object should be unref'd with g_object_unref() when
+ *          no longer needed.
  */
-typedef gboolean (*NautilusSrmOperationFunc)  (GList                       *files,
-                                               gboolean                     fast,
-                                               GsdSecureDeleteOperationMode mode,
-                                               gboolean                     zeroise,
-                                               GCallback                    finished_handler,
-                                               GCallback                    progress_handler,
-                                               gpointer                     data,
-                                               GError                     **error);
+typedef GsdAsyncOperation  *(*NautilusSrmOperationFunc) (GList                       *files,
+                                                         gboolean                     fast,
+                                                         GsdSecureDeleteOperationMode mode,
+                                                         gboolean                     zeroise,
+                                                         GCallback                    finished_handler,
+                                                         GCallback                    progress_handler,
+                                                         gpointer                     data,
+                                                         GError                     **error);
 
 void    nautilus_srm_operation_manager_run    (GtkWindow                *parent,
                                                GList                    *files,

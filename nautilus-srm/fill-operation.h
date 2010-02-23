@@ -29,14 +29,14 @@
 G_BEGIN_DECLS
 
 
-gboolean    nautilus_srm_fill_operation     (GList                       *files,
-                                             gboolean                     fast,
-                                             GsdSecureDeleteOperationMode mode,
-                                             gboolean                     zeroise,
-                                             GCallback                    finished_handler,
-                                             GCallback                    progress_handler,
-                                             gpointer                     data,
-                                             GError                     **error);
+GsdAsyncOperation  *nautilus_srm_fill_operation   (GList                       *files,
+                                                   gboolean                     fast,
+                                                   GsdSecureDeleteOperationMode mode,
+                                                   gboolean                     zeroise,
+                                                   GCallback                    finished_handler,
+                                                   GCallback                    progress_handler,
+                                                   gpointer                     data,
+                                                   GError                     **error);
 
 
 G_END_DECLS

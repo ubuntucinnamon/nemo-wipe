@@ -283,6 +283,9 @@ filter_dir_list (GList *directories)
 /*
  * nautilus_srm_fill_operation:
  * @directories: A list of #NautilusFileInfo to work on
+ * @fast: The Gsd.SecureDeleteOperation:fast setting
+ * @mode: The Gsd.SecureDeleteOperation:mode setting
+ * @zeroise: The Gsd.ZeroableOperation:zeroise setting
  * @finished_handler: A handler for GsdAsyncOperation::finished
  * @progress_handler: A handler for GsdAsyncOperation::progress
  * @data: User data to pass to @finished_handler and @progress_handler
@@ -291,11 +294,11 @@ filter_dir_list (GList *directories)
  * 
  * "sfill"s the given directories.
  * 
- * Returns: %TRUE if operation successfully started, %FALSE otherwise. %TRUE
- *          does not mean that anything was actually done, but only that the
- *          operation started successfully.
+ * Returns: The operation object that was launched, or %NULL on failure.
+ *          The operation object should be unref'd with g_object_unref() when
+ *          no longer needed.
  */
-gboolean
+GsdAsyncOperation *
 nautilus_srm_fill_operation (GList                       *directories,
                              gboolean                     fast,
                              GsdSecureDeleteOperationMode mode,
@@ -337,6 +340,6 @@ nautilus_srm_fill_operation (GList                       *directories,
     }
   }
   
-  return success;
+  return success ? g_object_ref (opdata->operation) : NULL;
 }
 

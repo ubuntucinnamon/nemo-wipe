@@ -104,6 +104,7 @@ display_dialog (GtkWindow       *parent,
 
 struct NautilusSrmOperationData
 {
+  GsdAsyncOperation          *operation;
   GtkWindow                  *window;
   gulong                      window_destroy_hid;
   NautilusSrmProgressDialog  *progress_dialog;
@@ -120,6 +121,7 @@ free_opdata (struct NautilusSrmOperationData *opdata)
   if (opdata->window_destroy_hid) {
     g_signal_handler_disconnect (opdata->window, opdata->window_destroy_hid);
   }
+  g_object_unref (opdata->operation);
   g_free (opdata->failed_primary_text);
   g_free (opdata->success_primary_text);
   g_free (opdata->success_secondary_text);
@@ -389,10 +391,11 @@ nautilus_srm_operation_manager_run (GtkWindow                *parent,
     opdata->failed_primary_text = g_strdup (failed_primary_text);
     opdata->success_primary_text = g_strdup (success_primary_text);
     opdata->success_secondary_text = g_strdup (success_secondary_text);
-    if (! operation_launcher_func (files, fast, delete_mode, zeroise,
-                                   G_CALLBACK (operation_finished_handler),
-                                   G_CALLBACK (operation_progress_handler),
-                                   opdata, &err)) {
+    opdata->operation = operation_launcher_func (files, fast, delete_mode, zeroise,
+                                                 G_CALLBACK (operation_finished_handler),
+                                                 G_CALLBACK (operation_progress_handler),
+                                                 opdata, &err);
+    if (! opdata->operation) {
       if (err->code == G_SPAWN_ERROR_NOENT) {
         gchar *message;
         
