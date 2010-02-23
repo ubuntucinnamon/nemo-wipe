@@ -344,6 +344,31 @@ operation_confirm_dialog (GtkWindow                    *parent,
   return response == GTK_RESPONSE_ACCEPT;
 }
 
+static void
+progress_dialog_response_handler (GtkDialog *dialog,
+                                  gint       response_id,
+                                  gpointer   data)
+{
+  struct NautilusSrmOperationData *opdata = data;
+  
+  switch (response_id) {
+    case GTK_RESPONSE_CANCEL:
+    case GTK_RESPONSE_DELETE_EVENT:
+      if (display_dialog (GTK_WINDOW (dialog), GTK_MESSAGE_QUESTION, TRUE,
+                          _("Are you sure you want to cancel the operation?"),
+                          _("Canceling an operation might leave some file(s) in an intermediate state."),
+                          _("Continue operation"), GTK_RESPONSE_REJECT,
+                          _("Cancel operation"), GTK_RESPONSE_ACCEPT,
+                          NULL) == GTK_RESPONSE_ACCEPT) {
+        gsd_async_operation_cancel (opdata->operation);
+      }
+      break;
+    
+    default:
+      break;
+  }
+}
+
 /* 
  * nautilus_srm_operation_manager_run:
  * @parent: Parent window for dialogs
@@ -391,6 +416,9 @@ nautilus_srm_operation_manager_run (GtkWindow                *parent,
                                                    G_CALLBACK (opdata_window_destroy_handler), opdata);
     opdata->progress_dialog = NAUTILUS_SRM_PROGRESS_DIALOG (nautilus_srm_progress_dialog_new (opdata->window, 0,
                                                                                               progress_dialog_text));
+    nautilus_srm_progress_dialog_set_has_cancel_button (opdata->progress_dialog, TRUE);
+    g_signal_connect (opdata->progress_dialog, "response",
+                      G_CALLBACK (progress_dialog_response_handler), opdata);
     opdata->failed_primary_text = g_strdup (failed_primary_text);
     opdata->success_primary_text = g_strdup (success_primary_text);
     opdata->success_secondary_text = g_strdup (success_secondary_text);
