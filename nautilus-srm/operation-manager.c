@@ -91,7 +91,10 @@ display_dialog (GtkWindow       *parent,
   /* show the dialog */
   if (wait_for_response) {
     response = gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
+    /* if not already destroyed by the parent */
+    if (GTK_IS_WIDGET (dialog)) {
+      gtk_widget_destroy (dialog);
+    }
   } else {
     g_signal_connect (dialog, "response", G_CALLBACK (gtk_widget_destroy), NULL);
     gtk_widget_show (dialog);
