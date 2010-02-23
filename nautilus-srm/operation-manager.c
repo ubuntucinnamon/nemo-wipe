@@ -255,18 +255,6 @@ operation_confirm_dialog (GtkWindow                    *parent,
     gtk_container_add (GTK_CONTAINER (content_area), expander);
     box = gtk_vbox_new (FALSE, 0);
     gtk_container_add (GTK_CONTAINER (expander), box);
-    /* fast option */
-    if (fast) {
-      GtkWidget *check;
-      
-      check = gtk_check_button_new_with_label (
-        _("Fast (and insecure) mode: no /dev/urandom, no synchronize mode")
-      );
-      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check), *fast);
-      g_signal_connect (check, "toggled",
-                        G_CALLBACK (pref_bool_toggle_changed_handler), fast);
-      gtk_box_pack_start (GTK_BOX (box), check, FALSE, TRUE, 0);
-    }
     /* delete mode option */
     if (delete_mode) {
       GtkWidget        *hbox;
@@ -322,6 +310,18 @@ operation_confirm_dialog (GtkWindow                    *parent,
       g_signal_connect (combo, "changed",
                         G_CALLBACK (pref_enum_combo_changed_handler), delete_mode);
       gtk_box_pack_start (GTK_BOX (hbox), combo, FALSE, TRUE, 0);
+    }
+    /* fast option */
+    if (fast) {
+      GtkWidget *check;
+      
+      check = gtk_check_button_new_with_label (
+        _("Fast (and insecure) mode: no /dev/urandom, no synchronize mode")
+      );
+      gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check), *fast);
+      g_signal_connect (check, "toggled",
+                        G_CALLBACK (pref_bool_toggle_changed_handler), fast);
+      gtk_box_pack_start (GTK_BOX (box), check, FALSE, TRUE, 0);
     }
     /* "zeroise" option */
     if (zeroise) {
