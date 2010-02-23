@@ -120,14 +120,13 @@ nautilus_srm_progress_dialog_response (GtkDialog *dialog,
 {
   NautilusSrmProgressDialog *self = NAUTILUS_SRM_PROGRESS_DIALOG (dialog);
   
-  if (response_id == GTK_RESPONSE_CANCEL &&
-      self->priv->cancel_button) {
-    g_debug ("Canceled");
-    nautilus_srm_progress_dialog_cancel (self);
+  if (GTK_IS_WIDGET (self->priv->cancel_button)) {
+    gtk_widget_set_sensitive (self->priv->cancel_button,
+                              ! (self->priv->canceled || self->priv->finished));
   }
-  if (self->priv->close_button) {
-    gtk_dialog_set_response_sensitive (dialog, GTK_RESPONSE_CLOSE,
-                                       self->priv->finished || self->priv->canceled);
+  if (GTK_IS_WIDGET (self->priv->close_button)) {
+    gtk_widget_set_sensitive (self->priv->close_button,
+                              self->priv->finished || self->priv->canceled);
   }
   
   if (GTK_DIALOG_CLASS (nautilus_srm_progress_dialog_parent_class)->response) {
@@ -188,7 +187,6 @@ nautilus_srm_progress_dialog_init (NautilusSrmProgressDialog *self)
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (self->priv->progress), FALSE, TRUE, 7);
   gtk_widget_show (GTK_WIDGET (self->priv->progress));
   
-  gtk_dialog_set_response_sensitive (GTK_DIALOG (self), GTK_RESPONSE_CANCEL, FALSE);
   gtk_window_set_deletable (GTK_WINDOW (self), FALSE);
   gtk_progress_bar_set_ellipsize (self->priv->progress, PANGO_ELLIPSIZE_END);
   update_action_area_visibility (self, FALSE);
@@ -552,8 +550,8 @@ nautilus_srm_progress_dialog_set_has_close_button (NautilusSrmProgressDialog *di
       dialog->priv->close_button = gtk_dialog_add_button (GTK_DIALOG (dialog),
                                                           GTK_STOCK_CLOSE,
                                                           GTK_RESPONSE_CLOSE);
-      gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE,
-                                         dialog->priv->finished || dialog->priv->canceled);
+      gtk_widget_set_sensitive (dialog->priv->close_button,
+                                dialog->priv->finished || dialog->priv->canceled);
     } else {
       gtk_widget_destroy (dialog->priv->close_button);
       dialog->priv->close_button = NULL;
@@ -597,8 +595,8 @@ nautilus_srm_progress_dialog_set_has_cancel_button (NautilusSrmProgressDialog *d
       dialog->priv->cancel_button = gtk_dialog_add_button (GTK_DIALOG (dialog),
                                                            GTK_STOCK_CANCEL,
                                                            GTK_RESPONSE_CANCEL);
-      gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL,
-                                         ! dialog->priv->canceled && ! dialog->priv->finished);
+      gtk_widget_set_sensitive (dialog->priv->cancel_button,
+                                ! dialog->priv->canceled && ! dialog->priv->finished);
     } else {
       gtk_widget_destroy (dialog->priv->cancel_button);
       dialog->priv->cancel_button = NULL;
