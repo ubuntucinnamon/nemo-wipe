@@ -189,7 +189,9 @@ nautilus_srm_fill_cleanup (struct FillOperationData *opdata)
 {
   g_signal_handler_disconnect (opdata->operation, opdata->progress_hid);
   g_signal_handler_disconnect (opdata->operation, opdata->finished_hid);
-  g_object_unref (opdata->operation);
+  if (opdata->operation) {
+    g_object_unref (opdata->operation);
+  }
   while (opdata->dir) {
     nautilus_srm_fill_pop_dir (opdata);
   }
