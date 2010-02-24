@@ -124,7 +124,9 @@ free_opdata (struct NautilusSrmOperationData *opdata)
   if (opdata->window_destroy_hid) {
     g_signal_handler_disconnect (opdata->window, opdata->window_destroy_hid);
   }
-  g_object_unref (opdata->operation);
+  if (opdata->operation) {
+    g_object_unref (opdata->operation);
+  }
   g_free (opdata->failed_primary_text);
   g_free (opdata->success_primary_text);
   g_free (opdata->success_secondary_text);
