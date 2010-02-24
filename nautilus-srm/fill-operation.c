@@ -135,6 +135,8 @@ find_mountpoint (GFile   *file,
 }
 
 
+
+
 typedef void  (*FillFinishedFunc) (GsdFillOperation  *self,
                                    gboolean           success,
                                    const gchar       *message,
@@ -161,11 +163,21 @@ struct FillOperationData
   gpointer          cbdata;
 };
 
+static void   nautilus_srm_fill_finished_handler  (GsdFillOperation         *operation,
+                                                   gboolean                  success,
+                                                   const gchar              *message,
+                                                   struct FillOperationData *opdata);
+static void   nautilus_srm_fill_progress_handler  (GsdFillOperation         *operation,
+                                                   gdouble                   fraction,
+                                                   struct FillOperationData *opdata);
+
+
 /* Actually calls libgsecuredelete */
 static gboolean
 do_sfill_operation (struct FillOperationData *opdata,
                     GError                  **error)
 {
+  g_message ("Starting work on %s", (const gchar *)opdata->dir->data);
   /* FIXME: don't launch sfill in a useful directory since it can leave a bunch
    * of files if it get interrupted (e.g. from a crash, a user kill or so) */
   return gsd_fill_operation_run (opdata->operation, opdata->dir->data, 100, error);
@@ -210,6 +222,30 @@ nautilus_srm_fill_progress_handler (GsdFillOperation         *operation,
                             opdata->cbdata);
 }
 
+/* timeout function to launch next operation after finish of the previous
+ * operation.
+ * we need this kind of hack since operation are locked while running. */
+static gboolean
+launch_next_sfill_operation (struct FillOperationData *opdata)
+{
+  gboolean busy;
+  
+  busy = gsd_async_operation_get_busy (GSD_ASYNC_OPERATION (opdata->operation));
+  if (! busy) {
+    GError   *err = NULL;
+    gboolean  success;
+    
+    success = do_sfill_operation (opdata, &err);
+    if (! success) {
+      nautilus_srm_fill_finished_handler (opdata->operation,
+                                          success, err->message, opdata);
+      g_error_free (err);
+    }
+  }
+  
+  return busy; /* keeps our timeout function until lock is released */
+}
+
 /* Wrapper for the finished handler.
  * It launches the next operation if there is one left, or call the user's
  * handler if done or on error. */
@@ -219,28 +255,21 @@ nautilus_srm_fill_finished_handler (GsdFillOperation         *operation,
                                     const gchar              *message,
                                     struct FillOperationData *opdata)
 {
-  gboolean free_message = FALSE; /* hack to be able to fill @message */
-  
   opdata->n_op_done++;
   /* remove the directory just proceeded */
   nautilus_srm_fill_pop_dir (opdata);
   /* if the last operation succeeded and we have work left */
   if (success && opdata->dir) {
-    GError *err = NULL;
-    
-    success = do_sfill_operation (opdata, &err);
-    if (! success) {
-      message = g_strdup (err->message);
-      free_message = TRUE;
-      g_error_free (err);
-    }
-  }
-  if (! success || ! opdata->dir) {
+    /* we can't launch the next operation right here since the previous must
+     * release its lock before, which is done just after return of the current
+     * function.
+     * To work around this, we add a timeout function that will try to launch
+     * the next operation if the current one is not busy, which fixes the
+     * problem. */
+    g_timeout_add (10, (GSourceFunc)launch_next_sfill_operation, opdata);
+  } else {
     opdata->finished_handler (operation, success, message, opdata->cbdata);
     nautilus_srm_fill_cleanup (opdata);
-  }
-  if (free_message) {
-    g_free ((gchar *)message);
   }
 }
 
