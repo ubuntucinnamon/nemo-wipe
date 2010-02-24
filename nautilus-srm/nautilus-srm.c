@@ -240,12 +240,13 @@ menu_item_delete_activate_handler (NautilusMenuItem     *item,
 
 static NautilusMenuItem *
 nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
+                            const gchar          *item_name,
                             GtkWidget            *window,
                             GList                *files)
 {
   NautilusMenuItem *item;
   
-  item = nautilus_menu_item_new ("NautilusSrm::srm_item",
+  item = nautilus_menu_item_new (item_name,
                                  _("Delete and overwrite content"),
                                  g_dngettext (NULL, "Delete the selected file and overwrite its data",
                                                     "Delete the selected files and overwrite their data",
@@ -270,12 +271,13 @@ menu_item_fill_activate_handler (NautilusMenuItem     *item,
 
 static NautilusMenuItem *
 nautilus_srm_menu_item_sfill (NautilusMenuProvider *provider,
+                              const gchar          *item_name,
                               GtkWidget            *window,
                               GList                *folders)
 {
   NautilusMenuItem *item;
 
-  item = nautilus_menu_item_new ("NautilusSrm::sfill_item",
+  item = nautilus_menu_item_new (item_name,
                                  _("Overwrite free space here"),
                                  g_dngettext (NULL, "Overwrite free space in the device containing this file",
                                                     "Overwrite free space in the device(s) containing these files",
@@ -295,10 +297,15 @@ nautilus_srm_get_file_items (NautilusMenuProvider *provider,
                              GList                *files)
 {
   GList *items = NULL;
-  items = g_list_append (items, nautilus_srm_menu_item_srm (provider,
-                                                            window, files));
-  items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
+  
+  if (files) {
+    items = g_list_append (items, nautilus_srm_menu_item_srm (provider,
+                                                              "nautilus-srm::files-items::srm",
                                                               window, files));
+    items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
+                                                                "nautilus-srm::files-items::sfill",
+                                                                window, files));
+  }
   
   return items;
 }
@@ -313,6 +320,7 @@ nautilus_srm_get_background_items (NautilusMenuProvider *provider,
   GList *files = g_list_append (NULL, current_folder);
   
   items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
+                                                              "nautilus-srm::background-items::sfill",
                                                               window, files));
   g_list_free (files);
   
