@@ -84,18 +84,26 @@ find_mountpoint_unix (const gchar *path)
 #endif
 
 static gchar *
-find_mountpoint (GFile *file)
+find_mountpoint (GFile   *file,
+                 GError **error)
 {
   gchar  *mountpoint_path = NULL;
   GMount *mount;
+  GError *err = NULL;
   
   /* Try with GIO first */
-  mount = g_file_find_enclosing_mount (file, NULL, NULL);
+  mount = g_file_find_enclosing_mount (file, NULL, &err);
   if (mount) {
     GFile *mountpoint_file;
     
     mountpoint_file = g_mount_get_root (mount);
     mountpoint_path = g_file_get_path (mountpoint_file);
+    if (! mountpoint_path) {
+      gchar *uri = g_file_get_uri (mountpoint_file);
+      
+      g_set_error (&err, 0, 0, "Mount \"%s\" is not local", uri);
+      g_free (uri);
+    }
     g_object_unref (mountpoint_file);
     g_object_unref (mount);
   }
@@ -104,12 +112,24 @@ find_mountpoint (GFile *file)
   if (! mountpoint_path) {
     gchar *path = g_file_get_path (file);
     
+    g_clear_error (&err);
     if (path) {
       mountpoint_path = find_mountpoint_unix (path);
+      if (! mountpoint_path) {
+        g_set_error (&err, 0, 0, "No mount point found for path \"%s\"", path);
+      }
+    } else {
+      gchar *uri = g_file_get_uri (file);
+      
+      g_set_error (&err, 0, 0, "File \"%s\" is not local", uri);
+      g_free (uri);
     }
     g_free (path);
   }
   #endif
+  if (! mountpoint_path) {
+    g_propagate_error (error, err);
+  }
   
   return mountpoint_path;
 }
@@ -233,42 +253,49 @@ nautilus_srm_fill_finished_handler (GsdFillOperation         *operation,
  *          g_free() before freeing the list.
  */
 static GList *
-filter_dir_list (GList *directories)
+filter_dir_list (GList   *directories,
+                 GError **error)
 {
   GList      *dirs = NULL;
+  GError     *err = NULL;
   /* table of different mountpoints */
   GHashTable *mountpoints = g_hash_table_new_full (g_str_hash, g_str_equal,
                                                    g_free, NULL);
   
-  for (; directories; directories = g_list_next (directories)) {
+  g_return_val_if_fail (directories != NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  
+  for (; ! err && directories; directories = g_list_next (directories)) {
     GFile *file = nautilus_file_info_get_location (directories->data);
     gchar *mountpoint;
     
-    mountpoint = find_mountpoint (file);
-    if (G_UNLIKELY (! mountpoint)) {
-      /* FIXME: do something even if this is very unlikely */
-      gchar *uri = g_file_get_uri (file);
-      
-      g_warning ("Cannot find mountpoint of URI %s, skipping", uri);
-      g_free (uri);
-    } else {
+    mountpoint = find_mountpoint (file, &err);
+    if (G_LIKELY (mountpoint)) {
       if (g_hash_table_lookup (mountpoints, mountpoint)) {
         /* the mountpoint is already added, skip it */
         g_free (mountpoint);
       } else {
         gchar *path;
         
-        g_hash_table_insert (mountpoints, mountpoint, NULL);
+        g_hash_table_insert (mountpoints, mountpoint, (gpointer)TRUE);
         path = g_file_get_path (file);
         if (! path) {
-          /* FIXME: do something (it is probably a remote file)
-           * hum, I think it can't happen since find_mountpoint() would fail
-           * on remote files */
+          /* FIXME: fix error domain & code */
           gchar *uri = g_file_get_uri (file);
           
-          g_warning ("Cannot get path for URI %s, skipping", uri);
+          g_set_error (&err, 0, 0, "Cannot find local path for URI \"%s\"", uri);
           g_free (uri);
         } else {
+          /* if it is not a directory, gets its container directory.
+           * no harm since files cannot be mountpoint themselves, then it gets
+           * at most the mountpoint itself */
+          if (! g_file_test (path, G_FILE_TEST_IS_DIR)) {
+            gchar *tmp;
+            
+            tmp = g_path_get_dirname (path);
+            g_free (path);
+            path = tmp;
+          }
           dirs = g_list_append (dirs, path);
         }
       }
@@ -276,6 +303,16 @@ filter_dir_list (GList *directories)
     g_object_unref (file);
   }
   g_hash_table_destroy (mountpoints);
+  if (err) {
+    while (dirs) {
+      GList *tmp = dirs;
+      
+      dirs = g_list_next (dirs);
+      g_free (tmp->data);
+      g_list_free_1 (tmp);
+    }
+    g_propagate_error (error, err);
+  }
   
   return dirs;
 }
@@ -308,16 +345,14 @@ nautilus_srm_fill_operation (GList                       *directories,
                              gpointer                     data,
                              GError                     **error)
 {
-  gboolean                  success = TRUE;
+  gboolean                  success = FALSE;
   struct FillOperationData *opdata;
   GList                    *dirs;
   
-  dirs = filter_dir_list (directories);
-  if (! dirs) {
-    /* FIXME: use correct error quark and code */
-    g_set_error (error, 0, 0, "Nothing to do!");
-    success = FALSE;
-  } else {
+  g_return_val_if_fail (directories != NULL, NULL);
+  
+  dirs = filter_dir_list (directories, error);
+  if (dirs) {
     opdata = g_slice_alloc (sizeof *opdata);
     opdata->dir               = dirs;
     opdata->finished_handler  = (FillFinishedFunc)finished_handler;
