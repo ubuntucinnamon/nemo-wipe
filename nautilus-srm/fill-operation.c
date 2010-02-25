@@ -32,9 +32,6 @@
 # include <gio/gunixmounts.h>
 #endif
 #include <gsecuredelete/gsecuredelete.h>
-#include <libnautilus-extension/nautilus-file-info.h>
-
-#include "compat.h" /* for nautilus_file_info_get_location() */
 
 
 #if HAVE_GIO_UNIX
@@ -84,14 +81,16 @@ find_mountpoint_unix (const gchar *path)
 #endif
 
 static gchar *
-find_mountpoint (GFile   *file,
-                 GError **error)
+find_mountpoint (const gchar *path,
+                 GError     **error)
 {
   gchar  *mountpoint_path = NULL;
+  GFile  *file;
   GMount *mount;
   GError *err = NULL;
   
   /* Try with GIO first */
+  file = g_file_new_for_path (path);
   mount = g_file_find_enclosing_mount (file, NULL, &err);
   if (mount) {
     GFile *mountpoint_file;
@@ -107,24 +106,15 @@ find_mountpoint (GFile   *file,
     g_object_unref (mountpoint_file);
     g_object_unref (mount);
   }
+  g_object_unref (file);
   #if HAVE_GIO_UNIX
   /* fallback to find_unix_mount() */
   if (! mountpoint_path) {
-    gchar *path = g_file_get_path (file);
-    
     g_clear_error (&err);
-    if (path) {
-      mountpoint_path = find_mountpoint_unix (path);
-      if (! mountpoint_path) {
-        g_set_error (&err, 0, 0, "No mount point found for path \"%s\"", path);
-      }
-    } else {
-      gchar *uri = g_file_get_uri (file);
-      
-      g_set_error (&err, 0, 0, "File \"%s\" is not local", uri);
-      g_free (uri);
+    mountpoint_path = find_mountpoint_unix (path);
+    if (! mountpoint_path) {
+      g_set_error (&err, 0, 0, "No mount point found for path \"%s\"", path);
     }
-    g_free (path);
   }
   #endif
   if (! mountpoint_path) {
@@ -275,7 +265,7 @@ nautilus_srm_fill_finished_handler (GsdFillOperation         *operation,
 
 /*
  * filter_dir_list:
- * @directories: a list of #NautilusFileInfo
+ * @directories: a list of paths
  * 
  * Filter the input file list so that there remains only one path for
  * each filesystem.
@@ -297,10 +287,10 @@ filter_dir_list (GList   *directories,
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
   
   for (; ! err && directories; directories = g_list_next (directories)) {
-    GFile *file = nautilus_file_info_get_location (directories->data);
-    gchar *mountpoint;
+    const gchar  *file_path = directories->data;
+    gchar        *mountpoint;
     
-    mountpoint = find_mountpoint (file, &err);
+    mountpoint = find_mountpoint (file_path, &err);
     if (G_LIKELY (mountpoint)) {
       if (g_hash_table_lookup (mountpoints, mountpoint)) {
         /* the mountpoint is already added, skip it */
@@ -309,29 +299,17 @@ filter_dir_list (GList   *directories,
         gchar *path;
         
         g_hash_table_insert (mountpoints, mountpoint, (gpointer)TRUE);
-        path = g_file_get_path (file);
-        if (! path) {
-          /* FIXME: fix error domain & code */
-          gchar *uri = g_file_get_uri (file);
-          
-          g_set_error (&err, 0, 0, "Cannot find local path for URI \"%s\"", uri);
-          g_free (uri);
+        /* if it is not a directory, gets its container directory.
+         * no harm since files cannot be mountpoint themselves, then it gets
+         * at most the mountpoint itself */
+        if (! g_file_test (file_path, G_FILE_TEST_IS_DIR)) {
+          path = g_path_get_dirname (file_path);
         } else {
-          /* if it is not a directory, gets its container directory.
-           * no harm since files cannot be mountpoint themselves, then it gets
-           * at most the mountpoint itself */
-          if (! g_file_test (path, G_FILE_TEST_IS_DIR)) {
-            gchar *tmp;
-            
-            tmp = g_path_get_dirname (path);
-            g_free (path);
-            path = tmp;
-          }
-          dirs = g_list_append (dirs, path);
+          path = g_strdup (file_path);
         }
+        dirs = g_list_append (dirs, path);
       }
     }
-    g_object_unref (file);
   }
   g_hash_table_destroy (mountpoints);
   if (err) {
@@ -350,7 +328,7 @@ filter_dir_list (GList   *directories,
 
 /*
  * nautilus_srm_fill_operation:
- * @directories: A list of #NautilusFileInfo to work on
+ * @directories: A list of paths to work on
  * @fast: The Gsd.SecureDeleteOperation:fast setting
  * @mode: The Gsd.SecureDeleteOperation:mode setting
  * @zeroise: The Gsd.ZeroableOperation:zeroise setting

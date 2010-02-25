@@ -32,7 +32,7 @@ G_BEGIN_DECLS
 
 /**
  * NautilusSrmOperationFunc:
- * @files: Files to work on
+ * @files: Paths to work on
  * @fast: The Gsd.SecureDeleteOperation:fast setting
  * @mode: The Gsd.SecureDeleteOperation:mode setting
  * @zeroise: The Gsd.ZeroableOperation:zeroise setting

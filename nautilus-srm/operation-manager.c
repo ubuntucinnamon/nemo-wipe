@@ -374,7 +374,7 @@ progress_dialog_response_handler (GtkDialog *dialog,
 /* 
  * nautilus_srm_operation_manager_run:
  * @parent: Parent window for dialogs
- * @files: List of #NautilusFileInfo to pass to @operation_launcher_func
+ * @files: List of paths to pass to @operation_launcher_func
  * @confirm_primary_text: Primary text for the confirmation dialog
  * @confirm_secondary_text: Secondary text for the confirmation dialog
  * @confirm_button_text: Text for the confirm button of the confirmation dialog.

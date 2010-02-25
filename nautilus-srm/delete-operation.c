@@ -29,14 +29,11 @@
 #include <glib-object.h>
 #include <gio/gio.h>
 #include <gsecuredelete/gsecuredelete.h>
-#include <libnautilus-extension/nautilus-file-info.h>
-
-#include "compat.h" /* for nautilus_file_info_get_location() */
 
 
 /*
  * nsrm_delete_operation:
- * @files: A list of #NautilusFileInfo to delete.
+ * @files: A list of paths to delete.
  * @fast: The Gsd.SecureDeleteOperation:fast setting
  * @mode: The Gsd.SecureDeleteOperation:mode setting
  * @zeroise: The Gsd.ZeroableOperation:zeroise setting
@@ -67,32 +64,16 @@ nautilus_srm_delete_operation (GList                       *files,
   guint               n_files = 0;
   
   operation = gsd_delete_operation_new ();
-  for (; success && files; files = g_list_next (files)) {
-    GFile *file = nautilus_file_info_get_location (files->data);
-    gchar *path;
-    
-    path = g_file_get_path (file);
-    if (! path) {
-      gchar *uri = g_file_get_uri (file);
-      
-      success = FALSE;
-      /* FIXME: use correct error quark and code */
-      g_set_error (error, 0, 0, "Unsupported location: %s", uri);
-      g_free (uri);
-    } else {
-      gsd_delete_operation_add_path (operation, path);
-    }
-    g_free (path);
-    g_object_unref (file);
+  for (; files; files = g_list_next (files)) {
+    gsd_delete_operation_add_path (operation, files->data);
     n_files ++;
   }
-  if (success && n_files < 1) {
+  if (n_files < 1) {
     /* FIXME: use correct error quark and code */
     g_set_error (error, 0, 0, "Nothing to do!");
     success = FALSE;
-  }
-  /* if file addition succeeded, try to launch operation */
-  if (success) {
+  } else {
+    /* if file addition succeeded, try to launch operation */
     gsd_secure_delete_operation_set_fast (GSD_SECURE_DELETE_OPERATION (operation), fast);
     gsd_secure_delete_operation_set_mode (GSD_SECURE_DELETE_OPERATION (operation), mode);
     gsd_zeroable_operation_set_zeroise (GSD_ZEROABLE_OPERATION (operation), zeroise);

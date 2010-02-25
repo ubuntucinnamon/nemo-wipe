@@ -34,6 +34,7 @@
 #include "operation-manager.h"
 #include "delete-operation.h"
 #include "fill-operation.h"
+#include "compat.h"
 
 
 static GType provider_types[1];
@@ -175,6 +176,77 @@ static void       run_delete_operation  (GtkWindow *parent,
                                          GList     *files);
 
 
+/* gets the path of a #NautilusFileInfo. */
+static gchar *
+nautilus_srm_nfi_get_path (NautilusFileInfo *nfi)
+{
+  GFile *file;
+  gchar *path;
+  
+  file = nautilus_file_info_get_location (nfi);
+  path = g_file_get_path (file);
+  
+  return path;
+}
+
+/* frees a list of paths */
+static void
+nautilus_srm_path_list_free (GList *paths)
+{
+  while (paths) {
+    GList *tmp = paths;
+    
+    paths = g_list_next (paths);
+    g_free (tmp->data);
+    g_list_free_1 (tmp);
+  }
+}
+
+/* copies a list of paths
+ * free the returned list with nautilus_srm_path_list_free() */
+static GList *
+nautilus_srm_path_list_copy (GList *src)
+{
+  GList *paths = NULL;
+  
+  while (src) {
+    paths = g_list_append (paths, g_strdup (src->data));
+    src = g_list_next (src);
+  }
+  
+  return paths;
+}
+
+/* converts a list of #NautilusFileInfo to a list of paths.
+ * free the returned list with nautilus_srm_path_list_free()
+ * 
+ * Returns: The list of paths on success, or %NULL on failure. This function
+ *          will always fail on non-local-mounted (then without paths) files */
+static GList *
+nautilus_srm_nfi_list_to_path_list (GList *nfis)
+{
+  gboolean  success = TRUE;
+  GList    *paths   = NULL;
+  
+  while (nfis && success) {
+    gchar *path;
+    
+    path = nautilus_srm_nfi_get_path (nfis->data);
+    if (path) {
+      paths = g_list_append (paths, path);
+    } else {
+      success = FALSE;
+    }
+    nfis = g_list_next (nfis);
+  }
+  if (! success) {
+    nautilus_srm_path_list_free (paths);
+    paths = NULL;
+  }
+  
+  return paths;
+}
+
 
 /* Data needed to be able to start an operation.
  * We don't use private filed of the extension's object because there is only
@@ -186,14 +258,14 @@ struct ItemData
                        * Note: don't ref or unref it, it seems to break
                        * something in Nautilus (like the object being alive but
                        * the widget destroyed... strange) */
-  GList     *files;   /* list of selected NautilusFileInfos */
+  GList     *paths;   /* list of selected paths */
 };
 
 /* Frees an #ItemData */
 static void
 item_data_free (struct ItemData *idata)
 {
-  nautilus_file_info_list_free (idata->files);
+  nautilus_srm_path_list_free (idata->paths);
   g_slice_free1 (sizeof *idata, idata);
 }
 
@@ -204,7 +276,7 @@ item_data_free (struct ItemData *idata)
 static void
 add_item_data (NautilusMenuItem *item,
                GtkWidget        *window,
-               GList            *files)
+               GList            *paths)
 {
   struct ItemData *idata;
   
@@ -213,7 +285,7 @@ add_item_data (NautilusMenuItem *item,
    * GtkWindow. This would not be a problem since at this time the user will
    * not (even be able to) activate our button. */
   idata->window = GTK_IS_WINDOW (window) ? GTK_WINDOW (window) : NULL;
-  idata->files = nautilus_file_info_list_copy (files);
+  idata->paths = nautilus_srm_path_list_copy (paths);
   g_object_set_data_full (G_OBJECT (item), "NautilusSrm::item-data",
                           idata, (GDestroyNotify)item_data_free);
 }
@@ -235,14 +307,14 @@ menu_item_delete_activate_handler (NautilusMenuItem     *item,
 {
   struct ItemData *idata = get_item_data (item);
   
-  run_delete_operation (idata->window, idata->files);
+  run_delete_operation (idata->window, idata->paths);
 }
 
 static NautilusMenuItem *
 nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
                             const gchar          *item_name,
                             GtkWidget            *window,
-                            GList                *files)
+                            GList                *paths)
 {
   NautilusMenuItem *item;
   
@@ -250,9 +322,9 @@ nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
                                  _("Delete and overwrite content"),
                                  g_dngettext (NULL, "Delete the selected file and overwrite its data",
                                                     "Delete the selected files and overwrite their data",
-                                                    g_list_length (files)),
+                                                    g_list_length (paths)),
                                  GTK_STOCK_DELETE);
-  add_item_data (item, window, files);
+  add_item_data (item, window, paths);
   g_signal_connect (item, "activate",
                     G_CALLBACK (menu_item_delete_activate_handler), provider);
   
@@ -266,7 +338,7 @@ menu_item_fill_activate_handler (NautilusMenuItem     *item,
 {
   struct ItemData *idata = get_item_data (item);
   
-  run_fill_operation (idata->window, idata->files);
+  run_fill_operation (idata->window, idata->paths);
 }
 
 static NautilusMenuItem *
@@ -297,15 +369,18 @@ nautilus_srm_get_file_items (NautilusMenuProvider *provider,
                              GList                *files)
 {
   GList *items = NULL;
+  GList *paths;
   
-  if (files) {
+  paths = nautilus_srm_nfi_list_to_path_list (files);
+  if (paths) {
     items = g_list_append (items, nautilus_srm_menu_item_srm (provider,
                                                               "nautilus-srm::files-items::srm",
-                                                              window, files));
+                                                              window, paths));
     items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
                                                                 "nautilus-srm::files-items::sfill",
-                                                                window, files));
+                                                                window, paths));
   }
+  nautilus_srm_path_list_free (paths);
   
   return items;
 }
@@ -317,12 +392,15 @@ nautilus_srm_get_background_items (NautilusMenuProvider *provider,
                                    NautilusFileInfo     *current_folder)
 {
   GList *items = NULL;
-  GList *files = g_list_append (NULL, current_folder);
+  GList *paths = NULL;
   
-  items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
-                                                              "nautilus-srm::background-items::sfill",
-                                                              window, files));
-  g_list_free (files);
+  paths = g_list_append (paths, nautilus_srm_nfi_get_path (current_folder));
+  if (paths && paths->data) {
+    items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
+                                                                "nautilus-srm::background-items::sfill",
+                                                                window, paths));
+  }
+  nautilus_srm_path_list_free (paths);
   
   return items;
 }
@@ -345,7 +423,7 @@ run_delete_operation (GtkWindow *parent,
   } else if (n_items > 0) {
     gchar *name;
     
-    name = nautilus_file_info_get_name (files->data);
+    name = g_filename_display_basename (files->data);
     confirm_primary_text = g_strdup_printf (_("Are you sure you want to delete and wipe "
                                               "\"%s\"?"),
                                             name);
@@ -387,7 +465,7 @@ run_fill_operation (GtkWindow *parent,
   } else if (n_items > 0) {
     gchar *name;
     
-    name = nautilus_file_info_get_name (files->data);
+    name = g_filename_display_basename (files->data);
     confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe the free space "
                                               "on the device of \"%s\"?"),
                                             name);
