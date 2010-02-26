@@ -365,10 +365,8 @@ nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
   NautilusMenuItem *item;
   
   item = nautilus_menu_item_new (item_name,
-                                 _("Delete and overwrite content"),
-                                 g_dngettext (NULL, "Delete the selected file and overwrite its data",
-                                                    "Delete the selected files and overwrite their data",
-                                                    g_list_length (paths)),
+                                 _("Wipe"),
+                                 _("Delete each selected item, and overwrite its data"),
                                  GTK_STOCK_DELETE);
   add_item_data (item, window, paths);
   g_signal_connect (item, "activate",
@@ -396,10 +394,8 @@ nautilus_srm_menu_item_sfill (NautilusMenuProvider *provider,
   NautilusMenuItem *item;
 
   item = nautilus_menu_item_new (item_name,
-                                 _("Overwrite free space here"),
-                                 g_dngettext (NULL, "Overwrite free space in the device containing this file",
-                                                    "Overwrite free space in the device(s) containing these files",
-                                                    g_list_length (folders)),
+                                 _("Wipe available diskspace"),
+                                 _("Overwrite available diskspace in this device(s)"),
                                  NULL);
   add_item_data (item, window, folders);
   g_signal_connect (item, "activate",
@@ -464,13 +460,13 @@ run_delete_operation (GtkWindow *parent,
   n_items = g_list_length (files);
   /* FIXME: can't truly use g_dngettext since the args are not the same */
   if (n_items > 1) {
-    confirm_primary_text = g_strdup_printf (_("Are you sure you want to delete and wipe "
+    confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe "
                                               "the %u selected items?"), n_items);
   } else if (n_items > 0) {
     gchar *name;
     
     name = g_filename_display_basename (files->data);
-    confirm_primary_text = g_strdup_printf (_("Are you sure you want to delete and wipe "
+    confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe "
                                               "\"%s\"?"),
                                             name);
     g_free (name);
@@ -479,17 +475,17 @@ run_delete_operation (GtkWindow *parent,
     parent, files,
     /* confirm dialog */
     confirm_primary_text,
-    _("If you delete an item, it will not be recoverable."),
+    _("If you wipe an item, it will not be recoverable."),
     GTK_STOCK_DELETE,
     /* progress dialog */
-    _("Deleting files..."),
+    _("Wiping files..."),
     /* operation launcher */
     nautilus_srm_delete_operation,
     /* failed dialog */
-    _("Deletion failed"),
+    _("Wipe failed."),
     /* success dialog */
-    _("Deletion succeeded"),
-    _("Files have been successfully deleted and wiped")
+    _("Wipe successful."),
+    _("Item(s) have been successfully wiped.")
   );
   g_free (confirm_primary_text);
 }
@@ -502,19 +498,43 @@ run_fill_operation (GtkWindow *parent,
   gchar  *confirm_primary_text = NULL;
   guint   n_items;
   
+  /* XXX: we want 
+  n_items = g_list_length (mountpoints);*/
   n_items = g_list_length (files);
   /* FIXME: can't truly use g_dngettext since the args are not the same */
   if (n_items > 1) {
-    confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe the free space "
-                                              "on the device(s) of the %u selected items?"),
-                                            n_items);
+    /* XXX: precise the devices to sfill (name:=device name):
+    parcourir la g_list et insérer la première fois device_name
+
+        names = device_name
+
+    et à chaque fois suivante 
+
+        names += ", " device_name"
+
+    ensuite :
+
+        g_strdup_printf (_("Are you sure you want to wipe"
+                          "the available diskspace on the"
+                          "\"%s\" partitions or devices?"),
+                         names)
+    */
+    confirm_primary_text = _("Are you sure you want to wipe"
+                             "the available diskspace on this"
+                             "partition(s) or device(s)?");
   } else if (n_items > 0) {
     gchar *name;
     
     name = g_filename_display_basename (files->data);
-    confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe the free space "
-                                              "on the device of \"%s\"?"),
-                                            name);
+    /* XXX: precise the devices to sfill (name:=device name):
+    g_strdup_printf (_("Are you sure you want to wipe"
+                      "the available diskspace on the"
+                      "\"%s\" partition or device?"),
+                     name)
+    */
+    confirm_primary_text = _("Are you sure you want to wipe"
+                             "the available diskspace on this"
+                             "partition(s) or device(s)?");
     g_free (name);
   }
   nautilus_srm_operation_manager_run (
@@ -522,16 +542,23 @@ run_fill_operation (GtkWindow *parent,
     /* confirm dialog */
     confirm_primary_text,
     _("This operation may take a while."),
-    _("Overwrite free space"),
+    _("Wipe available diskspace"),
     /* progress dialog */
-    _("Wiping free space..."),
+    _("Wiping available diskspace..."),
     /* operation launcher */
     nautilus_srm_fill_operation,
     /* failed dialog */
     _("Wipe failed"),
     /* success dialog */
-    _("Wipe succeeded"),
-    _("Free space on the device(s) have been successfully wiped")
+    _("Wipe successful"),
+    /* XXX: when we will have the mountpoints :
+        
+        g_strdup_printf (_("Available diskspace on the partition(s) or"
+                           "device(s) %s have been successfully wiped."),
+                           mountpoints)
+
+    */
+    _("Available diskspace on the device(s) have been successfully wiped.")
   );
   g_free (confirm_primary_text);
 }

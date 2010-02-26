@@ -318,7 +318,7 @@ operation_confirm_dialog (GtkWindow                    *parent,
       GtkWidget *check;
       
       check = gtk_check_button_new_with_label (
-        _("Fast (and insecure) mode: no /dev/urandom, no synchronize mode")
+        _("Fast and insecure mode (no /dev/urandom, no synchronize mode)")
       );
       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check), *fast);
       g_signal_connect (check, "toggled",
@@ -330,7 +330,7 @@ operation_confirm_dialog (GtkWindow                    *parent,
       GtkWidget *check;
       
       check = gtk_check_button_new_with_label (
-        _("Wipe the last write with zeros instead of random data")
+        _("Last pass with zeros instead of random data")
       );
       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check), *zeroise);
       g_signal_connect (check, "toggled",
@@ -357,9 +357,10 @@ progress_dialog_response_handler (GtkDialog *dialog,
     case GTK_RESPONSE_CANCEL:
     case GTK_RESPONSE_DELETE_EVENT:
       if (display_dialog (GTK_WINDOW (dialog), GTK_MESSAGE_QUESTION, TRUE,
-                          _("Are you sure you want to cancel the operation?"),
-                          _("Canceling an operation might leave some file(s) in an intermediate state."),
-                          _("Continue operation"), GTK_RESPONSE_REJECT,
+                          _("Are you sure you want to cancel this operation?"),
+                          _("Canceling this operation might leave some item(s) in"
+                            "an intermediate state."),
+                          _("Resume operation"), GTK_RESPONSE_REJECT,
                           _("Cancel operation"), GTK_RESPONSE_ACCEPT,
                           NULL) == GTK_RESPONSE_ACCEPT) {
         gsd_async_operation_cancel (opdata->operation);
