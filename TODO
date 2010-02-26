@@ -6,3 +6,11 @@
 * Cleanup configure script
    * Check minimal dependencies (minimal versions of libraries)
 
+* Add our entries in the same section on the context's menu that
+  the "Delete" and the "Move to trash" entry
+
+* Add an icon for sfill
+
+* Sfill: display the mountpoints in the confirmation dialog. Requires
+  to calculate them before displaying the message.
+
