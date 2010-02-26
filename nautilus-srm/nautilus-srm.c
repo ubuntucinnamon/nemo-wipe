@@ -542,7 +542,7 @@ run_fill_operation (GtkWindow *parent,
     /* confirm dialog */
     confirm_primary_text,
     _("This operation may take a while."),
-    _("Wipe available diskspace"),
+    _("_Wipe available diskspace"),
     /* progress dialog */
     _("Wiping available diskspace..."),
     /* operation launcher */

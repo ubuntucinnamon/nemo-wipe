@@ -198,7 +198,7 @@ display_operation_error (struct NautilusSrmOperationData *opdata,
   g_free (short_error);
   /* add the details expander */
   content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-  expander = gtk_expander_new (_("Details"));
+  expander = gtk_expander_new_with_mnemonic (_("_Details"));
   gtk_container_add (GTK_CONTAINER (content_area), expander);
   scroll = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scroll),
@@ -315,7 +315,7 @@ operation_confirm_dialog (GtkWindow                    *parent,
     GtkWidget *expander;
     GtkWidget *box;
     
-    expander = gtk_expander_new (_("Options"));
+    expander = gtk_expander_new_with_mnemonic (_("_Options"));
     gtk_container_add (GTK_CONTAINER (content_area), expander);
     box = gtk_vbox_new (FALSE, 0);
     gtk_container_add (GTK_CONTAINER (expander), box);
@@ -329,7 +329,7 @@ operation_confirm_dialog (GtkWindow                    *parent,
       
       hbox = gtk_hbox_new (FALSE, 5);
       gtk_box_pack_start (GTK_BOX (box), hbox, FALSE, TRUE, 0);
-      label = gtk_label_new (_("Number of passes:"));
+      label = gtk_label_new_with_mnemonic (_("Number of _passes:"));
       gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
       gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
       /* store columns: setting value     (enum)
@@ -337,6 +337,7 @@ operation_confirm_dialog (GtkWindow                    *parent,
        *                descriptive text  (string) */
       store = gtk_list_store_new (3, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING);
       combo = gtk_combo_box_new_with_model (GTK_TREE_MODEL (store));
+      gtk_label_set_mnemonic_widget (GTK_LABEL (label), combo);
       /* number of passes column */
       renderer = gtk_cell_renderer_spin_new ();
       gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, FALSE);
@@ -379,8 +380,8 @@ operation_confirm_dialog (GtkWindow                    *parent,
     if (fast) {
       GtkWidget *check;
       
-      check = gtk_check_button_new_with_label (
-        _("Fast and insecure mode (no /dev/urandom, no synchronize mode)")
+      check = gtk_check_button_new_with_mnemonic (
+        _("_Fast and insecure mode (no /dev/urandom, no synchronize mode)")
       );
       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check), *fast);
       g_signal_connect (check, "toggled",
@@ -391,8 +392,8 @@ operation_confirm_dialog (GtkWindow                    *parent,
     if (zeroise) {
       GtkWidget *check;
       
-      check = gtk_check_button_new_with_label (
-        _("Last pass with zeros instead of random data")
+      check = gtk_check_button_new_with_mnemonic (
+        _("Last pass with _zeros instead of random data")
       );
       gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check), *zeroise);
       g_signal_connect (check, "toggled",
