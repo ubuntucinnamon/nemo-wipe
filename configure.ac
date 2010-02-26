@@ -25,12 +25,14 @@ AM_PROG_LIBTOOL
 GTK_REQUIRED=2.6
 GLIB_REQUIRED=2.16
 GOBJECT_REQUIRED=2.4.0
+GCONF_REQUIRED=2.0
 NAUTILUS_EXTENSION=2.0
 GSECUREDELETE_REQUIRED=0.1
 
 PKG_CHECK_MODULES([NAUTILUS_SRM], \
   glib-2.0              >= ${GLIB_REQUIRED}           \
   gtk+-2.0              >= ${GTK_REQUIRED}            \
+  gconf-2.0             >= ${GCONF_REQUIRED}          \
   libnautilus-extension >= ${NAUTILUS_EXTENSION}      \
   gsecuredelete         >= ${GSECUREDELETE_REQUIRED}  \
 )

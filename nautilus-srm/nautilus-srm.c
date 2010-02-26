@@ -26,8 +26,8 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
-
 #include <gio/gio.h>
+#include <gconf/gconf-client.h>
 
 #include <gsecuredelete/gsecuredelete.h>
 
@@ -176,7 +176,48 @@ static void       run_delete_operation  (GtkWindow *parent,
                                          GList     *files);
 
 
-/* gets the path of a #NautilusFileInfo. */
+/* gets the Nautilus' desktop path (to handle x-nautilus-desktop:// URIs)
+ * heavily based on the implementation from nautilus-open-terminal */
+static gchar *
+nautilus_srm_get_desktop_path (void)
+{
+  gchar        *path = NULL;
+  GConfClient  *conf_client;
+  
+  conf_client = gconf_client_get_default ();
+  if (gconf_client_get_bool (conf_client,
+                             "/apps/nautilus/preferences/desktop_is_home_dir",
+                             NULL)) {
+    path = g_strdup (g_get_home_dir ());
+  } else {
+    path = g_strdup (g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP));
+  }
+  g_object_unref (conf_client);
+  
+  return path;
+}
+
+/* checks whether a #NautilusFileInfo have the given URI scheme */
+static gboolean
+nautilus_srm_nfi_has_uri_scheme (NautilusFileInfo *nfi,
+                                 const gchar      *scheme)
+{
+  gboolean  matches = FALSE;
+  gchar    *nfi_scheme;
+  
+  nfi_scheme = nautilus_file_info_get_uri_scheme (nfi);
+  /*g_message ("does %s match %s?", nfi_scheme, scheme);*/
+  if (nfi_scheme == scheme || strcmp (nfi_scheme, scheme) == 0) {
+    matches = TRUE;
+  }
+  g_free (nfi_scheme);
+  
+  return matches;
+}
+
+/* gets the path of a #NautilusFileInfo.
+ * this is different from getting if GFile then getting the path since it tries
+ * handle x-nautilus-desktop */
 static gchar *
 nautilus_srm_nfi_get_path (NautilusFileInfo *nfi)
 {
@@ -185,6 +226,11 @@ nautilus_srm_nfi_get_path (NautilusFileInfo *nfi)
   
   file = nautilus_file_info_get_location (nfi);
   path = g_file_get_path (file);
+  if (! path) {
+    if (nautilus_srm_nfi_has_uri_scheme (nfi, "x-nautilus-desktop")) {
+      path = nautilus_srm_get_desktop_path ();
+    }
+  }
   
   return path;
 }

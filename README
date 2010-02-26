@@ -4,6 +4,7 @@ Dependancies
 - libnautilus-extension
 - libgtk2.0
 - libgsecuredelete
+- libgconf2
 - make
 - autoconf
 - libtool
