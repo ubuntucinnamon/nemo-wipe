@@ -105,6 +105,35 @@ display_dialog (GtkWindow       *parent,
 
 
 
+/* Gets the last line (delimited by \n) in @str.
+ * If the last character is \n, gets the chunk between the the previous \n and
+ * the last one.
+ * Free the returned string with g_free(). */
+static gchar *
+string_last_line (const gchar *str)
+{
+  gchar        *last_line;
+  const gchar  *prev_eol  = str;
+  const gchar  *eol       = str;
+  gsize         i;
+  
+  for (i = 0; str[i] != 0; i++) {
+    if (str[i] == '\n') {
+      prev_eol = eol;
+      eol = (&str[i]) + 1;
+    }
+  }
+  if (*eol != 0 || eol == str) {
+    last_line = g_strdup (eol);
+  } else {
+    last_line = g_strndup (prev_eol, (gsize)(eol - 1 - prev_eol));
+  }
+  
+  return last_line;
+}
+
+
+
 struct NautilusSrmOperationData
 {
   GsdAsyncOperation          *operation;
@@ -149,10 +178,43 @@ static void
 display_operation_error (struct NautilusSrmOperationData *opdata,
                          const gchar                     *error)
 {
-  display_dialog (opdata->window, GTK_MESSAGE_ERROR, FALSE,
-                  opdata->failed_primary_text, error,
-                  GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-                  NULL);
+  GtkWidget      *dialog;
+  GtkWidget      *content_area;
+  GtkWidget      *expander;
+  GtkWidget      *scroll;
+  GtkWidget      *view;
+  GtkTextBuffer  *buffer;
+  gchar          *short_error;
+  
+  dialog = gtk_message_dialog_new (opdata->window,
+                                   GTK_DIALOG_DESTROY_WITH_PARENT,
+                                   GTK_MESSAGE_ERROR, GTK_BUTTONS_NONE,
+                                   "%s", opdata->failed_primary_text);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
+  /* we hope that the last line in the error message is meaningful */
+  short_error = string_last_line (error);
+  gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                            "%s", short_error);
+  g_free (short_error);
+  /* add the details expander */
+  content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  expander = gtk_expander_new (_("Details"));
+  gtk_container_add (GTK_CONTAINER (content_area), expander);
+  scroll = gtk_scrolled_window_new (NULL, NULL);
+  gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scroll),
+                                       GTK_SHADOW_IN);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
+                                  GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+  gtk_container_add (GTK_CONTAINER (expander), scroll);
+  buffer = gtk_text_buffer_new (NULL);
+  gtk_text_buffer_set_text (buffer, error, -1);
+  view = gtk_text_view_new_with_buffer (buffer);
+  gtk_text_view_set_editable (GTK_TEXT_VIEW (view), FALSE);
+  gtk_container_add (GTK_CONTAINER (scroll), view);
+  gtk_widget_show_all (expander);
+  /* show the dialog */
+  g_signal_connect (dialog, "response", G_CALLBACK (gtk_widget_destroy), NULL);
+  gtk_widget_show (dialog);
 }
 
 static void
