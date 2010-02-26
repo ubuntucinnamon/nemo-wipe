@@ -504,36 +504,36 @@ run_fill_operation (GtkWindow *parent,
   /* FIXME: can't truly use g_dngettext since the args are not the same */
   if (n_items > 1) {
     /* XXX: precise the devices to sfill (name:=device name):
-    parcourir la g_list et insérer la première fois device_name
+    walk the GList and insert device_name the first time
 
         names = device_name
 
-    et à chaque fois suivante 
+    and each next time
 
         names += ", " device_name"
 
-    ensuite :
+    and then:
 
-        g_strdup_printf (_("Are you sure you want to wipe"
-                          "the available diskspace on the"
+        g_strdup_printf (_("Are you sure you want to wipe "
+                          "the available diskspace on the "
                           "\"%s\" partitions or devices?"),
                          names)
     */
-    confirm_primary_text = _("Are you sure you want to wipe"
-                             "the available diskspace on this"
+    confirm_primary_text = _("Are you sure you want to wipe "
+                             "the available diskspace on this "
                              "partition(s) or device(s)?");
   } else if (n_items > 0) {
     gchar *name;
     
     name = g_filename_display_basename (files->data);
     /* XXX: precise the devices to sfill (name:=device name):
-    g_strdup_printf (_("Are you sure you want to wipe"
-                      "the available diskspace on the"
+    g_strdup_printf (_("Are you sure you want to wipe "
+                      "the available diskspace on the "
                       "\"%s\" partition or device?"),
                      name)
     */
-    confirm_primary_text = _("Are you sure you want to wipe"
-                             "the available diskspace on this"
+    confirm_primary_text = _("Are you sure you want to wipe "
+                             "the available diskspace on this "
                              "partition(s) or device(s)?");
     g_free (name);
   }
@@ -553,12 +553,12 @@ run_fill_operation (GtkWindow *parent,
     _("Wipe successful"),
     /* XXX: when we will have the mountpoints :
         
-        g_strdup_printf (_("Available diskspace on the partition(s) or"
+        g_strdup_printf (_("Available diskspace on the partition(s) or "
                            "device(s) %s have been successfully wiped."),
                            mountpoints)
 
     */
     _("Available diskspace on the device(s) have been successfully wiped.")
   );
-  g_free (confirm_primary_text);
+  /*g_free (confirm_primary_text);*/
 }

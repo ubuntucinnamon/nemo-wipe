@@ -358,7 +358,7 @@ progress_dialog_response_handler (GtkDialog *dialog,
     case GTK_RESPONSE_DELETE_EVENT:
       if (display_dialog (GTK_WINDOW (dialog), GTK_MESSAGE_QUESTION, TRUE,
                           _("Are you sure you want to cancel this operation?"),
-                          _("Canceling this operation might leave some item(s) in"
+                          _("Canceling this operation might leave some item(s) in "
                             "an intermediate state."),
                           _("Resume operation"), GTK_RESPONSE_REJECT,
                           _("Cancel operation"), GTK_RESPONSE_ACCEPT,
