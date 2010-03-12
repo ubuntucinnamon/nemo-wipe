@@ -300,7 +300,7 @@ nautilus_srm_fill_operation_filter_files (GList    *paths,
     
     mountpoint = find_mountpoint (file_path, &err);
     if (G_LIKELY (mountpoint)) {
-      if (g_list_find_custom (work_mounts, mountpoint, g_str_equal)) {
+      if (g_list_find_custom (work_mounts, mountpoint, (GCompareFunc)strcmp)) {
         /* the mountpoint is already added, skip it */
         g_free (mountpoint);
       } else {
