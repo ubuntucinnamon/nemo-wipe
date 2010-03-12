@@ -65,8 +65,12 @@ struct _NautilusSrmClass {
   GObjectClass parent_slot;
 };
 
-GType   nautilus_srm_get_type      (void) G_GNUC_CONST;
-GQuark  nautilus_srm_error_quark   (void) G_GNUC_CONST;
+GType   nautilus_srm_get_type       (void) G_GNUC_CONST;
+GQuark  nautilus_srm_error_quark    (void) G_GNUC_CONST;
+
+void    nautilus_srm_path_list_free (GList *paths);
+GList  *nautilus_srm_path_list_copy (GList *src);
+
 
 G_END_DECLS
 

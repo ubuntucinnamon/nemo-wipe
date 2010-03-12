@@ -32,6 +32,7 @@
 # include <gio/gunixmounts.h>
 #endif
 #include <gsecuredelete/gsecuredelete.h>
+#include "nautilus-srm.h"
 
 
 #if HAVE_GIO_UNIX
@@ -264,41 +265,48 @@ nautilus_srm_fill_finished_handler (GsdFillOperation         *operation,
 }
 
 /*
- * filter_dir_list:
- * @directories: a list of paths
+ * nautilus_srm_fill_operation_filter_files:
+ * @paths: A list of paths to filter
+ * @work_paths_: return location for filtered paths
+ * @work_mounts_: return location for filtered paths' mounts
+ * @error: return location for errors, or %NULL to ignore them
  * 
- * Filter the input file list so that there remains only one path for
- * each filesystem.
+ * Ties to get usable paths (local directories) and keep only one per
+ * mountpoint.
  * 
- * Returns: A #GList of file pathes to actually work on. Free each element with
- *          g_free() before freeing the list.
+ * The returned lists (@work_paths_ and @work_mounts_) have the same length, and
+ * an index in a list correspond to the same in the other:
+ * g_list_index(work_paths_, 0) is the path of g_list_index(work_mounts_, 0).
+ * Free returned lists with nautilus_srm_path_list_free().
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
  */
-static GList *
-filter_dir_list (GList   *directories,
-                 GError **error)
+gboolean
+nautilus_srm_fill_operation_filter_files (GList    *paths,
+                                          GList   **work_paths_,
+                                          GList   **work_mounts_,
+                                          GError  **error)
 {
-  GList      *dirs = NULL;
-  GError     *err = NULL;
-  /* table of different mountpoints */
-  GHashTable *mountpoints = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                                   g_free, NULL);
+  GList  *work_paths  = NULL;
+  GError *err         = NULL;
+  GList  *work_mounts = NULL;
   
-  g_return_val_if_fail (directories != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (paths != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   
-  for (; ! err && directories; directories = g_list_next (directories)) {
-    const gchar  *file_path = directories->data;
+  for (; ! err && paths; paths = g_list_next (paths)) {
+    const gchar  *file_path = paths->data;
     gchar        *mountpoint;
     
     mountpoint = find_mountpoint (file_path, &err);
     if (G_LIKELY (mountpoint)) {
-      if (g_hash_table_lookup (mountpoints, mountpoint)) {
+      if (g_list_find_custom (work_mounts, mountpoint, g_str_equal)) {
         /* the mountpoint is already added, skip it */
         g_free (mountpoint);
       } else {
         gchar *path;
         
-        g_hash_table_insert (mountpoints, mountpoint, (gpointer)TRUE);
+        work_mounts = g_list_append (work_mounts, mountpoint);
         /* if it is not a directory, gets its container directory.
          * no harm since files cannot be mountpoint themselves, then it gets
          * at most the mountpoint itself */
@@ -307,28 +315,31 @@ filter_dir_list (GList   *directories,
         } else {
           path = g_strdup (file_path);
         }
-        dirs = g_list_append (dirs, path);
+        work_paths = g_list_append (work_paths, path);
       }
     }
   }
-  g_hash_table_destroy (mountpoints);
+  if (err || ! work_paths_) {
+    nautilus_srm_path_list_free (work_paths);
+  } else {
+    *work_paths_ = work_paths;
+  }
+  if (err || ! work_mounts_) {
+    nautilus_srm_path_list_free (work_mounts);
+  } else {
+    *work_mounts_ = work_mounts;
+  }
   if (err) {
-    while (dirs) {
-      GList *tmp = dirs;
-      
-      dirs = g_list_next (dirs);
-      g_free (tmp->data);
-      g_list_free_1 (tmp);
-    }
     g_propagate_error (error, err);
   }
   
-  return dirs;
+  return ! err;
 }
 
 /*
  * nautilus_srm_fill_operation:
- * @directories: A list of paths to work on
+ * @directories: A list of paths to work on (should have been filtered with
+ *               nautilus_srm_fill_operation_filter_files() or so)
  * @fast: The Gsd.SecureDeleteOperation:fast setting
  * @mode: The Gsd.SecureDeleteOperation:mode setting
  * @zeroise: The Gsd.ZeroableOperation:zeroise setting
@@ -360,7 +371,7 @@ nautilus_srm_fill_operation (GList                       *directories,
   
   g_return_val_if_fail (directories != NULL, NULL);
   
-  dirs = filter_dir_list (directories, error);
+  dirs = nautilus_srm_path_list_copy (directories);
   if (dirs) {
     opdata = g_slice_alloc (sizeof *opdata);
     opdata->dir               = dirs;

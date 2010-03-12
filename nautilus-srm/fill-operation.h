@@ -29,6 +29,10 @@
 G_BEGIN_DECLS
 
 
+gboolean nautilus_srm_fill_operation_filter_files (GList    *paths,
+                                                   GList   **work_paths_,
+                                                   GList   **work_mounts_,
+                                                   GError  **error);
 GsdAsyncOperation  *nautilus_srm_fill_operation   (GList                       *files,
                                                    gboolean                     fast,
                                                    GsdSecureDeleteOperationMode mode,

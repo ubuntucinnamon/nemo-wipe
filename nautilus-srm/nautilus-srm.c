@@ -171,7 +171,8 @@ nautilus_srm_register_type (GTypeModule *module)
 /*=== Actual extension ===*/
 
 static void       run_fill_operation    (GtkWindow *parent,
-                                         GList     *files);
+                                         GList     *paths,
+                                         GList     *mountpoints);
 static void       run_delete_operation  (GtkWindow *parent,
                                          GList     *files);
 
@@ -236,7 +237,7 @@ nautilus_srm_nfi_get_path (NautilusFileInfo *nfi)
 }
 
 /* frees a list of paths */
-static void
+void
 nautilus_srm_path_list_free (GList *paths)
 {
   while (paths) {
@@ -250,7 +251,7 @@ nautilus_srm_path_list_free (GList *paths)
 
 /* copies a list of paths
  * free the returned list with nautilus_srm_path_list_free() */
-static GList *
+GList *
 nautilus_srm_path_list_copy (GList *src)
 {
   GList *paths = NULL;
@@ -300,11 +301,12 @@ nautilus_srm_nfi_list_to_path_list (GList *nfis)
  * operations to the same window rather than the one that launched it. */
 struct ItemData
 {
-  GtkWindow *window;  /* parent window
-                       * Note: don't ref or unref it, it seems to break
-                       * something in Nautilus (like the object being alive but
-                       * the widget destroyed... strange) */
-  GList     *paths;   /* list of selected paths */
+  GtkWindow *window;      /* parent window
+                           * Note: don't ref or unref it, it seems to break
+                           * something in Nautilus (like the object being alive
+                           * but the widget destroyed... strange) */
+  GList     *paths;       /* list of selected paths */
+  GList     *mountpoints; /* list of selected mountpoints, used by fill op */
 };
 
 /* Frees an #ItemData */
@@ -312,6 +314,7 @@ static void
 item_data_free (struct ItemData *idata)
 {
   nautilus_srm_path_list_free (idata->paths);
+  nautilus_srm_path_list_free (idata->mountpoints);
   g_slice_free1 (sizeof *idata, idata);
 }
 
@@ -322,7 +325,8 @@ item_data_free (struct ItemData *idata)
 static void
 add_item_data (NautilusMenuItem *item,
                GtkWidget        *window,
-               GList            *paths)
+               GList            *paths,
+               GList            *mountpoints)
 {
   struct ItemData *idata;
   
@@ -332,6 +336,7 @@ add_item_data (NautilusMenuItem *item,
    * not (even be able to) activate our button. */
   idata->window = GTK_IS_WINDOW (window) ? GTK_WINDOW (window) : NULL;
   idata->paths = nautilus_srm_path_list_copy (paths);
+  idata->mountpoints = nautilus_srm_path_list_copy (mountpoints);
   g_object_set_data_full (G_OBJECT (item), "NautilusSrm::item-data",
                           idata, (GDestroyNotify)item_data_free);
 }
@@ -368,7 +373,7 @@ nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
                                  _("Wipe"),
                                  _("Delete each selected item, and overwrite its data"),
                                  GTK_STOCK_DELETE);
-  add_item_data (item, window, paths);
+  add_item_data (item, window, paths, NULL);
   g_signal_connect (item, "activate",
                     G_CALLBACK (menu_item_delete_activate_handler), provider);
   
@@ -382,27 +387,48 @@ menu_item_fill_activate_handler (NautilusMenuItem     *item,
 {
   struct ItemData *idata = get_item_data (item);
   
-  run_fill_operation (idata->window, idata->paths);
+  run_fill_operation (idata->window, idata->paths, idata->mountpoints);
 }
 
 static NautilusMenuItem *
 nautilus_srm_menu_item_sfill (NautilusMenuProvider *provider,
                               const gchar          *item_name,
                               GtkWidget            *window,
-                              GList                *folders)
+                              GList                *files)
 {
-  NautilusMenuItem *item;
+  NautilusMenuItem *item        = NULL;
+  GList            *mountpoints = NULL;
+  GList            *folders     = NULL;
+  GError           *err         = NULL;
 
-  item = nautilus_menu_item_new (item_name,
-                                 _("Wipe available diskspace"),
-                                 _("Overwrite available diskspace in this device(s)"),
-                                 NULL);
-  add_item_data (item, window, folders);
-  g_signal_connect (item, "activate",
-                    G_CALLBACK (menu_item_fill_activate_handler), provider);
+  if (! nautilus_srm_fill_operation_filter_files (files, &folders, &mountpoints,
+                                                  &err)) {
+    g_warning ("File filtering failed: %s", err->message);
+    g_error_free (err);
+  } else {
+    item = nautilus_menu_item_new (item_name,
+                                   _("Wipe available diskspace"),
+                                   _("Overwrite available diskspace in this device(s)"),
+                                   NULL);
+    add_item_data (item, window, folders, mountpoints);
+    g_signal_connect (item, "activate",
+                      G_CALLBACK (menu_item_fill_activate_handler), provider);
+    nautilus_srm_path_list_free (folders);
+    nautilus_srm_path_list_free (mountpoints);
+  }
   
   return item;
 }
+
+/* adds @item to the #GList @items if not %NULL */
+#define ADD_ITEM(items, item)                         \
+  G_STMT_START {                                      \
+    NautilusMenuItem *ADD_ITEM__item = (item);        \
+                                                      \
+    if (ADD_ITEM__item != NULL) {                     \
+      items = g_list_append (items, ADD_ITEM__item);  \
+    }                                                 \
+  } G_STMT_END
 
 /* populates Nautilus' file menu */
 static GList *
@@ -415,12 +441,12 @@ nautilus_srm_get_file_items (NautilusMenuProvider *provider,
   
   paths = nautilus_srm_nfi_list_to_path_list (files);
   if (paths) {
-    items = g_list_append (items, nautilus_srm_menu_item_srm (provider,
-                                                              "nautilus-srm::files-items::srm",
-                                                              window, paths));
-    items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
-                                                                "nautilus-srm::files-items::sfill",
-                                                                window, paths));
+    ADD_ITEM (items, nautilus_srm_menu_item_srm (provider,
+                                          "nautilus-srm::files-items::srm",
+                                          window, paths));
+    ADD_ITEM (items, nautilus_srm_menu_item_sfill (provider,
+                                            "nautilus-srm::files-items::sfill",
+                                            window, paths));
   }
   nautilus_srm_path_list_free (paths);
   
@@ -438,15 +464,16 @@ nautilus_srm_get_background_items (NautilusMenuProvider *provider,
   
   paths = g_list_append (paths, nautilus_srm_nfi_get_path (current_folder));
   if (paths && paths->data) {
-    items = g_list_append (items, nautilus_srm_menu_item_sfill (provider,
-                                                                "nautilus-srm::background-items::sfill",
-                                                                window, paths));
+    ADD_ITEM (items, nautilus_srm_menu_item_sfill (provider,
+                                                   "nautilus-srm::background-items::sfill",
+                                                   window, paths));
   }
   nautilus_srm_path_list_free (paths);
   
   return items;
 }
 
+#undef ADD_ITEM
 
 
 /* Runs the srm operation */
@@ -493,14 +520,15 @@ run_delete_operation (GtkWindow *parent,
 /* Runs the sfill operation */
 static void
 run_fill_operation (GtkWindow *parent,
-                    GList     *files)
+                    GList     *paths,
+                    GList     *mountpoints)
 {
   gchar  *confirm_primary_text = NULL;
   guint   n_items;
   
   /* XXX: we want 
   n_items = g_list_length (mountpoints);*/
-  n_items = g_list_length (files);
+  n_items = g_list_length (mountpoints);
   /* FIXME: can't truly use g_dngettext since the args are not the same */
   if (n_items > 1) {
     /* XXX: precise the devices to sfill (name:=device name):
@@ -525,7 +553,7 @@ run_fill_operation (GtkWindow *parent,
   } else if (n_items > 0) {
     gchar *name;
     
-    name = g_filename_display_basename (files->data);
+    name = g_filename_display_basename (mountpoints->data);
     /* XXX: precise the devices to sfill (name:=device name):
     g_strdup_printf (_("Are you sure you want to wipe "
                       "the available diskspace on the "
@@ -538,7 +566,7 @@ run_fill_operation (GtkWindow *parent,
     g_free (name);
   }
   nautilus_srm_operation_manager_run (
-    parent, files,
+    parent, paths,
     /* confirm dialog */
     confirm_primary_text,
     _("This operation may take a while."),
