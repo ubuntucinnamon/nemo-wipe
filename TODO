@@ -1,16 +1,9 @@
-* Better progress dialog, perhaps as a derivated widget allowing:
-   * Setting the current progress status;
-   * Setting the current status message;
-   * Connecting a signal to watch a user cancel;
+* Perhaps cleanup a bit progress dialog, it is currently overkill
 
 * Cleanup configure script
-   * Check minimal dependencies (minimal versions of libraries)
 
 * Add our entries in the same section on the context's menu that
   the "Delete" and the "Move to trash" entry
+  -> I don't think it's possible
 
 * Add an icon for sfill
-
-* Sfill: display the mountpoints in the confirmation dialog. Requires
-  to calculate them before displaying the message.
-
