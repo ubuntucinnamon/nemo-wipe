@@ -9,10 +9,6 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror])
 AC_CONFIG_HEADERS([config.h])
 
-# hum, what's that exactly?
-# look at http://www.gnu.org/software/automake/manual/automake.html#index-AM_005fMAINTAINER_005fMODE-1001
-#~ AM_MAINTAINER_MODE
-
 # Checks for programs.
 AC_PROG_CC
 # ?
@@ -20,10 +16,14 @@ AM_DISABLE_STATIC
 AM_PROG_LIBTOOL
 
 # Checks for libraries.
-# gtk_message_dialog_format_secondary_text() requires GTK >= 2.6
-# g_uri_unescape_string() requires GLib >= 2.16
+# 2.6 for gtk_message_dialog_format_secondary_text()
+# We use some newer functions, but we (should) only do so if available.
 GTK_REQUIRED=2.6
-GLIB_REQUIRED=2.16
+# 2.10 to have the slice allocator (may be dropped if needed, but its probably a
+# acceptable dependency).
+# We use g_dngettext() (a 2.18 feature), but only conditionally if present.
+GLIB_REQUIRED=2.10
+# 2.4 for g_type_class_add_private()
 GOBJECT_REQUIRED=2.4.0
 GCONF_REQUIRED=2.0
 NAUTILUS_EXTENSION=2.0
