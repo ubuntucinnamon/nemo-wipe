@@ -26,7 +26,7 @@
 #include <gtk/gtk.h>
 
 #include "compat.h" /* for gtk_dialog_get_action_area(),
-                     *     gtk_dialog_get_countent_area() and
+                     *     gtk_dialog_get_content_area() and
                      *     gtk_widget_get_sensitive() */
 
 
@@ -187,7 +187,6 @@ nautilus_srm_progress_dialog_init (NautilusSrmProgressDialog *self)
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (self->priv->progress), FALSE, TRUE, 7);
   gtk_widget_show (GTK_WIDGET (self->priv->progress));
   
-  gtk_window_set_deletable (GTK_WINDOW (self), FALSE);
   gtk_progress_bar_set_ellipsize (self->priv->progress, PANGO_ELLIPSIZE_END);
   update_action_area_visibility (self, FALSE);
 }
