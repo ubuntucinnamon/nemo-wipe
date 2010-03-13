@@ -524,45 +524,53 @@ run_fill_operation (GtkWindow *parent,
                     GList     *mountpoints)
 {
   gchar  *confirm_primary_text = NULL;
+  gchar  *success_secondary_text = NULL;
   guint   n_items;
   
-  /* XXX: we want 
-  n_items = g_list_length (mountpoints);*/
   n_items = g_list_length (mountpoints);
   /* FIXME: can't truly use g_dngettext since the args are not the same */
   if (n_items > 1) {
-    /* XXX: precise the devices to sfill (name:=device name):
-    walk the GList and insert device_name the first time
-
-        names = device_name
-
-    and each next time
-
-        names += ", " device_name"
-
-    and then:
-
-        g_strdup_printf (_("Are you sure you want to wipe "
-                          "the available diskspace on the "
-                          "\"%s\" partitions or devices?"),
-                         names)
-    */
-    confirm_primary_text = _("Are you sure you want to wipe "
-                             "the available diskspace on this "
-                             "partition(s) or device(s)?");
+    GList    *tmp;
+    GString  *devices = g_string_new (NULL);
+    
+    for (tmp = mountpoints; tmp; tmp = g_list_next (tmp)) {
+      gchar *name;
+      
+      name = g_filename_display_basename (tmp->data);
+      if (devices->len > 0) {
+        if (! tmp->next) {
+          /* TRANSLATORS: this is the last device names separator */
+          g_string_append (devices, _(" and "));
+        } else {
+          /* TRANSLATORS: this is the device names separator (except last) */
+          g_string_append (devices, _(", "));
+        }
+      }
+      /* TRANSLATORS: this is the device name */
+      g_string_append_printf (devices, _("\"%s\""), name);
+      g_free (name);
+    }
+    confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe "
+                                              "the available diskspace on the "
+                                              "%s partitions or devices?"),
+                                            devices->str);
+    success_secondary_text = g_strdup_printf (_("Available diskspace on the "
+                                                "partitions or devices %s "
+                                                "have been successfully wiped."),
+                                              devices->str);
+    g_string_free (devices, TRUE);
   } else if (n_items > 0) {
     gchar *name;
     
     name = g_filename_display_basename (mountpoints->data);
-    /* XXX: precise the devices to sfill (name:=device name):
-    g_strdup_printf (_("Are you sure you want to wipe "
-                      "the available diskspace on the "
-                      "\"%s\" partition or device?"),
-                     name)
-    */
-    confirm_primary_text = _("Are you sure you want to wipe "
-                             "the available diskspace on this "
-                             "partition(s) or device(s)?");
+    confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe "
+                                              "the available diskspace on the "
+                                              "\"%s\" partition or device?"),
+                                            name);
+    success_secondary_text = g_strdup_printf (_("Available diskspace on the "
+                                                "partition or device \"%s\" "
+                                                "have been successfully wiped."),
+                                              name);
     g_free (name);
   }
   nautilus_srm_operation_manager_run (
@@ -579,14 +587,8 @@ run_fill_operation (GtkWindow *parent,
     _("Wipe failed"),
     /* success dialog */
     _("Wipe successful"),
-    /* XXX: when we will have the mountpoints :
-        
-        g_strdup_printf (_("Available diskspace on the partition(s) or "
-                           "device(s) %s have been successfully wiped."),
-                           mountpoints)
-
-    */
-    _("Available diskspace on the device(s) have been successfully wiped.")
+    success_secondary_text
   );
-  /*g_free (confirm_primary_text);*/
+  g_free (confirm_primary_text);
+  g_free (success_secondary_text);
 }
