@@ -335,11 +335,11 @@ operation_confirm_dialog (GtkWindow                    *parent,
       /* store columns: setting value     (enum)
        *                number of passes  (int)
        *                descriptive text  (string) */
-      store = gtk_list_store_new (3, G_TYPE_INT, G_TYPE_INT, G_TYPE_STRING);
+      store = gtk_list_store_new (3, G_TYPE_INT, G_TYPE_STRING, G_TYPE_STRING);
       combo = gtk_combo_box_new_with_model (GTK_TREE_MODEL (store));
       gtk_label_set_mnemonic_widget (GTK_LABEL (label), combo);
       /* number of passes column */
-      renderer = gtk_cell_renderer_spin_new ();
+      renderer = gtk_cell_renderer_text_new ();
       gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (combo), renderer, FALSE);
       gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (combo), renderer,
                                       "text", 1, NULL);
@@ -357,7 +357,7 @@ operation_confirm_dialog (GtkWindow                    *parent,
           GtkTreeIter iter;                                                    \
                                                                                \
           gtk_list_store_append (store, &iter);                                \
-          gtk_list_store_set (store, &iter, 0, value, 1, n_pass, 2, text, -1); \
+          gtk_list_store_set (store, &iter, 0, value, 1, #n_pass, 2, text, -1);\
           if (value == *delete_mode) {                                         \
               gtk_combo_box_set_active_iter (GTK_COMBO_BOX (combo), &iter);    \
           }                                                                    \
