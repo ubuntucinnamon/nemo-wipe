@@ -71,8 +71,8 @@ main (int     argc,
   gtk_init (&argc, &argv);
   
   dialog = nautilus_srm_progress_dialog_new (NULL, 0, "Progress...");
-  //~ nautilus_srm_progress_dialog_set_has_cancel_button (NAUTILUS_SRM_PROGRESS_DIALOG (dialog), TRUE);
-  //~ nautilus_srm_progress_dialog_set_has_close_button (NAUTILUS_SRM_PROGRESS_DIALOG (dialog), TRUE);
+  /*nautilus_srm_progress_dialog_set_has_cancel_button (NAUTILUS_SRM_PROGRESS_DIALOG (dialog), TRUE);*/
+  /*nautilus_srm_progress_dialog_set_has_close_button (NAUTILUS_SRM_PROGRESS_DIALOG (dialog), TRUE);*/
   g_signal_connect (dialog, "response", G_CALLBACK (response_handler), NULL);
   gtk_widget_show (GTK_WIDGET (dialog));
   

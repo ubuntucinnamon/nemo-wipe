@@ -58,7 +58,6 @@ find_mountpoint_unix (const gchar *path)
   while (! found && mountpoint) {
     GUnixMountEntry *unix_mount;
     
-    //~ g_debug ("trying %s", mountpoint);
     unix_mount = g_unix_mount_at (mountpoint, NULL);
     if (unix_mount) {
       found = TRUE;
