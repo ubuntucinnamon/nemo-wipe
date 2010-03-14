@@ -7,3 +7,9 @@
   -> I don't think it's possible
 
 * Add an icon for sfill
+
+* Sfill: display the mountpoints in the confirmation dialog. Requires
+  to calculate them before displaying the message.
+  * Add a "/" to show that pathes are absolute
+
+* Use a thrash icon in the confirmation dialog
