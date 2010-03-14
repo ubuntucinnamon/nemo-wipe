@@ -1,0 +1,193 @@
+nautilus-secure-delete Documentation
+
+
+# Short description
+
+`nautilus-secure-delete` allow to wipe files or free disk space from
+`nautilus`.
+
+Usually when you delete a file, even when bypassing the trash, it's
+not accessible anymore, but its content still exists on the media that
+contained it until a new file is written over it. Consequently, it can
+be quite easy to recover it.
+
+`nautilus-secure-delete` enables you to wipe files and available disk space
+from `nautilus` using the `secure-delete` program written by van Hauser /
+THC[1].
+
+[1]. Secure-delete, van Hauser / THC  <vh@thc.org>, 1997-2003
+     (http://www.thc.org)
+
+
+# An introduction to data deletion
+
+
+## Deleting doesn't affect data
+
+When you delete a file, even when bypassing or emptying the trash, you
+only tell your [computer/OS/???] that you don't care anymore for the
+file. The file's entry is removed from the list of existing files. The
+content of the file ??? the actual data ??? remains on the storage
+medium. The data will remain there until the operating system reuses
+the space for new data.
+
+This could take weeks, months or years before this space is actually
+used for new data, actually overwriting the content of the deleted
+file. Until then, it's possible to recover it by reading directly the
+data on the storage media. That's a quite simple operation, automated
+by number of softwares.
+
+
+## An answer : overwriting data several times
+
+If you want to make the content of a file really hard to recover, you
+have to overwrite it with other data. But that's not enough. On a
+magnetic hard disk, it's known[2] that the content can still be
+recovered by doing magnetic analysis of the hard disk surface. To
+adress this issue, it's possible to overwrite several times the
+content do be deleted. That process is called "wiping".
+
+If some sensible files have been already deleted whitout paying
+attention to this issue, some of their data probably remains on the
+storage media. It's thus also useful to wipe all the available free
+space of a storage media.
+
+[2]. Peter Gutmann: Secure Deletion of Data from Magnetic and Solid-State
+     Memory, 6th Usenix Security Symposium, 1996
+     (http://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html)
+
+
+## Limitations
+
+This section is quite technical. In a nutshell, there's a lot of limitations, so
+using this tool whithout setting up a complete security policy will probably be
+useless.
+
+- Temporary files and disks: lots of programs writes temporary and backup files.
+  This means that the sensitive data you want do delete probably exists in an
+  other form somewhere on your computer;
+- swap space: most operating systems could save data they are working on on a
+  part of the hard disk called swap space. Your sensitive data could exist
+  there;
+- storage media features: modern storage mediums often reorganize their content,
+  e.g.  to spread the writings over the media or to hide defectuous[??] places
+  to the [computer/os/???]. Consequently, you can't be sure that the actual place
+  occupied by your sensitive data was wiped;
+- journalised file systems: modern file systems log modifications of the files to
+  ease recovering after a crash. This could make wiping inefficient. The same
+  kind of problem exists with redundant file systems (e.g. RAID), file systems
+  that make snapshots or that cache data (e.g. NFS). However, only the names of
+  the files are logged if you use the default parameters of the standard Linux
+  file system (ext3/ext4);
+- old algorythms: the wipe algorythms are old, and they are not guarranteed to
+  work as expected on new storage medias.
+
+
+## The wipe algorythm
+
+nautilus-secure-delete enables you to wipe files and free disk space
+from `nautilus` using the `secure-delete` program written by van Hauser
+/ THC [3]
+
+     The deletion process is as follows:
+
+     1. The overwriting procedure (in the secure mode) does a 38 times
+        overwriting. After each pass, the disk cache is flushed.
+     2. truncating the file, so that an attacker don't know which
+        diskblocks belonged to the file.
+     3. renaming of the file, so that an attacker can't draw any conclusion
+        from the filename on the contents of the deleted file.
+     4. finally deleting the file (unlink).
+
+                                                (`secure-delete` documentation)
+
+[3]. Secure-delete, van Hauser / THC  <vh@thc.org>, 1997-2003
+     (http://www.thc.org)
+
+
+# Using `nautilus-secure-delete`
+
+
+## Launching nautilus-secure-delete
+
+
+### Wiping file(s) or directory(es)
+
+Select the file(s) you want to wipe, and right-click on them. If
+`nautilus-secure-delete` is able to wipe them, there will be a "Wipe" entry in
+the context menu.
+
+
+### Wiping available diskspace on storage media
+
+Select a file or a directory which is on the partition on which you want to wipe
+the available diskspace. If `nautilus-secure-delete` is able to wipe it, there
+will be a "Wipe available diskspace" entry in the context menu. 
+
+
+## The confirmation dialog
+
+Once you click a menu item, a confirmation dialog will appear, where you can
+confirm or abort the wipe, and choose options (see next section).
+
+
+## The progress dialog
+
+If you confirm the wipe, a dialog will appear to let you see the progression of
+the deletion. For big files or partitions with a lot of available diskspace,
+wiping can take hours.
+
+It's possible, but discouraged, to cancel the wipe process. This would kill the
+underlaying `secure-delete` program and could lead to strange things like files
+partly overwriten but not deleted or big junk files.
+
+When the wipe is finished, a dialog should inform you of the success of the
+deletion.
+
+
+# Configuring `nautilus-secure-delete`
+
+In the confirmation dialog, you can click on the arrow left to the "Options"
+word to display options. To understand these options, you must have a good
+overview of the wipe process. If it's not already the case, please read [[An
+introduction to data deletion]].
+
+
+## Number of passes
+
+You can configure the number of times that the data to be wiped is overwritten by new data.
+
+38: Overwriting the data 38 times should prevent data recovery throught
+    magnetic analysis of the hard drive surface. This is achieved by the
+    following procedure:
+
+      1x overwrite with 0xff
+      5x random passes
+     27x overwriting with special values to make the recovery from MFM and
+         RLL encoded hard disks hard/impossible - see Gutmann's paper on that
+         which is also included.
+      5x random passes
+
+    This is the default value.
+
+2:  Only two passes are written: one mode with 0xff and a final mode random
+    values. [FIXME: implications]
+
+1:  Only one random pass is written. Overwriting the data only one time should
+    prevent from data recovery by analysing raw data written on the storage
+    media, but is unuseful against magnetic analysis of the hard drive surface.
+    In this mode, only one random pass is written.
+
+
+## Fast and insecure mode (no /dev/urandom, no sync)
+
+Fastens the wipe at the expense of security:
+
+- use a more predictible but faster pseudo-random number generator;
+- do not ensure that overwriting data is actually written on the storage media.
+
+
+## Last pass with zeros instead of random data
+
+Use zeros for the last overwrite, which is the data that will be actually easy to read. The default is to use pseudo random data.
+
