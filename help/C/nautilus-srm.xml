@@ -454,7 +454,7 @@
       </variablelist>
     </sect2>
     <sect2 id="nautilus-secure-delete-fast-mode">
-      <title>Fast and insecure mode (no /dev/urandom, no sync)</title>
+      <title>Fast and insecure mode (no /dev/urandom, no synchronize mode)</title>
       <para>
         Fastens the wipe at the expense of security:
       </para>
