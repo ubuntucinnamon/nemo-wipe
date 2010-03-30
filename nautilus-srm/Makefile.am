@@ -15,10 +15,25 @@ libnautilus_srm_la_SOURCES = nautilus-srm.c \
                              progress-dialog.c \
                              progress-dialog.h \
                              compat.h
+libnautilus_srm_la_CPPFLAGS = -DG_LOG_DOMAIN=\"$(PACKAGE)\"
+libnautilus_srm_la_CFLAGS   = @GLIB_CFLAGS@ \
+                              @GTK_CFLAGS@ \
+                              @GCONF_CFLAGS@ \
+                              @LIBNAUTILUS_EXTENSION_CFLAGS@ \
+                              @GSECUREDELETE_CFLAGS@ \
+                              @GIO_UNIX_CFLAGS@
+libnautilus_srm_la_LDFLAGS  = -module -avoid-version \
+                              @GLIB_LIBS@ \
+                              @GTK_LIBS@ \
+                              @GCONF_LIBS@ \
+                              @LIBNAUTILUS_EXTENSION_LIBS@ \
+                              @GSECUREDELETE_LIBS@ \
+                              @GIO_UNIX_LIBS@
 
-libnautilus_srm_la_LDFLAGS = $(AM_LIBS) -module -avoid-version
-
-test_LDFLAGS = $(AM_LIBS)
+test_CFLAGS  = @GLIB_CFLAGS@ \
+               @GTK_CFLAGS@
+test_LDFLAGS = @GLIB_LIBS@ \
+               @GTK_LIBS@
 # Linking against a loadable module is not portable according to libtool.
 # However, I don't really care about portability issue here because it is only a
 # test program (that might even be removed at a time).

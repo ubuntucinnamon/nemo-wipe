@@ -1,7 +1,5 @@
 * Perhaps cleanup a bit progress dialog, it is currently overkill
 
-* Cleanup configure script
-
 * Add our entries in the same section on the context's menu that
   the "Delete" and the "Move to trash" entry
   -> I don't think it's possible
