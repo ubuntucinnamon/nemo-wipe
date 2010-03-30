@@ -1,4 +1,4 @@
-nautilus-secure-delete Documentation
+% nautilus-secure-delete Documentation
 
 
 # Short description
@@ -16,7 +16,7 @@ from `nautilus` using the `secure-delete` program written by van Hauser /
 THC[1].
 
 [1]. Secure-delete, van Hauser / THC  <vh@thc.org>, 1997-2003
-     (http://www.thc.org)
+     <http://www.thc.org>
 
 
 # An introduction to data deletion
@@ -52,8 +52,8 @@ storage media. It's thus also useful to wipe all the available free
 space of a storage media.
 
 [2]. Peter Gutmann: Secure Deletion of Data from Magnetic and Solid-State
-     Memory, 6th Usenix Security Symposium, 1996
-     (http://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html)
+     Memory, 6th Usenix Security Symposium, 1996 
+     <http://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html>
 
 
 ## Limitations
@@ -88,20 +88,20 @@ nautilus-secure-delete enables you to wipe files and free disk space
 from `nautilus` using the `secure-delete` program written by van Hauser
 / THC [3]
 
-     The deletion process is as follows:
-
-     1. The overwriting procedure (in the secure mode) does a 38 times
-        overwriting. After each pass, the disk cache is flushed.
-     2. truncating the file, so that an attacker don't know which
-        disk blocks belonged to the file.
-     3. renaming of the file, so that an attacker can't draw any conclusion
-        from the filename on the contents of the deleted file.
-     4. finally deleting the file (unlink).
-
-                                                (`secure-delete` documentation)
+>     The deletion process is as follows:
+>
+>     1. The overwriting procedure (in the secure mode) does a 38 times
+>        overwriting. After each pass, the disk cache is flushed.
+>     2. truncating the file, so that an attacker don't know which
+>        disk blocks belonged to the file.
+>     3. renaming of the file, so that an attacker can't draw any conclusion
+>        from the filename on the contents of the deleted file.
+>     4. finally deleting the file (unlink).
+>
+> (`secure-delete` documentation)
 
 [3]. Secure-delete, van Hauser / THC  <vh@thc.org>, 1997-2003
-     (http://www.thc.org)
+     <http://www.thc.org>
 
 
 # Using `nautilus-secure-delete`
@@ -157,25 +157,32 @@ introduction to data deletion]].
 You can configure the number of times that the data to be wiped is overwritten
 by new data.
 
-38: Overwriting the data 38 times should prevent data recovery through
-    magnetic analysis of the hard drive surface. This is achieved by the
-    following procedure:
 
-      1x overwrite with 0xff
-      5x random passes
-     27x overwriting with special values to make the recovery from MFM and
-         RLL encoded hard disks hard/impossible - see Gutmann's paper on that
-         which is also included.
-      5x random passes
+38
 
-    This is the default value.
+: Overwriting the data 38 times should prevent data recovery through
+  magnetic analysis of the hard drive surface. This is achieved by the
+  following procedure:
 
-2:  Only two passes are written: one mode with 0xff and a final mode random
-    values. [FIXME: implications]
+  - 1x overwrite with 0xff
+  - 5x random passes
+  - 27x overwriting with special values to make the recovery from MFM and
+    RLL encoded hard disks hard/impossible - see Gutmann's paper on that
+    which is also included.
+  - 5x random passes
 
-1:  Only one random pass is written. Overwriting the data only one time should
-    prevent from data recovery by analyzing raw data written on the storage
-    media, but is useless against magnetic analysis of the hard drive surface.
+  This is the default value.
+
+2
+
+: Only two passes are written: one mode with 0xff and a final mode random
+  values. [FIXME: implications]
+
+1
+
+: Only one random pass is written. Overwriting the data only one time should
+  prevent from data recovery by analyzing raw data written on the storage
+  media, but is useless against magnetic analysis of the hard drive surface.
 
 
 ## Fast and insecure mode (no /dev/urandom, no sync)
