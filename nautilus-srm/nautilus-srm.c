@@ -536,7 +536,7 @@ run_fill_operation (GtkWindow *parent,
     for (tmp = mountpoints; tmp; tmp = g_list_next (tmp)) {
       gchar *name;
       
-      name = g_filename_display_basename (tmp->data);
+      name = g_filename_display_name (tmp->data);
       if (devices->len > 0) {
         if (! tmp->next) {
           /* TRANSLATORS: this is the last device names separator */
@@ -562,7 +562,7 @@ run_fill_operation (GtkWindow *parent,
   } else if (n_items > 0) {
     gchar *name;
     
-    name = g_filename_display_basename (mountpoints->data);
+    name = g_filename_display_name (mountpoints->data);
     confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe "
                                               "the available diskspace on the "
                                               "\"%s\" partition or device?"),
