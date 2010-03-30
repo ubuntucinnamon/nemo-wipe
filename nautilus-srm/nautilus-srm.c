@@ -409,7 +409,7 @@ nautilus_srm_menu_item_sfill (NautilusMenuProvider *provider,
     item = nautilus_menu_item_new (item_name,
                                    _("Wipe available diskspace"),
                                    _("Overwrite available diskspace in this device(s)"),
-                                   NULL);
+                                   GTK_STOCK_CLEAR);
     add_item_data (item, window, folders, mountpoints);
     g_signal_connect (item, "activate",
                       G_CALLBACK (menu_item_fill_activate_handler), provider);
