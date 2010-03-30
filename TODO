@@ -1,3 +1,9 @@
+* Adapt the default wipe algorithm and the manual to the latest papers
+  suggestions (a few random passes are enought on modern hard drives).
+  Use the secure-delete's `-l` option could be a good option.
+  cf. http://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html and
+  http://csrc.nist.gov/publications/nistpubs/800-88/NISTSP800-88_rev1.pdf
+
 * Perhaps cleanup a bit progress dialog, it is currently overkill
 
 * Add our entries in the same section on the context's menu that
