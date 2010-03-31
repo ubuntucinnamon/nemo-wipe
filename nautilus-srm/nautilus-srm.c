@@ -19,12 +19,17 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "nautilus-srm.h"
 
 #include <libnautilus-extension/nautilus-menu-provider.h>
 #include <libnautilus-extension/nautilus-file-info.h>
 
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 #include <gtk/gtk.h>
 #include <gio/gio.h>
 #include <gconf/gconf-client.h>
@@ -56,6 +61,7 @@ void
 nautilus_module_initialize (GTypeModule *module)
 {
   g_message (_("Initializing"));
+  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
   nautilus_srm_register_type (module);
   provider_types[0] = nautilus_srm_get_type ();
 }

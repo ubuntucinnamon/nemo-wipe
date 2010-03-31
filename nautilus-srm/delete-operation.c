@@ -26,6 +26,7 @@
 #include "delete-operation.h"
 
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 #include <glib-object.h>
 #include <gio/gio.h>
 #include <gsecuredelete/gsecuredelete.h>
@@ -70,7 +71,7 @@ nautilus_srm_delete_operation (GList                       *files,
   }
   if (n_files < 1) {
     /* FIXME: use correct error quark and code */
-    g_set_error (error, 0, 0, "Nothing to do!");
+    g_set_error (error, 0, 0, _("Nothing to do!"));
     success = FALSE;
   } else {
     /* if file addition succeeded, try to launch operation */

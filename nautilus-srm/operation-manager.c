@@ -19,10 +19,15 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "operation-manager.h"
 
 #include <stdarg.h>
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
 #include <gsecuredelete/gsecuredelete.h>
