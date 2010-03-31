@@ -283,6 +283,9 @@ pref_enum_combo_changed_handler (GtkComboBox *combo,
  * @secondary_text: Dialog's secondary text
  * @confirm_button_text: Text of the button to hit in order to confirm (can be a
  *                       stock item)
+ * @confirm_button_icon: A #GtkWidget to use as the confirmation button's icon,
+ *                       or %NULL for none or the default (e.g. if
+ *                       @confirm_button_text is a stock item that have an icon)
  * @fast: return location for the Gsd.SecureDeleteOperation:fast setting, or
  *        %NULL
  * @delete_mode: return location for the Gsd.SecureDeleteOperation:mode setting,
@@ -295,11 +298,13 @@ operation_confirm_dialog (GtkWindow                    *parent,
                           const gchar                  *primary_text,
                           const gchar                  *secondary_text,
                           const gchar                  *confirm_button_text,
+                          GtkWidget                    *confirm_button_icon,
                           gboolean                     *fast,
                           GsdSecureDeleteOperationMode *delete_mode,
                           gboolean                     *zeroise)
 {
   GtkResponseType response = GTK_RESPONSE_NONE;
+  GtkWidget      *button;
   GtkWidget      *dialog;
   
   dialog = gtk_message_dialog_new (parent,
@@ -310,10 +315,13 @@ operation_confirm_dialog (GtkWindow                    *parent,
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                               "%s", secondary_text);
   }
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-                          GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-                          confirm_button_text, GTK_RESPONSE_ACCEPT,
-                          NULL);
+  gtk_dialog_add_button (GTK_DIALOG (dialog),
+                         GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT);
+  button = gtk_dialog_add_button (GTK_DIALOG (dialog),
+                                  confirm_button_text, GTK_RESPONSE_ACCEPT);
+  if (confirm_button_icon) {
+    gtk_button_set_image (GTK_BUTTON (button), confirm_button_icon);
+  }
   /* if we have settings to choose */
   if (fast || delete_mode || zeroise) {
     GtkWidget *content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
@@ -448,6 +456,9 @@ progress_dialog_response_handler (GtkDialog *dialog,
  * @confirm_secondary_text: Secondary text for the confirmation dialog
  * @confirm_button_text: Text for the confirm button of the confirmation dialog.
  *                       It may be a GTK stock item.
+ * @confirm_button_icon: A #GtkWidget to use as the confirmation button's icon,
+ *                       or %NULL for none or the default (e.g. if
+ *                       @confirm_button_text is a stock item that have an icon)
  * @progress_dialog_text: Text for the progress dialog
  * @operation_launcher_func: the function that will be launched to do the operation
  * @failed_primary_text: Primary text of the dialog displayed if operation failed.
@@ -463,6 +474,7 @@ nautilus_srm_operation_manager_run (GtkWindow                *parent,
                                     const gchar              *confirm_primary_text,
                                     const gchar              *confirm_secondary_text,
                                     const gchar              *confirm_button_text,
+                                    GtkWidget                *confirm_button_icon,
                                     const gchar              *progress_dialog_text,
                                     NautilusSrmOperationFunc  operation_launcher_func,
                                     const gchar              *failed_primary_text,
@@ -476,7 +488,7 @@ nautilus_srm_operation_manager_run (GtkWindow                *parent,
   
   if (operation_confirm_dialog (parent,
                                 confirm_primary_text, confirm_secondary_text,
-                                confirm_button_text,
+                                confirm_button_text, confirm_button_icon,
                                 &fast, &delete_mode, &zeroise)) {
     GError                           *err = NULL;
     struct NautilusSrmOperationData  *opdata;

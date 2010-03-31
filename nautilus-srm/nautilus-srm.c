@@ -509,7 +509,8 @@ run_delete_operation (GtkWindow *parent,
     /* confirm dialog */
     confirm_primary_text,
     _("If you wipe an item, it will not be recoverable."),
-    GTK_STOCK_DELETE,
+    _("_Wipe"),
+    gtk_image_new_from_stock (GTK_STOCK_DELETE, GTK_ICON_SIZE_BUTTON),
     /* progress dialog */
     _("Wiping files..."),
     /* operation launcher */
@@ -585,6 +586,7 @@ run_fill_operation (GtkWindow *parent,
     confirm_primary_text,
     _("This operation may take a while."),
     _("_Wipe available diskspace"),
+    gtk_image_new_from_stock (GTK_STOCK_CLEAR, GTK_ICON_SIZE_BUTTON),
     /* progress dialog */
     _("Wiping available diskspace..."),
     /* operation launcher */
