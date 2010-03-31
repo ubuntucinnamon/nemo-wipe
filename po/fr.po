@@ -1,0 +1,223 @@
+# French translations for nautilus-srm package
+# Traductions françaises du paquet nautilus-srm.
+# Copyright (C) 2010 Colomban Wendling <ban@herbesfolles.org>
+# This file is distributed under the same license as the nautilus-srm package.
+# Colomban Wendling <ban@herbesfolles.org>, 2010.
+msgid ""
+msgstr ""
+"Project-Id-Version: nautilus-srm 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-03-31 15:16+0200\n"
+"PO-Revision-Date: 2010-03-31 15:30+0200\n"
+"Last-Translator: Colomban Wendling <ban@herbesfolles.org>\n"
+"Language-Team: French\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: nautilus-srm/delete-operation.c:74
+msgid "Nothing to do!"
+msgstr "Rien à faire !"
+
+#: nautilus-srm/fill-operation.c:104
+#, c-format
+msgid "Mount \"%s\" is not local"
+msgstr "Le montage « %s » n'est pas local"
+
+#: nautilus-srm/fill-operation.c:117
+#, c-format
+msgid "No mount point found for path \"%s\""
+msgstr "Aucun point de montage trouvé pour le chemin « %s »"
+
+#: nautilus-srm/nautilus-srm.c:63
+msgid "Initializing"
+msgstr ""
+
+#: nautilus-srm/nautilus-srm.c:84
+msgid "Shutting down"
+msgstr ""
+
+#: nautilus-srm/nautilus-srm.c:379
+msgid "Wipe"
+msgstr "Écraser"
+
+#: nautilus-srm/nautilus-srm.c:380
+msgid "Delete each selected item, and overwrite its data"
+msgstr "Supprime chaque élément sélectionné et écraser son contenu"
+
+#: nautilus-srm/nautilus-srm.c:416
+msgid "Wipe available diskspace"
+msgstr "Écraser l'espace disque disponible"
+
+#: nautilus-srm/nautilus-srm.c:417
+msgid "Overwrite available diskspace in this device(s)"
+msgstr ""
+"Écrase l'espace disque disponible sur les périphérique(s) sélectionné(s)"
+
+#: nautilus-srm/nautilus-srm.c:496
+#, c-format
+msgid "Are you sure you want to wipe the %u selected items?"
+msgstr "Êtes-vous sûr de vouloir écraser les %u éléments sélectionnés ?"
+
+#: nautilus-srm/nautilus-srm.c:502
+#, c-format
+msgid "Are you sure you want to wipe \"%s\"?"
+msgstr "Êtes-vous sûr de vouloir écraser « %s » ?"
+
+#: nautilus-srm/nautilus-srm.c:511
+msgid "If you wipe an item, it will not be recoverable."
+msgstr "Si vous écrasez un élément, il ne pourra plus être récupéré."
+
+#: nautilus-srm/nautilus-srm.c:512
+msgid "_Wipe"
+msgstr "Écras_er"
+
+#: nautilus-srm/nautilus-srm.c:515
+msgid "Wiping files..."
+msgstr "Écrasement des fichiers…"
+
+#: nautilus-srm/nautilus-srm.c:519
+msgid "Wipe failed."
+msgstr "L'écrasement a échoué."
+
+#: nautilus-srm/nautilus-srm.c:521
+msgid "Wipe successful."
+msgstr "L'écrasement a réussi."
+
+#: nautilus-srm/nautilus-srm.c:522
+msgid "Item(s) have been successfully wiped."
+msgstr "Le(s) élément(s) ont été écrasé(s) avec succès."
+
+#. TRANSLATORS: this is the last device names separator
+#: nautilus-srm/nautilus-srm.c:550
+msgid " and "
+msgstr " et "
+
+#. TRANSLATORS: this is the device names separator (except last)
+#: nautilus-srm/nautilus-srm.c:553
+msgid ", "
+msgstr ", "
+
+#. TRANSLATORS: this is the device name
+#: nautilus-srm/nautilus-srm.c:557
+#, c-format
+msgid "\"%s\""
+msgstr "« %s »"
+
+#: nautilus-srm/nautilus-srm.c:560
+#, c-format
+msgid ""
+"Are you sure you want to wipe the available diskspace on the %s partitions "
+"or devices?"
+msgstr ""
+"Êtes-vous sûr de vouloir écraser l'espace disque libre sur les partitions ou "
+"périphériques %s ?"
+
+#: nautilus-srm/nautilus-srm.c:564
+#, c-format
+msgid ""
+"Available diskspace on the partitions or devices %s have been successfully "
+"wiped."
+msgstr ""
+"L'espace disque disponible sur les partitions ou périphériques %s a été "
+"écrasé avec succès."
+
+#: nautilus-srm/nautilus-srm.c:573
+#, c-format
+msgid ""
+"Are you sure you want to wipe the available diskspace on the \"%s\" "
+"partition or device?"
+msgstr ""
+"Êtes-vous sûr de vouloir écraser l'espace disque disponible sur la partition "
+"ou le périphérique « %s » ?"
+
+#: nautilus-srm/nautilus-srm.c:577
+#, c-format
+msgid ""
+"Available diskspace on the partition or device \"%s\" have been successfully "
+"wiped."
+msgstr ""
+"L'espace disque disponible sur la partition ou le périphérique « %s » a été "
+"écrasé avec succès."
+
+#: nautilus-srm/nautilus-srm.c:587
+msgid "This operation may take a while."
+msgstr "Cette opération peut prendre du temps."
+
+#: nautilus-srm/nautilus-srm.c:588
+msgid "_Wipe available diskspace"
+msgstr "Écras_er l'espace disque disponible"
+
+#: nautilus-srm/nautilus-srm.c:591
+msgid "Wiping available diskspace..."
+msgstr "Écrasement de l'espace disque disponible…"
+
+#: nautilus-srm/nautilus-srm.c:595
+msgid "Wipe failed"
+msgstr "L'écrasement a échoué"
+
+#: nautilus-srm/nautilus-srm.c:597
+msgid "Wipe successful"
+msgstr "L'écrasement a réussi"
+
+#: nautilus-srm/operation-manager.c:206
+msgid "_Details"
+msgstr "_Détails"
+
+#: nautilus-srm/operation-manager.c:331
+msgid "_Options"
+msgstr "_Options"
+
+#: nautilus-srm/operation-manager.c:345
+msgid "Number of _passes:"
+msgstr "Nombre de _passes :"
+
+#: nautilus-srm/operation-manager.c:380
+msgid "(secure, recommended)"
+msgstr "(sûr, recommandé)"
+
+#: nautilus-srm/operation-manager.c:382
+msgid "(insecure, but faster)"
+msgstr "(peu sûr mais rapide)"
+
+#: nautilus-srm/operation-manager.c:384
+msgid "(very insecure, but fastest)"
+msgstr "(très peu sûr, mais très rapide)"
+
+#: nautilus-srm/operation-manager.c:397
+msgid "_Fast and insecure mode (no /dev/urandom, no synchronize mode)"
+msgstr ""
+"Mode _rapide et peu sûr (pas de /dev/urandom, pas de mode de synchronisation)"
+
+#: nautilus-srm/operation-manager.c:409
+msgid "Last pass with _zeros instead of random data"
+msgstr "Dernière passe avec des _zéros à la place de données aléatoires"
+
+#: nautilus-srm/operation-manager.c:436
+msgid "Are you sure you want to cancel this operation?"
+msgstr "Êtes-vous sûr de vouloir annuler cette opération ?"
+
+#: nautilus-srm/operation-manager.c:437
+msgid ""
+"Canceling this operation might leave some item(s) in an intermediate state."
+msgstr ""
+"Annuler cette opération peut laisser certains éléments dans un état "
+"intermédiaire."
+
+#: nautilus-srm/operation-manager.c:439
+msgid "Resume operation"
+msgstr "Reprendre l'opération"
+
+#: nautilus-srm/operation-manager.c:440
+msgid "Cancel operation"
+msgstr "Annuler l'opération"
+
+#: nautilus-srm/operation-manager.c:518
+#, c-format
+msgid ""
+"%s. Please make sure you have the secure-delete package properly installed "
+"on your system."
+msgstr ""
+"%s. Veuillez vérifier que le paquet secure-delete est bien installé sur "
+"votre système."
