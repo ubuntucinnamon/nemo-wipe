@@ -1,4 +1,4 @@
-SUBDIRS = po nautilus-srm
+SUBDIRS = nautilus-srm po
 
 ACLOCAL_AMFLAGS = -I m4
 

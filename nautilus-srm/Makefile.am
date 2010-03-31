@@ -4,6 +4,8 @@ nautilus_extension_LTLIBRARIES = libnautilus-srm.la
 
 noinst_PROGRAMS = test
 
+localedir = $(datadir)/locale
+
 libnautilus_srm_la_SOURCES = nautilus-srm.c \
                              nautilus-srm.h \
                              operation-manager.c \
@@ -15,7 +17,8 @@ libnautilus_srm_la_SOURCES = nautilus-srm.c \
                              progress-dialog.c \
                              progress-dialog.h \
                              compat.h
-libnautilus_srm_la_CPPFLAGS = -DG_LOG_DOMAIN=\"$(PACKAGE)\"
+libnautilus_srm_la_CPPFLAGS = -DG_LOG_DOMAIN=\"$(PACKAGE)\" \
+                              -DLOCALEDIR=\"$(localedir)\"
 libnautilus_srm_la_CFLAGS   = @GLIB_CFLAGS@ \
                               @GTK_CFLAGS@ \
                               @GCONF_CFLAGS@ \
