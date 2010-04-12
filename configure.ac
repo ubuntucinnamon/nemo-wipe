@@ -5,7 +5,7 @@ AC_INIT([nautilus-srm],[0.1])
 AC_CONFIG_SRCDIR([nautilus-srm/nautilus-srm.h])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror])
+AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror foreign])
 AC_CONFIG_HEADERS([config.h])
 
 AM_SILENT_RULES([yes])
@@ -15,6 +15,8 @@ LT_PREREQ([2.2.6])
 LT_INIT([disable-static])
 AC_PROG_CC
 AM_PROG_CC_C_O
+
+GNOME_DOC_INIT
 
 # Checks for libraries.
 # 2.6 for gtk_message_dialog_format_secondary_text()
@@ -72,5 +74,6 @@ AC_CHECK_FUNCS([nautilus_file_info_get_location])
 AC_CONFIG_FILES([Makefile
                  po/Makevars
                  po/Makefile.in
-                 nautilus-srm/Makefile])
+                 nautilus-srm/Makefile
+                 help/Makefile])
 AC_OUTPUT

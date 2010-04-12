@@ -5,7 +5,8 @@
   <!ENTITY appversion "0.1">
   <!ENTITY manrevision "0.1">
   <!ENTITY date "March 2010">
-  <!ENTITY app "<application>Nautilus Secure Delete</application>">
+  <!ENTITY appname "Nautilus Secure Delete">
+  <!ENTITY app "<application>&appname;</application>">
   <!-- Information about the entities
        The legal.xml file contains legal information, there is no need to edit the file. 
        Use the appversion entity to specify the version of the application.
@@ -25,7 +26,12 @@
 <!-- please do not change the id; for translations, change lang to -->
 <!-- appropriate code -->
   <articleinfo> 
-    <title>&app; Manual V&manrevision;</title>       
+    <title>&app; Manual V&manrevision;</title>
+
+    <abstract role="description">
+      <para>&app; allows you to wipe files or available diskspace from
+      <application>Nautilus</application></para>
+    </abstract>
 
     <copyright> 
       <year>2010</year> 
@@ -53,7 +59,7 @@
 
     <authorgroup> 
       <!-- XXX -->
-      <author> 
+      <author role="maintainer">
         <firstname>The Nautilus Secure Delete Team</firstname> 
         <!--
         <surname>Writer 2</surname> 
@@ -126,6 +132,12 @@
       </revision> 
     </revhistory> 
 -->
+    <revhistory>
+      <revision>
+        <revnumber>&appname; Manual V&manrevision;</revnumber>
+        <date>&date;</date>
+      </revision>
+    </revhistory>
 
     <releaseinfo>This manual describes version &appversion; of Nautilus Secure Delete
     </releaseinfo> 

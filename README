@@ -9,4 +9,5 @@ Dependancies
 - autoconf
 - libtool
 - gcc
+- gnome-doc-utils
 
