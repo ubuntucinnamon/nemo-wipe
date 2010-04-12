@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-srm 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-31 15:16+0200\n"
+"POT-Creation-Date: 2010-04-12 20:04+0200\n"
 "PO-Revision-Date: 2010-03-31 15:30+0200\n"
 "Last-Translator: Colomban Wendling <ban@herbesfolles.org>\n"
 "Language-Team: French\n"
@@ -16,96 +16,93 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: nautilus-srm/delete-operation.c:74
+#: nautilus-srm/delete-operation.c:88
 msgid "Nothing to do!"
 msgstr "Rien à faire !"
 
-#: nautilus-srm/fill-operation.c:104
+#: nautilus-srm/fill-operation.c:119
 #, c-format
 msgid "Mount \"%s\" is not local"
 msgstr "Le montage « %s » n'est pas local"
 
-#: nautilus-srm/fill-operation.c:117
+#: nautilus-srm/fill-operation.c:135
 #, c-format
 msgid "No mount point found for path \"%s\""
 msgstr "Aucun point de montage trouvé pour le chemin « %s »"
 
-#: nautilus-srm/nautilus-srm.c:63
-msgid "Initializing"
-msgstr ""
-
-#: nautilus-srm/nautilus-srm.c:84
-msgid "Shutting down"
-msgstr ""
-
-#: nautilus-srm/nautilus-srm.c:379
+#: nautilus-srm/nautilus-srm.c:361
 msgid "Wipe"
 msgstr "Écraser"
 
-#: nautilus-srm/nautilus-srm.c:380
-msgid "Delete each selected item, and overwrite its data"
+#: nautilus-srm/nautilus-srm.c:362
+msgid "Delete each selected item and overwrite its data"
 msgstr "Supprime chaque élément sélectionné et écraser son contenu"
 
-#: nautilus-srm/nautilus-srm.c:416
+#: nautilus-srm/nautilus-srm.c:394
+#, c-format
+msgid "File filtering failed: %s"
+msgstr "Le filtrage des fichiers a échoué : %s"
+
+#: nautilus-srm/nautilus-srm.c:398
 msgid "Wipe available diskspace"
 msgstr "Écraser l'espace disque disponible"
 
-#: nautilus-srm/nautilus-srm.c:417
+#: nautilus-srm/nautilus-srm.c:399
 msgid "Overwrite available diskspace in this device(s)"
 msgstr ""
 "Écrase l'espace disque disponible sur les périphérique(s) sélectionné(s)"
 
-#: nautilus-srm/nautilus-srm.c:496
+#: nautilus-srm/nautilus-srm.c:478
 #, c-format
 msgid "Are you sure you want to wipe the %u selected items?"
 msgstr "Êtes-vous sûr de vouloir écraser les %u éléments sélectionnés ?"
 
-#: nautilus-srm/nautilus-srm.c:502
+#: nautilus-srm/nautilus-srm.c:484
 #, c-format
 msgid "Are you sure you want to wipe \"%s\"?"
 msgstr "Êtes-vous sûr de vouloir écraser « %s » ?"
 
-#: nautilus-srm/nautilus-srm.c:511
+#: nautilus-srm/nautilus-srm.c:493
 msgid "If you wipe an item, it will not be recoverable."
 msgstr "Si vous écrasez un élément, il ne pourra plus être récupéré."
 
-#: nautilus-srm/nautilus-srm.c:512
+#: nautilus-srm/nautilus-srm.c:494
 msgid "_Wipe"
-msgstr "Écras_er"
+msgstr "Éc_raser"
 
-#: nautilus-srm/nautilus-srm.c:515
+#: nautilus-srm/nautilus-srm.c:497
 msgid "Wiping files..."
 msgstr "Écrasement des fichiers…"
 
-#: nautilus-srm/nautilus-srm.c:519
+#: nautilus-srm/nautilus-srm.c:501
 msgid "Wipe failed."
 msgstr "L'écrasement a échoué."
 
-#: nautilus-srm/nautilus-srm.c:521
+#: nautilus-srm/nautilus-srm.c:503
 msgid "Wipe successful."
 msgstr "L'écrasement a réussi."
 
-#: nautilus-srm/nautilus-srm.c:522
+#: nautilus-srm/nautilus-srm.c:504
 msgid "Item(s) have been successfully wiped."
 msgstr "Le(s) élément(s) ont été écrasé(s) avec succès."
 
 #. TRANSLATORS: this is the last device names separator
-#: nautilus-srm/nautilus-srm.c:550
+#: nautilus-srm/nautilus-srm.c:532
 msgid " and "
 msgstr " et "
 
 #. TRANSLATORS: this is the device names separator (except last)
-#: nautilus-srm/nautilus-srm.c:553
+#: nautilus-srm/nautilus-srm.c:535
 msgid ", "
 msgstr ", "
 
 #. TRANSLATORS: this is the device name
-#: nautilus-srm/nautilus-srm.c:557
+#: nautilus-srm/nautilus-srm.c:539
 #, c-format
 msgid "\"%s\""
 msgstr "« %s »"
 
-#: nautilus-srm/nautilus-srm.c:560
+#: nautilus-srm/nautilus-srm.c:542
 #, c-format
 msgid ""
 "Are you sure you want to wipe the available diskspace on the %s partitions "
@@ -114,7 +111,7 @@ msgstr ""
 "Êtes-vous sûr de vouloir écraser l'espace disque libre sur les partitions ou "
 "périphériques %s ?"
 
-#: nautilus-srm/nautilus-srm.c:564
+#: nautilus-srm/nautilus-srm.c:546
 #, c-format
 msgid ""
 "Available diskspace on the partitions or devices %s have been successfully "
@@ -123,7 +120,7 @@ msgstr ""
 "L'espace disque disponible sur les partitions ou périphériques %s a été "
 "écrasé avec succès."
 
-#: nautilus-srm/nautilus-srm.c:573
+#: nautilus-srm/nautilus-srm.c:555
 #, c-format
 msgid ""
 "Are you sure you want to wipe the available diskspace on the \"%s\" "
@@ -132,7 +129,7 @@ msgstr ""
 "Êtes-vous sûr de vouloir écraser l'espace disque disponible sur la partition "
 "ou le périphérique « %s » ?"
 
-#: nautilus-srm/nautilus-srm.c:577
+#: nautilus-srm/nautilus-srm.c:559
 #, c-format
 msgid ""
 "Available diskspace on the partition or device \"%s\" have been successfully "
@@ -141,79 +138,83 @@ msgstr ""
 "L'espace disque disponible sur la partition ou le périphérique « %s » a été "
 "écrasé avec succès."
 
-#: nautilus-srm/nautilus-srm.c:587
+#: nautilus-srm/nautilus-srm.c:569
 msgid "This operation may take a while."
 msgstr "Cette opération peut prendre du temps."
 
-#: nautilus-srm/nautilus-srm.c:588
+#: nautilus-srm/nautilus-srm.c:570
 msgid "_Wipe available diskspace"
-msgstr "Écras_er l'espace disque disponible"
+msgstr "Éc_raser l'espace disque disponible"
 
-#: nautilus-srm/nautilus-srm.c:591
+#: nautilus-srm/nautilus-srm.c:573
 msgid "Wiping available diskspace..."
 msgstr "Écrasement de l'espace disque disponible…"
 
-#: nautilus-srm/nautilus-srm.c:595
+#: nautilus-srm/nautilus-srm.c:577
 msgid "Wipe failed"
 msgstr "L'écrasement a échoué"
 
-#: nautilus-srm/nautilus-srm.c:597
+#: nautilus-srm/nautilus-srm.c:579
 msgid "Wipe successful"
 msgstr "L'écrasement a réussi"
 
-#: nautilus-srm/operation-manager.c:206
+#: nautilus-srm/operation-manager.c:205
 msgid "_Details"
 msgstr "_Détails"
 
-#: nautilus-srm/operation-manager.c:331
+#: nautilus-srm/operation-manager.c:294
+msgid "Failed to open help"
+msgstr "Impossible d'ouvrir l'aide"
+
+#: nautilus-srm/operation-manager.c:367
 msgid "_Options"
 msgstr "_Options"
 
-#: nautilus-srm/operation-manager.c:345
+#: nautilus-srm/operation-manager.c:381
 msgid "Number of _passes:"
 msgstr "Nombre de _passes :"
 
-#: nautilus-srm/operation-manager.c:380
+#: nautilus-srm/operation-manager.c:416
 msgid "(secure, recommended)"
 msgstr "(sûr, recommandé)"
 
-#: nautilus-srm/operation-manager.c:382
+#: nautilus-srm/operation-manager.c:418
 msgid "(insecure, but faster)"
 msgstr "(peu sûr mais rapide)"
 
-#: nautilus-srm/operation-manager.c:384
+#: nautilus-srm/operation-manager.c:420
 msgid "(very insecure, but fastest)"
 msgstr "(très peu sûr, mais très rapide)"
 
-#: nautilus-srm/operation-manager.c:397
+#: nautilus-srm/operation-manager.c:433
 msgid "_Fast and insecure mode (no /dev/urandom, no synchronize mode)"
 msgstr ""
-"Mode _rapide et peu sûr (pas de /dev/urandom, pas de mode de synchronisation)"
+"_Mode rapide et peu sûr (pas de /dev/urandom, pas de mode de synchronisation)"
 
-#: nautilus-srm/operation-manager.c:409
+#: nautilus-srm/operation-manager.c:445
 msgid "Last pass with _zeros instead of random data"
 msgstr "Dernière passe avec des _zéros à la place de données aléatoires"
 
-#: nautilus-srm/operation-manager.c:436
+#: nautilus-srm/operation-manager.c:472
 msgid "Are you sure you want to cancel this operation?"
 msgstr "Êtes-vous sûr de vouloir annuler cette opération ?"
 
-#: nautilus-srm/operation-manager.c:437
+#: nautilus-srm/operation-manager.c:473
 msgid ""
 "Canceling this operation might leave some item(s) in an intermediate state."
 msgstr ""
 "Annuler cette opération peut laisser certains éléments dans un état "
 "intermédiaire."
 
-#: nautilus-srm/operation-manager.c:439
+#: nautilus-srm/operation-manager.c:475
 msgid "Resume operation"
 msgstr "Reprendre l'opération"
 
-#: nautilus-srm/operation-manager.c:440
+#: nautilus-srm/operation-manager.c:476
 msgid "Cancel operation"
 msgstr "Annuler l'opération"
 
-#: nautilus-srm/operation-manager.c:518
+#: nautilus-srm/operation-manager.c:554
 #, c-format
 msgid ""
 "%s. Please make sure you have the secure-delete package properly installed "
