@@ -30,6 +30,7 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
 
 G_BEGIN_DECLS
 
@@ -44,6 +45,29 @@ G_BEGIN_DECLS
 #if ! GTK_CHECK_VERSION (2, 18, 0)
 # define gtk_widget_get_sensitive(w) (GTK_WIDGET_SENSITIVE (w))
 #endif /* ! GTK_CHECK_VERSION (2, 18, 0) */
+
+#if ! GTK_CHECK_VERSION (2, 13, 1)
+
+static gboolean
+gtk_show_uri (GdkScreen    *screen,
+              const gchar  *uri,
+              guint32       timestamp,
+              GError      **error)
+{
+  gboolean  success;
+  gchar    *quoted_uri;
+  gchar    *cmd;
+  
+  quoted_uri = g_shell_quote (uri);
+  cmd = g_strconcat ("xdg-open", " ", quoted_uri, NULL);
+  g_free (quoted_uri);
+  success = gdk_spawn_command_line_on_screen (screen, cmd, error);
+  g_free (cmd);
+  
+  return success;
+}
+
+#endif
 
 
 /* Nautilus stuff */

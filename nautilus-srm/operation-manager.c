@@ -276,6 +276,30 @@ pref_enum_combo_changed_handler (GtkComboBox *combo,
   }
 }
 
+static void
+help_button_clicked_handler (GtkWidget *widget,
+                             gpointer   data)
+{
+  GtkWindow  *parent = data;
+  GError     *err = NULL;
+  
+  if (! gtk_show_uri (gtk_widget_get_screen (widget),
+                      "ghelp:nautilus-srm?nautilus-secure-delete-config",
+                      gtk_get_current_event_time (),
+                      &err)) {
+    /* display the error.
+     * here we cannot use non-blocking dialog since we are called from a
+     * dialog ran by gtk_dialog_run(), then the dialog must be ran the same way
+     * to get events */
+    display_dialog (parent, GTK_MESSAGE_ERROR, TRUE,
+                    _("Failed to open help"),
+                    err->message,
+                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                    NULL);
+    g_error_free (err);
+  }
+}
+
 /*
  * operation_confirm_dialog:
  * @parent: Parent window, or %NULL for none
@@ -306,17 +330,30 @@ operation_confirm_dialog (GtkWindow                    *parent,
   GtkResponseType response = GTK_RESPONSE_NONE;
   GtkWidget      *button;
   GtkWidget      *dialog;
+  GtkWidget      *action_area;
   
   dialog = gtk_message_dialog_new (parent,
                                    GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
                                    "%s", primary_text);
+  action_area = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
   if (secondary_text) {
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                               "%s", secondary_text);
   }
+  /* help button. don't use response not to close the dialog on click */
+  button = gtk_button_new_from_stock (GTK_STOCK_HELP);
+  g_signal_connect (button, "clicked",
+                    G_CALLBACK (help_button_clicked_handler), dialog);
+  gtk_box_pack_start (GTK_BOX (action_area), button, FALSE, TRUE, 0);
+  if (GTK_IS_BUTTON_BOX (action_area)) {
+    gtk_button_box_set_child_secondary (GTK_BUTTON_BOX (action_area), button, TRUE);
+  }
+  gtk_widget_show (button);
+  /* cancel button */
   gtk_dialog_add_button (GTK_DIALOG (dialog),
                          GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT);
+  /* launch button */
   button = gtk_dialog_add_button (GTK_DIALOG (dialog),
                                   confirm_button_text, GTK_RESPONSE_ACCEPT);
   if (confirm_button_icon) {
