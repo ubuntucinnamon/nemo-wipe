@@ -29,6 +29,29 @@
 G_BEGIN_DECLS
 
 
+/**
+ * NautilusSrmFillOperationError:
+ * @NAUTILUS_SRM_FILL_OPERATION_ERROR_MISSING_MOUNT: A file have no mount
+ * @NAUTILUS_SRM_FILL_OPERATION_ERROR_REMOTE_MOUNT: A mount is not local
+ * @NAUTILUS_SRM_FILL_OPERATION_ERROR_FAILED: An error occurred
+ * 
+ * Possible errors from the %NAUTILUS_SRM_FILL_OPERATION_ERROR domain.
+ */
+typedef enum
+{
+  NAUTILUS_SRM_FILL_OPERATION_ERROR_MISSING_MOUNT,
+  NAUTILUS_SRM_FILL_OPERATION_ERROR_REMOTE_MOUNT,
+  NAUTILUS_SRM_FILL_OPERATION_ERROR_FAILED
+} NautilusSrmFillOperationError;
+
+/**
+ * NAUTILUS_SRM_FILL_OPERATION_ERROR:
+ * 
+ * Domain for error coming from a NautilusSrm's fill operation.
+ */
+#define NAUTILUS_SRM_FILL_OPERATION_ERROR (nautilus_srm_fill_operation_error_quark ())
+
+GQuark   nautilus_srm_fill_operation_error_quark  (void) G_GNUC_CONST;
 gboolean nautilus_srm_fill_operation_filter_files (GList    *paths,
                                                    GList   **work_paths_,
                                                    GList   **work_mounts_,

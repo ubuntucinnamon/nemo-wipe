@@ -36,6 +36,18 @@
 #include "nautilus-srm.h"
 
 
+GQuark
+nautilus_srm_fill_operation_error_quark (void)
+{
+  static GQuark q = 0;
+  
+  if (G_UNLIKELY (q == 0)) {
+    q = g_quark_from_static_string ("NautilusSrmFillOperationError");
+  }
+  
+  return q;
+}
+
 #if HAVE_GIO_UNIX
 /*
  * find_mountpoint_unix:
@@ -101,7 +113,10 @@ find_mountpoint (const gchar *path,
     if (! mountpoint_path) {
       gchar *uri = g_file_get_uri (mountpoint_file);
       
-      g_set_error (&err, 0, 0, _("Mount \"%s\" is not local"), uri);
+      g_set_error (&err,
+                   NAUTILUS_SRM_FILL_OPERATION_ERROR,
+                   NAUTILUS_SRM_FILL_OPERATION_ERROR_REMOTE_MOUNT,
+                   _("Mount \"%s\" is not local"), uri);
       g_free (uri);
     }
     g_object_unref (mountpoint_file);
@@ -114,7 +129,10 @@ find_mountpoint (const gchar *path,
     g_clear_error (&err);
     mountpoint_path = find_mountpoint_unix (path);
     if (! mountpoint_path) {
-      g_set_error (&err, 0, 0, _("No mount point found for path \"%s\""), path);
+      g_set_error (&err,
+                   NAUTILUS_SRM_FILL_OPERATION_ERROR,
+                   NAUTILUS_SRM_FILL_OPERATION_ERROR_MISSING_MOUNT,
+                   _("No mount point found for path \"%s\""), path);
     }
   }
   #endif

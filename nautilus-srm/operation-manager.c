@@ -148,7 +148,6 @@ struct NautilusSrmOperationData
   gchar                      *failed_primary_text;
   gchar                      *success_primary_text;
   gchar                      *success_secondary_text;
-  /*GList                      *files;*/
 };
 
 /* Frees a NautilusSrmOperationData structure */

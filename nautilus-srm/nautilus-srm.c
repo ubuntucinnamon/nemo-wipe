@@ -60,7 +60,7 @@ static GList *nautilus_srm_get_background_items (NautilusMenuProvider *provider,
 void
 nautilus_module_initialize (GTypeModule *module)
 {
-  g_message (_("Initializing"));
+  g_message ("Initializing");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
   nautilus_srm_register_type (module);
   provider_types[0] = nautilus_srm_get_type ();
@@ -81,7 +81,6 @@ nautilus_module_list_types (const GType **types,
 void
 nautilus_module_shutdown (void)
 {
-  g_message (_("Shutting down"));
   /* Any module-specific shutdown code*/
 }
 
@@ -110,29 +109,13 @@ nautilus_srm_menu_provider_iface_init (NautilusMenuProviderIface *iface)
 static void 
 nautilus_srm_instance_init (NautilusSrm *srm)
 {
-  g_message ("Object [%p] initialized", srm);
-}
-
-static void 
-nautilus_srm_instance_finalize (GObject *object)
-{
-  g_message ("Object [%p] finalized", object);
+  /* instance initialization */
 }
 
 static void
 nautilus_srm_class_init (NautilusSrmClass *class)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (class);
-  
-  object_class->finalize = nautilus_srm_instance_finalize;
-  
-  g_message ("Class initialized");
-}
-
-static void
-nautilus_srm_class_finalize (NautilusSrmClass *class)
-{
-  g_message ("Class finalized");
+  /* class initialization */
 }
 
 GType
@@ -213,7 +196,6 @@ nautilus_srm_nfi_has_uri_scheme (NautilusFileInfo *nfi,
   gchar    *nfi_scheme;
   
   nfi_scheme = nautilus_file_info_get_uri_scheme (nfi);
-  /*g_message ("does %s match %s?", nfi_scheme, scheme);*/
   if (nfi_scheme == scheme || strcmp (nfi_scheme, scheme) == 0) {
     matches = TRUE;
   }
@@ -377,7 +359,7 @@ nautilus_srm_menu_item_srm (NautilusMenuProvider *provider,
   
   item = nautilus_menu_item_new (item_name,
                                  _("Wipe"),
-                                 _("Delete each selected item, and overwrite its data"),
+                                 _("Delete each selected item and overwrite its data"),
                                  GTK_STOCK_DELETE);
   add_item_data (item, window, paths, NULL);
   g_signal_connect (item, "activate",
@@ -409,7 +391,7 @@ nautilus_srm_menu_item_sfill (NautilusMenuProvider *provider,
 
   if (! nautilus_srm_fill_operation_filter_files (files, &folders, &mountpoints,
                                                   &err)) {
-    g_warning ("File filtering failed: %s", err->message);
+    g_warning (_("File filtering failed: %s"), err->message);
     g_error_free (err);
   } else {
     item = nautilus_menu_item_new (item_name,

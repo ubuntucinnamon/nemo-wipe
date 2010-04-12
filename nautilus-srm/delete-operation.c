@@ -32,6 +32,18 @@
 #include <gsecuredelete/gsecuredelete.h>
 
 
+GQuark
+nautilus_srm_delete_operation_error_quark (void)
+{
+  static GQuark q = 0;
+  
+  if (G_UNLIKELY (q == 0)) {
+    q = g_quark_from_static_string ("NautilusSrmDeleteOperationError");
+  }
+  
+  return q;
+}
+
 /*
  * nsrm_delete_operation:
  * @files: A list of paths to delete.
@@ -70,8 +82,10 @@ nautilus_srm_delete_operation (GList                       *files,
     n_files ++;
   }
   if (n_files < 1) {
-    /* FIXME: use correct error quark and code */
-    g_set_error (error, 0, 0, _("Nothing to do!"));
+    g_set_error (error,
+                 NAUTILUS_SRM_DELETE_OPERATION_ERROR,
+                 NAUTILUS_SRM_DELETE_OPERATION_ERROR_FAILED,
+                 _("Nothing to do!"));
     success = FALSE;
   } else {
     /* if file addition succeeded, try to launch operation */

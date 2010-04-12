@@ -29,6 +29,25 @@
 G_BEGIN_DECLS
 
 
+/**
+ * NautilusSrmDeleteOperationError:
+ * @NAUTILUS_SRM_DELETE_OPERATION_ERROR_FAILED: An error occurred
+ * 
+ * Possible errors from the %NAUTILUS_SRM_DELETE_OPERATION_ERROR domain.
+ */
+typedef enum
+{
+  NAUTILUS_SRM_DELETE_OPERATION_ERROR_FAILED
+} NautilusSrmDeleteOperationError;
+
+/**
+ * NAUTILUS_SRM_DELETE_OPERATION_ERROR:
+ * 
+ * Domain for error coming from a NautilusSrm's delete operation.
+ */
+#define NAUTILUS_SRM_DELETE_OPERATION_ERROR (nautilus_srm_delete_operation_error_quark ())
+
+GQuark              nautilus_srm_delete_operation_error_quark (void) G_GNUC_CONST;
 GsdAsyncOperation  *nautilus_srm_delete_operation   (GList                       *files,
                                                      gboolean                     fast,
                                                      GsdSecureDeleteOperationMode mode,
