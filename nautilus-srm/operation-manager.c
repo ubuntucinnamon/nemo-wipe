@@ -413,11 +413,11 @@ operation_confirm_dialog (GtkWindow                    *parent,
         } G_STMT_END
       /* add items */
       ADD_ITEM (GSD_SECURE_DELETE_OPERATION_MODE_NORMAL,
-                38, _("(secure, recommended)"));
+                38, _("(Gutmann method for old disks)"));
       ADD_ITEM (GSD_SECURE_DELETE_OPERATION_MODE_INSECURE,
-                2, _("(insecure, but faster)"));
+                2, _("(advised for modern hard disks)"));
       ADD_ITEM (GSD_SECURE_DELETE_OPERATION_MODE_VERY_INSECURE,
-                1, _("(very insecure, but fastest)"));
+                1, _("(only protects against software attacks)"));
       
       #undef ADD_ITEM
       /* connect change & pack */
