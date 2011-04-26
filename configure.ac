@@ -3,8 +3,8 @@
 AC_PREREQ([2.64])
 AC_INIT([nautilus-srm],[0.1])
 AC_CONFIG_SRCDIR([nautilus-srm/nautilus-srm.h])
-AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_AUX_DIR([build/aux])
+AC_CONFIG_MACRO_DIR([build/m4])
 AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror foreign])
 AC_CONFIG_HEADERS([config.h])
 
