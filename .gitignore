@@ -1,9 +1,18 @@
-*~
 Makefile
 Makefile.in
 stamp-*
 config.*
+/autom4te.cache/
+/aclocal.m4
+/configure
+/libtool
+*.lo
+*.o
+*.la
+.deps/
+.libs/
+build/
 
-# perhaps remove these if we make a heavy use of m4 and co.
-build-aux/
-*.m4
+po/Makefile.in.in
+po/POTFILES
+po/*.gmo
