@@ -313,7 +313,7 @@
         <orderedlist>
           <listitem>
             <para>
-              The overwriting procedure (in the secure mode) does a 38 times
+              the default overwriting procedure does a 2 times
               overwriting. After each pass, the disk cache is flushed.
             </para>
           </listitem>
@@ -410,36 +410,11 @@
           <term>38</term>
           <listitem>
             <para>
-              Overwriting the data 38 times should prevent data recovery
-              through magnetic analysis of the hard drive surface. This is
-              achieved by the following procedure:
-            </para>
-            <itemizedlist>
-              <listitem>
-                <para>
-                  1x overwrite with 0xff
-                </para>
-              </listitem>
-              <listitem>
-                <para>
-                  5x random passes
-                </para>
-              </listitem>
-              <listitem>
-                <para>
-                  27x overwriting with special values to make the recovery from MFM
-                  and RLL encoded hard disks hard/impossible - see Gutmann's paper on
-                  that which is also included.
-                </para>
-              </listitem>
-              <listitem>
-                <para>
-                  5x random passes
-                </para>
-              </listitem>
-            </itemizedlist>
-            <para>
-              This is the default value.
+              Overwriting the data 38 times was the algorithm advised by
+              Gutmann. It was designed to prevent data recovery
+              through magnetic analysis of the hard drive surface, but relied
+              on discontinued hardware technologies. It is thus not advised
+              anymore.
             </para>
           </listitem>
         </varlistentry>
@@ -447,8 +422,9 @@
           <term>2</term>
           <listitem>
             <para>
-              Only two passes are written: one mode with 0xff and a final mode
-              random values. [FIXME: implications]
+              Two passes are written: one mode with 0xff and a final mode random
+              values. This seems to be enough on modern hard drives and is thus
+              the default behaviour.
             </para>
           </listitem>
         </varlistentry>
@@ -456,10 +432,10 @@
           <term>1</term>
           <listitem>
             <para>
-              Only one random pass is written. Overwriting the data only one
-              time should prevent from data recovery by analyzing raw data
-              written on the storage media, but is useless against magnetic
-              analysis of the hard drive surface.
+              Only one random pass is written. It should prevent software-only
+              data recovery performed by analyzing raw data stored on the
+              storage media. However it is probably not sufficient against
+              magnetic analysis of the hard drive surface.
             </para>
           </listitem>
         </varlistentry>
