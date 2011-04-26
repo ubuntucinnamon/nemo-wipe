@@ -15,6 +15,7 @@ LT_PREREQ([2.2.6])
 LT_INIT([disable-static])
 AC_PROG_CC
 AM_PROG_CC_C_O
+IT_PROG_INTLTOOL
 
 GNOME_DOC_INIT
 
@@ -50,11 +51,11 @@ PKG_CHECK_MODULES([GIO_UNIX], gio-unix-2.0 >= ${GIO_UNIX_REQUIRED},
 AC_DEFINE_UNQUOTED([HAVE_GIO_UNIX], [${HAVE_GIO_UNIX}], [Whether we have gio-unix])
 
 # i18n
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.17])
 GETTEXT_PACKAGE="${PACKAGE}"
 AC_SUBST([GETTEXT_PACKAGE])
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["${GETTEXT_PACKAGE}"], [GNU gettext package])
+
+AM_GLIB_GNU_GETTEXT
 
 # Checks for header files.
 
@@ -72,7 +73,6 @@ AC_CHECK_FUNCS([nautilus_file_info_get_location])
 
 # Output
 AC_CONFIG_FILES([Makefile
-                 po/Makevars
                  po/Makefile.in
                  nautilus-srm/Makefile
                  help/Makefile])
