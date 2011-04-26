@@ -519,7 +519,7 @@ nautilus_srm_operation_manager_run (GtkWindow                *parent,
 {
   /* if the user confirms, try to launch the operation */
   gboolean                      fast        = FALSE;
-  GsdSecureDeleteOperationMode  delete_mode = GSD_SECURE_DELETE_OPERATION_MODE_NORMAL;
+  GsdSecureDeleteOperationMode  delete_mode = GSD_SECURE_DELETE_OPERATION_MODE_INSECURE;
   gboolean                      zeroise     = FALSE;
   
   if (operation_confirm_dialog (parent,
