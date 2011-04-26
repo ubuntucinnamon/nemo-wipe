@@ -13,3 +13,7 @@
 * Add our entries in the same section on the context's menu that
   the "Delete" and the "Move to trash" entry
   -> I don't think it's possible
+
+* When one try to remove a single file on a flash device, explain that it's not
+  useful at all rather than doing it, giving the user a false impression of
+  security.
