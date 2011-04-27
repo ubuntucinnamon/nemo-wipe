@@ -4,6 +4,8 @@ Installation Instructions
 Copyright (C) 1994, 1995, 1996, 1999, 2000, 2001, 2002, 2004, 2005,
 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 
+Copyright (C) 2011 Colomban Wendling <ban@herbesfolles.org>
+
    Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
 notice and this notice are preserved.  This file is offered as-is,
@@ -140,6 +142,11 @@ using the `lipo' tool if you have problems.
 
 Installation Names
 ==================
+
+   As this package is a nautilus extension, it will be installed where
+nautilus expects to find extensions. You can override this directory with
+--with-nautilus-extdir=DIR but nautilus may not find the extension if
+that directory is not in its extension search path.
 
    By default, `make install' installs the package's commands under
 `/usr/local/bin', include files under `/usr/local/include', etc.  You
