@@ -1,3 +1,11 @@
+Nautilus Secure Delete
+
+Overwiew
+========
+
+Nautilus Secure Delete allows you to wipe files or available diskspace
+from Nautilus.
+
 Dependancies
 ============
 
@@ -5,9 +13,17 @@ Dependancies
 - libgtk2.0
 - libgsecuredelete
 - libgconf2
+
+Build dependancies
+==================
+
 - make
-- autoconf
-- libtool
 - gcc
 - gnome-doc-utils
 
+Quick installation instructions
+===============================
+
+    $ ./configure
+    $ make
+    # make install
