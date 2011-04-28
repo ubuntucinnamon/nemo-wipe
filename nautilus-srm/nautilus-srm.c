@@ -228,13 +228,8 @@ nautilus_srm_nfi_get_path (NautilusFileInfo *nfi)
 void
 nautilus_srm_path_list_free (GList *paths)
 {
-  while (paths) {
-    GList *tmp = paths;
-    
-    paths = g_list_next (paths);
-    g_free (tmp->data);
-    g_list_free_1 (tmp);
-  }
+  g_list_foreach (paths, (GFunc)g_free, NULL);
+  g_list_free (paths);
 }
 
 /* copies a list of paths

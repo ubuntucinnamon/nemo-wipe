@@ -140,21 +140,17 @@ update_action_area_visibility (NautilusSrmProgressDialog *dialog,
 {
   if (dialog->priv->auto_hide_action_area || force_show) {
     GtkWidget  *container;
-    GList      *children;
     guint       n_children = 0;
     
     container = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
     if (force_show) {
       n_children = 1;
     } else {
+      GList *children;
+      
       children = gtk_container_get_children (GTK_CONTAINER (container));
-      while (children) {
-        GList *tmp = children;
-        
-        n_children ++;
-        children = g_list_next (children);
-        g_list_free1 (tmp);
-      }
+      n_children = g_list_length (children);
+      g_list_free (children);
     }
     
     gtk_dialog_set_has_separator (GTK_DIALOG (dialog), n_children > 0);
