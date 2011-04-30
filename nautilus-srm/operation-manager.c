@@ -208,12 +208,13 @@ display_operation_error (struct NautilusSrmOperationData *opdata,
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scroll),
                                        GTK_SHADOW_IN);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
-                                  GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+                                  GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   gtk_container_add (GTK_CONTAINER (expander), scroll);
   buffer = gtk_text_buffer_new (NULL);
   gtk_text_buffer_set_text (buffer, error, -1);
   view = gtk_text_view_new_with_buffer (buffer);
   gtk_text_view_set_editable (GTK_TEXT_VIEW (view), FALSE);
+  gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (view), GTK_WRAP_WORD);
   gtk_container_add (GTK_CONTAINER (scroll), view);
   gtk_widget_show_all (expander);
   /* show the dialog */
