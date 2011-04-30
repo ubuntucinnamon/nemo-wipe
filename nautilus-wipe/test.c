@@ -9,13 +9,13 @@ static gdouble fraction = 0.0;
 static gboolean
 progress (gpointer data)
 {
-  NautilusSrmProgressDialog *dialog = NAUTILUS_SRM_PROGRESS_DIALOG (data);
+  NautilusWipeProgressDialog *dialog = NAUTILUS_WIPE_PROGRESS_DIALOG (data);
   
   /*fraction = fraction >= (1.0 - STEP) ? 0.0 : fraction + STEP;*/
   fraction += STEP;
   
   if (fraction >= 1.0) {
-    nautilus_srm_progress_dialog_finish (dialog, TRUE);
+    nautilus_wipe_progress_dialog_finish (dialog, TRUE);
   } else {
     static const gchar *texts[10] = {
       "Checking input data integrity",
@@ -30,12 +30,12 @@ progress (gpointer data)
       "Checking output integrity"
     };
     
-    nautilus_srm_progress_dialog_set_fraction (dialog, fraction);
-    nautilus_srm_progress_dialog_set_progress_text (dialog, "%s", texts[(gint)(fraction * 10)]);
+    nautilus_wipe_progress_dialog_set_fraction (dialog, fraction);
+    nautilus_wipe_progress_dialog_set_progress_text (dialog, "%s", texts[(gint)(fraction * 10)]);
   }
   
-  return ! nautilus_srm_progress_dialog_is_canceled (dialog) &&
-         ! nautilus_srm_progress_dialog_is_finished (dialog);
+  return ! nautilus_wipe_progress_dialog_is_canceled (dialog) &&
+         ! nautilus_wipe_progress_dialog_is_finished (dialog);
 }
 
 static void
@@ -52,12 +52,12 @@ response_handler (GtkDialog *dialog,
       break;
     
     case GTK_RESPONSE_DELETE_EVENT:
-      nautilus_srm_progress_dialog_set_has_close_button (NAUTILUS_SRM_PROGRESS_DIALOG (dialog),
-                                                         ! nautilus_srm_progress_dialog_get_has_close_button (NAUTILUS_SRM_PROGRESS_DIALOG (dialog)));
+      nautilus_wipe_progress_dialog_set_has_close_button (NAUTILUS_WIPE_PROGRESS_DIALOG (dialog),
+                                                          ! nautilus_wipe_progress_dialog_get_has_close_button (NAUTILUS_WIPE_PROGRESS_DIALOG (dialog)));
       break;
     
-    case NAUTILUS_SRM_PROGRESS_DIALOG_RESPONSE_COMPLETE:
-      nautilus_srm_progress_dialog_set_progress_text (NAUTILUS_SRM_PROGRESS_DIALOG (dialog), "Done!");
+    case NAUTILUS_WIPE_PROGRESS_DIALOG_RESPONSE_COMPLETE:
+      nautilus_wipe_progress_dialog_set_progress_text (NAUTILUS_WIPE_PROGRESS_DIALOG (dialog), "Done!");
       break;
   }
 }
@@ -70,9 +70,9 @@ main (int     argc,
   
   gtk_init (&argc, &argv);
   
-  dialog = nautilus_srm_progress_dialog_new (NULL, 0, "Progress...");
-  /*nautilus_srm_progress_dialog_set_has_cancel_button (NAUTILUS_SRM_PROGRESS_DIALOG (dialog), TRUE);*/
-  /*nautilus_srm_progress_dialog_set_has_close_button (NAUTILUS_SRM_PROGRESS_DIALOG (dialog), TRUE);*/
+  dialog = nautilus_wipe_progress_dialog_new (NULL, 0, "Progress...");
+  /*nautilus_wipe_progress_dialog_set_has_cancel_button (NAUTILUS_WIPE_PROGRESS_DIALOG (dialog), TRUE);*/
+  /*nautilus_wipe_progress_dialog_set_has_close_button (NAUTILUS_WIPE_PROGRESS_DIALOG (dialog), TRUE);*/
   g_signal_connect (dialog, "response", G_CALLBACK (response_handler), NULL);
   gtk_widget_show (GTK_WIDGET (dialog));
   

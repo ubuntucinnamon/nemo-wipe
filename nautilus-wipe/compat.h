@@ -1,5 +1,5 @@
 /*
- *  nautilus-srm - a nautilus extension to wipe file(s) with srm
+ *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -21,8 +21,8 @@
 
 /* Contains compatibility things for old GTK and Nautilus */
 
-#ifndef NAUTILUS_SRM_COMPAT_H
-#define NAUTILUS_SRM_COMPAT_H
+#ifndef NAUTILUS_WIPE_COMPAT_H
+#define NAUTILUS_WIPE_COMPAT_H
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -104,7 +104,7 @@ nautilus_file_info_get_location (NautilusFileInfo *nfi)
  * the user thinks we use the remote one).
  */
 static gchar *
-NAUTILUS_SRM_g_file_get_path (GFile *file)
+NAUTILUS_WIPE_g_file_get_path (GFile *file)
 {
   gchar *path = NULL;
   
@@ -115,7 +115,7 @@ NAUTILUS_SRM_g_file_get_path (GFile *file)
   return path;
 }
 /* overwrite the GIO implementation */
-#define g_file_get_path NAUTILUS_SRM_g_file_get_path
+#define g_file_get_path NAUTILUS_WIPE_g_file_get_path
 
 #endif /* HAVE_NAUTILUS_FILE_INFO_GET_LOCATION */
 

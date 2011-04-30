@@ -1,5 +1,5 @@
 /*
- *  nautilus-srm - a nautilus extension to wipe file(s) with srm
+ *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef NAUTILUS_SRM_DELETE_OPERATION_H
-#define NAUTILUS_SRM_DELETE_OPERATION_H
+#ifndef NAUTILUS_WIPE_DELETE_OPERATION_H
+#define NAUTILUS_WIPE_DELETE_OPERATION_H
 
 #include <glib.h>
 #include <glib-object.h>
@@ -30,25 +30,25 @@ G_BEGIN_DECLS
 
 
 /**
- * NautilusSrmDeleteOperationError:
- * @NAUTILUS_SRM_DELETE_OPERATION_ERROR_FAILED: An error occurred
+ * NautilusWipeDeleteOperationError:
+ * @NAUTILUS_WIPE_DELETE_OPERATION_ERROR_FAILED: An error occurred
  * 
- * Possible errors from the %NAUTILUS_SRM_DELETE_OPERATION_ERROR domain.
+ * Possible errors from the %NAUTILUS_WIPE_DELETE_OPERATION_ERROR domain.
  */
 typedef enum
 {
-  NAUTILUS_SRM_DELETE_OPERATION_ERROR_FAILED
-} NautilusSrmDeleteOperationError;
+  NAUTILUS_WIPE_DELETE_OPERATION_ERROR_FAILED
+} NautilusWipeDeleteOperationError;
 
 /**
- * NAUTILUS_SRM_DELETE_OPERATION_ERROR:
+ * NAUTILUS_WIPE_DELETE_OPERATION_ERROR:
  * 
- * Domain for error coming from a NautilusSrm's delete operation.
+ * Domain for error coming from a NautilusWipe's delete operation.
  */
-#define NAUTILUS_SRM_DELETE_OPERATION_ERROR (nautilus_srm_delete_operation_error_quark ())
+#define NAUTILUS_WIPE_DELETE_OPERATION_ERROR (nautilus_wipe_delete_operation_error_quark ())
 
-GQuark              nautilus_srm_delete_operation_error_quark (void) G_GNUC_CONST;
-GsdAsyncOperation  *nautilus_srm_delete_operation   (GList                       *files,
+GQuark              nautilus_wipe_delete_operation_error_quark (void) G_GNUC_CONST;
+GsdAsyncOperation  *nautilus_wipe_delete_operation  (GList                       *files,
                                                      gboolean                     fast,
                                                      GsdSecureDeleteOperationMode mode,
                                                      gboolean                     zeroise,

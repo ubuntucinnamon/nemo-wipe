@@ -1,5 +1,5 @@
 /*
- *  nautilus-srm - a nautilus extension to wipe file(s) with srm
+ *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -33,19 +33,19 @@
 
 
 GQuark
-nautilus_srm_delete_operation_error_quark (void)
+nautilus_wipe_delete_operation_error_quark (void)
 {
   static GQuark q = 0;
   
   if (G_UNLIKELY (q == 0)) {
-    q = g_quark_from_static_string ("NautilusSrmDeleteOperationError");
+    q = g_quark_from_static_string ("NautilusWipeDeleteOperationError");
   }
   
   return q;
 }
 
 /*
- * nsrm_delete_operation:
+ * nautilus_wipe_delete_operation:
  * @files: A list of paths to delete.
  * @fast: The Gsd.SecureDeleteOperation:fast setting
  * @mode: The Gsd.SecureDeleteOperation:mode setting
@@ -63,14 +63,14 @@ nautilus_srm_delete_operation_error_quark (void)
  *          no longer needed.
  */
 GsdAsyncOperation *
-nautilus_srm_delete_operation (GList                       *files,
-                               gboolean                     fast,
-                               GsdSecureDeleteOperationMode mode,
-                               gboolean                     zeroise,
-                               GCallback                    finished_handler,
-                               GCallback                    progress_handler,
-                               gpointer                     data,
-                               GError                     **error)
+nautilus_wipe_delete_operation (GList                       *files,
+                                gboolean                     fast,
+                                GsdSecureDeleteOperationMode mode,
+                                gboolean                     zeroise,
+                                GCallback                    finished_handler,
+                                GCallback                    progress_handler,
+                                gpointer                     data,
+                                GError                     **error)
 {
   gboolean            success = TRUE;
   GsdDeleteOperation *operation;
@@ -83,8 +83,8 @@ nautilus_srm_delete_operation (GList                       *files,
   }
   if (n_files < 1) {
     g_set_error (error,
-                 NAUTILUS_SRM_DELETE_OPERATION_ERROR,
-                 NAUTILUS_SRM_DELETE_OPERATION_ERROR_FAILED,
+                 NAUTILUS_WIPE_DELETE_OPERATION_ERROR,
+                 NAUTILUS_WIPE_DELETE_OPERATION_ERROR_FAILED,
                  _("Nothing to do!"));
     success = FALSE;
   } else {

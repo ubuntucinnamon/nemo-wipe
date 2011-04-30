@@ -1,5 +1,5 @@
 /*
- *  nautilus-srm - a nautilus extension to wipe file(s) with srm
+ *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -32,7 +32,7 @@
 #include <gtk/gtk.h>
 #include <gsecuredelete/gsecuredelete.h>
 
-#include "nautilus-srm.h"
+#include "nautilus-wipe.h"
 #include "progress-dialog.h"
 #include "compat.h"
 
@@ -139,20 +139,20 @@ string_last_line (const gchar *str)
 
 
 
-struct NautilusSrmOperationData
+struct NautilusWipeOperationData
 {
   GsdAsyncOperation          *operation;
   GtkWindow                  *window;
   gulong                      window_destroy_hid;
-  NautilusSrmProgressDialog  *progress_dialog;
+  NautilusWipeProgressDialog  *progress_dialog;
   gchar                      *failed_primary_text;
   gchar                      *success_primary_text;
   gchar                      *success_secondary_text;
 };
 
-/* Frees a NautilusSrmOperationData structure */
+/* Frees a NautilusWipeOperationData structure */
 static void
-free_opdata (struct NautilusSrmOperationData *opdata)
+free_opdata (struct NautilusWipeOperationData *opdata)
 {
   if (opdata->window_destroy_hid) {
     g_signal_handler_disconnect (opdata->window, opdata->window_destroy_hid);
@@ -169,8 +169,8 @@ free_opdata (struct NautilusSrmOperationData *opdata)
 /* if the parent window get destroyed, we honor gently the thing and leave it
  * to the death. doing this is useful not to have a bad window pointer later */
 static void
-opdata_window_destroy_handler (GtkObject                       *obj,
-                               struct NautilusSrmOperationData *opdata)
+opdata_window_destroy_handler (GtkObject                        *obj,
+                               struct NautilusWipeOperationData *opdata)
 {
   g_signal_handler_disconnect (opdata->window, opdata->window_destroy_hid);
   opdata->window_destroy_hid = 0;
@@ -179,8 +179,8 @@ opdata_window_destroy_handler (GtkObject                       *obj,
 
 /* Displays an operation's error */
 static void
-display_operation_error (struct NautilusSrmOperationData *opdata,
-                         const gchar                     *error)
+display_operation_error (struct NautilusWipeOperationData *opdata,
+                         const gchar                      *error)
 {
   GtkWidget      *dialog;
   GtkWidget      *content_area;
@@ -228,7 +228,7 @@ operation_finished_handler (GsdDeleteOperation *operation,
                             const gchar        *error,
                             gpointer            data)
 {
-  struct NautilusSrmOperationData *opdata = data;
+  struct NautilusWipeOperationData *opdata = data;
   
   gtk_widget_destroy (GTK_WIDGET (opdata->progress_dialog));
   if (! success) {
@@ -248,10 +248,10 @@ operation_progress_handler (GsdDeleteOperation *operation,
                             gdouble             fraction,
                             gpointer            data)
 {
-  struct NautilusSrmOperationData *opdata = data;
+  struct NautilusWipeOperationData *opdata = data;
   
-  nautilus_srm_progress_dialog_set_fraction (opdata->progress_dialog,
-                                             fraction);
+  nautilus_wipe_progress_dialog_set_fraction (opdata->progress_dialog,
+                                              fraction);
 }
 
 /* sets @pref according to state of @toggle */
@@ -284,7 +284,7 @@ help_button_clicked_handler (GtkWidget *widget,
   GError     *err = NULL;
   
   if (! gtk_show_uri (gtk_widget_get_screen (widget),
-                      "ghelp:nautilus-srm?nautilus-secure-delete-config",
+                      "ghelp:nautilus-wipe?nautilus-secure-delete-config",
                       gtk_get_current_event_time (),
                       &err)) {
     /* display the error.
@@ -464,7 +464,7 @@ progress_dialog_response_handler (GtkDialog *dialog,
                                   gint       response_id,
                                   gpointer   data)
 {
-  struct NautilusSrmOperationData *opdata = data;
+  struct NautilusWipeOperationData *opdata = data;
   
   switch (response_id) {
     case GTK_RESPONSE_CANCEL:
@@ -486,7 +486,7 @@ progress_dialog_response_handler (GtkDialog *dialog,
 }
 
 /* 
- * nautilus_srm_operation_manager_run:
+ * nautilus_wipe_operation_manager_run:
  * @parent: Parent window for dialogs
  * @files: List of paths to pass to @operation_launcher_func
  * @confirm_primary_text: Primary text for the confirmation dialog
@@ -506,17 +506,17 @@ progress_dialog_response_handler (GtkDialog *dialog,
  * 
  */
 void
-nautilus_srm_operation_manager_run (GtkWindow                *parent,
-                                    GList                    *files,
-                                    const gchar              *confirm_primary_text,
-                                    const gchar              *confirm_secondary_text,
-                                    const gchar              *confirm_button_text,
-                                    GtkWidget                *confirm_button_icon,
-                                    const gchar              *progress_dialog_text,
-                                    NautilusSrmOperationFunc  operation_launcher_func,
-                                    const gchar              *failed_primary_text,
-                                    const gchar              *success_primary_text,
-                                    const gchar              *success_secondary_text)
+nautilus_wipe_operation_manager_run (GtkWindow                *parent,
+                                     GList                    *files,
+                                     const gchar              *confirm_primary_text,
+                                     const gchar              *confirm_secondary_text,
+                                     const gchar              *confirm_button_text,
+                                     GtkWidget                *confirm_button_icon,
+                                     const gchar              *progress_dialog_text,
+                                     NautilusWipeOperationFunc operation_launcher_func,
+                                     const gchar              *failed_primary_text,
+                                     const gchar              *success_primary_text,
+                                     const gchar              *success_secondary_text)
 {
   /* if the user confirms, try to launch the operation */
   gboolean                      fast        = FALSE;
@@ -528,15 +528,15 @@ nautilus_srm_operation_manager_run (GtkWindow                *parent,
                                 confirm_button_text, confirm_button_icon,
                                 &fast, &delete_mode, &zeroise)) {
     GError                           *err = NULL;
-    struct NautilusSrmOperationData  *opdata;
+    struct NautilusWipeOperationData *opdata;
     
     opdata = g_slice_alloc (sizeof *opdata);
     opdata->window = parent;
     opdata->window_destroy_hid = g_signal_connect (opdata->window, "destroy",
                                                    G_CALLBACK (opdata_window_destroy_handler), opdata);
-    opdata->progress_dialog = NAUTILUS_SRM_PROGRESS_DIALOG (nautilus_srm_progress_dialog_new (opdata->window, 0,
-                                                                                              progress_dialog_text));
-    nautilus_srm_progress_dialog_set_has_cancel_button (opdata->progress_dialog, TRUE);
+    opdata->progress_dialog = NAUTILUS_WIPE_PROGRESS_DIALOG (nautilus_wipe_progress_dialog_new (opdata->window, 0,
+                                                                                                progress_dialog_text));
+    nautilus_wipe_progress_dialog_set_has_cancel_button (opdata->progress_dialog, TRUE);
     g_signal_connect (opdata->progress_dialog, "response",
                       G_CALLBACK (progress_dialog_response_handler), opdata);
     opdata->failed_primary_text = g_strdup (failed_primary_text);

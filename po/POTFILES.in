@@ -1,5 +1,5 @@
 # List of source files which contain translatable strings.
-nautilus-srm/delete-operation.c
-nautilus-srm/fill-operation.c
-nautilus-srm/nautilus-srm.c
-nautilus-srm/operation-manager.c
+nautilus-wipe/delete-operation.c
+nautilus-wipe/fill-operation.c
+nautilus-wipe/nautilus-wipe.c
+nautilus-wipe/operation-manager.c

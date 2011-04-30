@@ -1,8 +1,8 @@
 # Initially based on NautilusActions configure & build system.
 
 AC_PREREQ([2.64])
-AC_INIT([nautilus-srm],[0.1])
-AC_CONFIG_SRCDIR([nautilus-srm/nautilus-srm.h])
+AC_INIT([nautilus-wipe],[0.1])
+AC_CONFIG_SRCDIR([nautilus-wipe/nautilus-wipe.h])
 AC_CONFIG_AUX_DIR([build/aux])
 AC_CONFIG_MACRO_DIR([build/m4])
 AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror foreign])
@@ -74,6 +74,6 @@ AC_CHECK_FUNCS([nautilus_file_info_get_location])
 # Output
 AC_CONFIG_FILES([Makefile
                  po/Makefile.in
-                 nautilus-srm/Makefile
+                 nautilus-wipe/Makefile
                  help/Makefile])
 AC_OUTPUT

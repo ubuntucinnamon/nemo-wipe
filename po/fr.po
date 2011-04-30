@@ -1,11 +1,11 @@
-# French translations for nautilus-srm package
-# Traductions françaises du paquet nautilus-srm.
+# French translations for nautilus-wipe package
+# Traductions françaises du paquet nautilus-wipe.
 # Copyright (C) 2010-2011  Colomban Wendling <ban@herbesfolles.org>
-# This file is distributed under the same license as the nautilus-srm package.
+# This file is distributed under the same license as the nautilus-wipe package.
 # Colomban Wendling <ban@herbesfolles.org>, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: nautilus-srm 0.1\n"
+"Project-Id-Version: nautilus-wipe 0.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-04-26 23:16+0200\n"
 "PO-Revision-Date: 2011-04-26 23:25+0200\n"
@@ -17,97 +17,97 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../nautilus-srm/delete-operation.c:88
+#: ../nautilus-wipe/delete-operation.c:88
 #, c-format
 msgid "Nothing to do!"
 msgstr "Rien à faire !"
 
-#: ../nautilus-srm/fill-operation.c:119
+#: ../nautilus-wipe/fill-operation.c:119
 #, c-format
 msgid "Mount \"%s\" is not local"
 msgstr "Le montage « %s » n'est pas local"
 
-#: ../nautilus-srm/fill-operation.c:135
+#: ../nautilus-wipe/fill-operation.c:135
 #, c-format
 msgid "No mount point found for path \"%s\""
 msgstr "Aucun point de montage trouvé pour le chemin « %s »"
 
-#: ../nautilus-srm/nautilus-srm.c:361
+#: ../nautilus-wipe/nautilus-wipe.c:361
 msgid "Wipe"
 msgstr "Écraser"
 
-#: ../nautilus-srm/nautilus-srm.c:362
+#: ../nautilus-wipe/nautilus-wipe.c:362
 msgid "Delete each selected item and overwrite its data"
 msgstr "Supprime chaque élément sélectionné et écraser son contenu"
 
-#: ../nautilus-srm/nautilus-srm.c:394
+#: ../nautilus-wipe/nautilus-wipe.c:394
 #, c-format
 msgid "File filtering failed: %s"
 msgstr "Le filtrage des fichiers a échoué : %s"
 
-#: ../nautilus-srm/nautilus-srm.c:398
+#: ../nautilus-wipe/nautilus-wipe.c:398
 msgid "Wipe available diskspace"
 msgstr "Écraser l'espace disque disponible"
 
-#: ../nautilus-srm/nautilus-srm.c:399
+#: ../nautilus-wipe/nautilus-wipe.c:399
 msgid "Overwrite available diskspace in this device(s)"
 msgstr ""
 "Écrase l'espace disque disponible sur le(s) périphérique(s) sélectionné(s)"
 
-#: ../nautilus-srm/nautilus-srm.c:478
+#: ../nautilus-wipe/nautilus-wipe.c:478
 #, c-format
 msgid "Are you sure you want to wipe the %u selected items?"
 msgstr "Êtes-vous sûr de vouloir écraser les %u éléments sélectionnés ?"
 
-#: ../nautilus-srm/nautilus-srm.c:484
+#: ../nautilus-wipe/nautilus-wipe.c:484
 #, c-format
 msgid "Are you sure you want to wipe \"%s\"?"
 msgstr "Êtes-vous sûr de vouloir écraser « %s » ?"
 
-#: ../nautilus-srm/nautilus-srm.c:493
+#: ../nautilus-wipe/nautilus-wipe.c:493
 msgid "If you wipe an item, it will not be recoverable."
 msgstr "Si vous écrasez un élément, il ne pourra plus être récupéré."
 
-#: ../nautilus-srm/nautilus-srm.c:494
+#: ../nautilus-wipe/nautilus-wipe.c:494
 msgid "_Wipe"
 msgstr "Éc_raser"
 
 #. progress dialog
-#: ../nautilus-srm/nautilus-srm.c:497
+#: ../nautilus-wipe/nautilus-wipe.c:497
 msgid "Wiping files..."
 msgstr "Écrasement des fichiers…"
 
 #. failed dialog
-#: ../nautilus-srm/nautilus-srm.c:501
+#: ../nautilus-wipe/nautilus-wipe.c:501
 msgid "Wipe failed."
 msgstr "L'écrasement a échoué."
 
 #. success dialog
-#: ../nautilus-srm/nautilus-srm.c:503
+#: ../nautilus-wipe/nautilus-wipe.c:503
 msgid "Wipe successful."
 msgstr "L'écrasement a réussi."
 
-#: ../nautilus-srm/nautilus-srm.c:504
+#: ../nautilus-wipe/nautilus-wipe.c:504
 msgid "Item(s) have been successfully wiped."
 msgstr "Le(s) élément(s) ont été écrasé(s) avec succès."
 
 #. TRANSLATORS: this is the last device names separator
-#: ../nautilus-srm/nautilus-srm.c:532
+#: ../nautilus-wipe/nautilus-wipe.c:532
 msgid " and "
 msgstr " et "
 
 #. TRANSLATORS: this is the device names separator (except last)
-#: ../nautilus-srm/nautilus-srm.c:535
+#: ../nautilus-wipe/nautilus-wipe.c:535
 msgid ", "
 msgstr ", "
 
 #. TRANSLATORS: this is the device name
-#: ../nautilus-srm/nautilus-srm.c:539
+#: ../nautilus-wipe/nautilus-wipe.c:539
 #, c-format
 msgid "\"%s\""
 msgstr "« %s »"
 
-#: ../nautilus-srm/nautilus-srm.c:542
+#: ../nautilus-wipe/nautilus-wipe.c:542
 #, c-format
 msgid ""
 "Are you sure you want to wipe the available diskspace on the %s partitions "
@@ -116,7 +116,7 @@ msgstr ""
 "Êtes-vous sûr de vouloir écraser l'espace disque libre sur les partitions ou "
 "périphériques %s ?"
 
-#: ../nautilus-srm/nautilus-srm.c:546
+#: ../nautilus-wipe/nautilus-wipe.c:546
 #, c-format
 msgid ""
 "Available diskspace on the partitions or devices %s have been successfully "
@@ -125,7 +125,7 @@ msgstr ""
 "L'espace disque disponible sur les partitions ou périphériques %s a été "
 "écrasé avec succès."
 
-#: ../nautilus-srm/nautilus-srm.c:555
+#: ../nautilus-wipe/nautilus-wipe.c:555
 #, c-format
 msgid ""
 "Are you sure you want to wipe the available diskspace on the \"%s\" "
@@ -134,7 +134,7 @@ msgstr ""
 "Êtes-vous sûr de vouloir écraser l'espace disque disponible sur la partition "
 "ou le périphérique « %s » ?"
 
-#: ../nautilus-srm/nautilus-srm.c:559
+#: ../nautilus-wipe/nautilus-wipe.c:559
 #, c-format
 msgid ""
 "Available diskspace on the partition or device \"%s\" have been successfully "
@@ -143,88 +143,88 @@ msgstr ""
 "L'espace disque disponible sur la partition ou le périphérique « %s » a été "
 "écrasé avec succès."
 
-#: ../nautilus-srm/nautilus-srm.c:569
+#: ../nautilus-wipe/nautilus-wipe.c:569
 msgid "This operation may take a while."
 msgstr "Cette opération peut prendre du temps."
 
-#: ../nautilus-srm/nautilus-srm.c:570
+#: ../nautilus-wipe/nautilus-wipe.c:570
 msgid "_Wipe available diskspace"
 msgstr "Éc_raser l'espace disque disponible"
 
 #. progress dialog
-#: ../nautilus-srm/nautilus-srm.c:573
+#: ../nautilus-wipe/nautilus-wipe.c:573
 msgid "Wiping available diskspace..."
 msgstr "Écrasement de l'espace disque disponible…"
 
 #. failed dialog
-#: ../nautilus-srm/nautilus-srm.c:577
+#: ../nautilus-wipe/nautilus-wipe.c:577
 msgid "Wipe failed"
 msgstr "L'écrasement a échoué"
 
 #. success dialog
-#: ../nautilus-srm/nautilus-srm.c:579
+#: ../nautilus-wipe/nautilus-wipe.c:579
 msgid "Wipe successful"
 msgstr "L'écrasement a réussi"
 
-#: ../nautilus-srm/operation-manager.c:205
+#: ../nautilus-wipe/operation-manager.c:205
 msgid "_Details"
 msgstr "_Détails"
 
-#: ../nautilus-srm/operation-manager.c:294
+#: ../nautilus-wipe/operation-manager.c:294
 msgid "Failed to open help"
 msgstr "Impossible d'ouvrir l'aide"
 
-#: ../nautilus-srm/operation-manager.c:367
+#: ../nautilus-wipe/operation-manager.c:367
 msgid "_Options"
 msgstr "_Options"
 
-#: ../nautilus-srm/operation-manager.c:381
+#: ../nautilus-wipe/operation-manager.c:381
 msgid "Number of _passes:"
 msgstr "Nombre de _passes :"
 
-#: ../nautilus-srm/operation-manager.c:416
+#: ../nautilus-wipe/operation-manager.c:416
 msgid "(Gutmann method for old disks)"
 msgstr "(méthode de Gutmann pour les vieux disques)"
 
-#: ../nautilus-srm/operation-manager.c:418
+#: ../nautilus-wipe/operation-manager.c:418
 msgid "(advised for modern hard disks)"
 msgstr "(méthode recommandée pour les disques actuels)"
 
-#: ../nautilus-srm/operation-manager.c:420
+#: ../nautilus-wipe/operation-manager.c:420
 msgid "(only protects against software attacks)"
 msgstr "(protège seulement des attaques logicielles)"
 
-#: ../nautilus-srm/operation-manager.c:433
+#: ../nautilus-wipe/operation-manager.c:433
 msgid "_Fast and insecure mode (no /dev/urandom, no synchronize mode)"
 msgstr ""
 "_Mode rapide et peu sûr (pas de /dev/urandom, pas de mode de synchronisation)"
 
-#: ../nautilus-srm/operation-manager.c:445
+#: ../nautilus-wipe/operation-manager.c:445
 msgid "Last pass with _zeros instead of random data"
 msgstr "Dernière passe avec des _zéros à la place de données aléatoires"
 
-#: ../nautilus-srm/operation-manager.c:472
+#: ../nautilus-wipe/operation-manager.c:472
 msgid "Are you sure you want to cancel this operation?"
 msgstr "Êtes-vous sûr de vouloir annuler cette opération ?"
 
-#: ../nautilus-srm/operation-manager.c:473
+#: ../nautilus-wipe/operation-manager.c:473
 msgid ""
 "Canceling this operation might leave some item(s) in an intermediate state."
 msgstr ""
 "Annuler cette opération peut laisser certains éléments dans un état "
 "intermédiaire."
 
-#: ../nautilus-srm/operation-manager.c:475
+#: ../nautilus-wipe/operation-manager.c:475
 msgid "Resume operation"
 msgstr "Reprendre l'opération"
 
-#: ../nautilus-srm/operation-manager.c:476
+#: ../nautilus-wipe/operation-manager.c:476
 msgid "Cancel operation"
 msgstr "Annuler l'opération"
 
 #. Merge the error message with our. Pretty much a hack, but should be
 #. * correct and more precise.
-#: ../nautilus-srm/operation-manager.c:554
+#: ../nautilus-wipe/operation-manager.c:554
 #, c-format
 msgid ""
 "%s. Please make sure you have the secure-delete package properly installed "

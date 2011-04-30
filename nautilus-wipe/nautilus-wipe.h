@@ -1,5 +1,5 @@
 /*
- *  nautilus-srm - a nautilus extension to wipe file(s) with srm
+ *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef NAUTILUS_SRM_H
-#define NAUTILUS_SRM_H
+#ifndef NAUTILUS_WIPE_H
+#define NAUTILUS_WIPE_H
 
 #include <glib.h>
 #include <glib-object.h>
@@ -38,36 +38,36 @@ G_BEGIN_DECLS
  * exported by libnautilus. */
 
 
-#define NAUTILUS_TYPE_SRM   (nautilus_srm_get_type ())
-#define NAUTILUS_SRM(o)     (G_TYPE_CHECK_INSTANCE_CAST ((o), NAUTILUS_TYPE_SRM, NautilusSrm))
-#define NAUTILUS_IS_SRM(o)  (G_TYPE_CHECK_INSTANCE_TYPE ((o), NAUTILUS_TYPE_SRM))
-typedef struct _NautilusSrm       NautilusSrm;
-typedef struct _NautilusSrmClass  NautilusSrmClass;
+#define NAUTILUS_TYPE_WIPE  (nautilus_wipe_get_type ())
+#define NAUTILUS_WIPE(o)    (G_TYPE_CHECK_INSTANCE_CAST ((o), NAUTILUS_TYPE_WIPE, NautilusWipe))
+#define NAUTILUS_IS_WIPE(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), NAUTILUS_TYPE_WIPE))
+typedef struct _NautilusWipe      NautilusWipe;
+typedef struct _NautilusWipeClass NautilusWipeClass;
 
-#define NAUTILUS_SRM_ERROR (nautilus_srm_error_quark ())
+#define NAUTILUS_WIPE_ERROR (nautilus_wipe_error_quark ())
 
 typedef enum {
-  NAUTILUS_SRM_ERROR_SPAWN_FAILED,
-  NAUTILUS_SRM_ERROR_CHILD_CRASHED,
-  NAUTILUS_SRM_ERROR_CHILD_FAILED,
-  NAUTILUS_SRM_ERROR_UNSUPPORTED_LOCATION,
-  NAUTILUS_SRM_ERROR_NOT_IMPLEMENTED,
-  NAUTILUS_SRM_ERROR_FAILED
-} NautilusSrmError;
+  NAUTILUS_WIPE_ERROR_SPAWN_FAILED,
+  NAUTILUS_WIPE_ERROR_CHILD_CRASHED,
+  NAUTILUS_WIPE_ERROR_CHILD_FAILED,
+  NAUTILUS_WIPE_ERROR_UNSUPPORTED_LOCATION,
+  NAUTILUS_WIPE_ERROR_NOT_IMPLEMENTED,
+  NAUTILUS_WIPE_ERROR_FAILED
+} NautilusWipeError;
 
-struct _NautilusSrm {
+struct _NautilusWipe {
   GObject parent_slot;
 };
 
-struct _NautilusSrmClass {
+struct _NautilusWipeClass {
   GObjectClass parent_slot;
 };
 
-GType   nautilus_srm_get_type       (void) G_GNUC_CONST;
-GQuark  nautilus_srm_error_quark    (void) G_GNUC_CONST;
+GType   nautilus_wipe_get_type        (void) G_GNUC_CONST;
+GQuark  nautilus_wipe_error_quark     (void) G_GNUC_CONST;
 
-void    nautilus_srm_path_list_free (GList *paths);
-GList  *nautilus_srm_path_list_copy (GList *src);
+void    nautilus_wipe_path_list_free  (GList *paths);
+GList  *nautilus_wipe_path_list_copy  (GList *src);
 
 
 G_END_DECLS

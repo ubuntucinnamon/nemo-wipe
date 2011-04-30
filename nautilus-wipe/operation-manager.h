@@ -1,5 +1,5 @@
 /*
- *  nautilus-srm - a nautilus extension to wipe file(s) with srm
+ *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef NAUTILUS_SRM_OPERATION_MANAGER_H
-#define NAUTILUS_SRM_OPERATION_MANAGER_H
+#ifndef NAUTILUS_WIPE_OPERATION_MANAGER_H
+#define NAUTILUS_WIPE_OPERATION_MANAGER_H
 
 #include <glib.h>
 #include <glib-object.h>
@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 
 
 /**
- * NautilusSrmOperationFunc:
+ * NautilusWipeOperationFunc:
  * @files: Paths to work on
  * @fast: The Gsd.SecureDeleteOperation:fast setting
  * @mode: The Gsd.SecureDeleteOperation:mode setting
@@ -46,23 +46,23 @@ G_BEGIN_DECLS
  *          The operation object should be unref'd with g_object_unref() when
  *          no longer needed.
  */
-typedef GsdAsyncOperation  *(*NautilusSrmOperationFunc) (GList                       *files,
-                                                         gboolean                     fast,
-                                                         GsdSecureDeleteOperationMode mode,
-                                                         gboolean                     zeroise,
-                                                         GCallback                    finished_handler,
-                                                         GCallback                    progress_handler,
-                                                         gpointer                     data,
-                                                         GError                     **error);
+typedef GsdAsyncOperation  *(*NautilusWipeOperationFunc)  (GList                       *files,
+                                                           gboolean                     fast,
+                                                           GsdSecureDeleteOperationMode mode,
+                                                           gboolean                     zeroise,
+                                                           GCallback                    finished_handler,
+                                                           GCallback                    progress_handler,
+                                                           gpointer                     data,
+                                                           GError                     **error);
 
-void    nautilus_srm_operation_manager_run    (GtkWindow                *parent,
+void    nautilus_wipe_operation_manager_run   (GtkWindow                *parent,
                                                GList                    *files,
                                                const gchar              *confirm_primary_text,
                                                const gchar              *confirm_secondary_text,
                                                const gchar              *confirm_button_text,
                                                GtkWidget                *confirm_button_icon,
                                                const gchar              *progress_dialog_text,
-                                               NautilusSrmOperationFunc  operation_launcher_func,
+                                               NautilusWipeOperationFunc operation_launcher_func,
                                                const gchar              *failed_primary_text,
                                                const gchar              *success_primary_text,
                                                const gchar              *success_secondary_text);

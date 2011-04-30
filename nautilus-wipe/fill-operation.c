@@ -1,5 +1,5 @@
 /*
- *  nautilus-srm - a nautilus extension to wipe file(s) with srm
+ *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -33,16 +33,16 @@
 # include <gio/gunixmounts.h>
 #endif
 #include <gsecuredelete/gsecuredelete.h>
-#include "nautilus-srm.h"
+#include "nautilus-wipe.h"
 
 
 GQuark
-nautilus_srm_fill_operation_error_quark (void)
+nautilus_wipe_fill_operation_error_quark (void)
 {
   static GQuark q = 0;
   
   if (G_UNLIKELY (q == 0)) {
-    q = g_quark_from_static_string ("NautilusSrmFillOperationError");
+    q = g_quark_from_static_string ("NautilusWipeFillOperationError");
   }
   
   return q;
@@ -114,8 +114,8 @@ find_mountpoint (const gchar *path,
       gchar *uri = g_file_get_uri (mountpoint_file);
       
       g_set_error (&err,
-                   NAUTILUS_SRM_FILL_OPERATION_ERROR,
-                   NAUTILUS_SRM_FILL_OPERATION_ERROR_REMOTE_MOUNT,
+                   NAUTILUS_WIPE_FILL_OPERATION_ERROR,
+                   NAUTILUS_WIPE_FILL_OPERATION_ERROR_REMOTE_MOUNT,
                    _("Mount \"%s\" is not local"), uri);
       g_free (uri);
     }
@@ -130,8 +130,8 @@ find_mountpoint (const gchar *path,
     mountpoint_path = find_mountpoint_unix (path);
     if (! mountpoint_path) {
       g_set_error (&err,
-                   NAUTILUS_SRM_FILL_OPERATION_ERROR,
-                   NAUTILUS_SRM_FILL_OPERATION_ERROR_MISSING_MOUNT,
+                   NAUTILUS_WIPE_FILL_OPERATION_ERROR,
+                   NAUTILUS_WIPE_FILL_OPERATION_ERROR_MISSING_MOUNT,
                    _("No mount point found for path \"%s\""), path);
     }
   }
@@ -172,19 +172,19 @@ struct FillOperationData
   gpointer          cbdata;
 };
 
-static void   nautilus_srm_fill_finished_handler  (GsdFillOperation         *operation,
+static void   nautilus_wipe_fill_finished_handler (GsdFillOperation         *operation,
                                                    gboolean                  success,
                                                    const gchar              *message,
                                                    struct FillOperationData *opdata);
-static void   nautilus_srm_fill_progress_handler  (GsdFillOperation         *operation,
+static void   nautilus_wipe_fill_progress_handler (GsdFillOperation         *operation,
                                                    gdouble                   fraction,
                                                    struct FillOperationData *opdata);
 
 
 /* Actually calls libgsecuredelete */
 static gboolean
-do_sfill_operation (struct FillOperationData *opdata,
-                    GError                  **error)
+do_fill_operation (struct FillOperationData *opdata,
+                   GError                  **error)
 {
   g_message ("Starting work on %s", (const gchar *)opdata->dir->data);
   /* FIXME: don't launch sfill in a useful directory since it can leave a bunch
@@ -194,7 +194,7 @@ do_sfill_operation (struct FillOperationData *opdata,
 
 /* Removes the current directory to proceed */
 static void
-nautilus_srm_fill_pop_dir (struct FillOperationData *opdata)
+nautilus_wipe_fill_pop_dir (struct FillOperationData *opdata)
 {
   GList *tmp;
   
@@ -206,7 +206,7 @@ nautilus_srm_fill_pop_dir (struct FillOperationData *opdata)
 
 /* Cleans up the opdata structure and frees it */
 static void
-nautilus_srm_fill_cleanup (struct FillOperationData *opdata)
+nautilus_wipe_fill_cleanup (struct FillOperationData *opdata)
 {
   g_signal_handler_disconnect (opdata->operation, opdata->progress_hid);
   g_signal_handler_disconnect (opdata->operation, opdata->finished_hid);
@@ -214,7 +214,7 @@ nautilus_srm_fill_cleanup (struct FillOperationData *opdata)
     g_object_unref (opdata->operation);
   }
   while (opdata->dir) {
-    nautilus_srm_fill_pop_dir (opdata);
+    nautilus_wipe_fill_pop_dir (opdata);
   }
   g_slice_free1 (sizeof *opdata, opdata);
 }
@@ -222,9 +222,9 @@ nautilus_srm_fill_cleanup (struct FillOperationData *opdata)
 /* wrapper for the progress handler returning the current progression over all
  * operations  */
 static void
-nautilus_srm_fill_progress_handler (GsdFillOperation         *operation,
-                                    gdouble                   fraction,
-                                    struct FillOperationData *opdata)
+nautilus_wipe_fill_progress_handler (GsdFillOperation         *operation,
+                                     gdouble                   fraction,
+                                     struct FillOperationData *opdata)
 {
   opdata->progress_handler (operation,
                             (opdata->n_op_done + fraction) / opdata->n_op,
@@ -235,7 +235,7 @@ nautilus_srm_fill_progress_handler (GsdFillOperation         *operation,
  * operation.
  * we need this kind of hack since operation are locked while running. */
 static gboolean
-launch_next_sfill_operation (struct FillOperationData *opdata)
+launch_next_fill_operation (struct FillOperationData *opdata)
 {
   gboolean busy;
   
@@ -244,10 +244,10 @@ launch_next_sfill_operation (struct FillOperationData *opdata)
     GError   *err = NULL;
     gboolean  success;
     
-    success = do_sfill_operation (opdata, &err);
+    success = do_fill_operation (opdata, &err);
     if (! success) {
-      nautilus_srm_fill_finished_handler (opdata->operation,
-                                          success, err->message, opdata);
+      nautilus_wipe_fill_finished_handler (opdata->operation,
+                                           success, err->message, opdata);
       g_error_free (err);
     }
   }
@@ -259,14 +259,14 @@ launch_next_sfill_operation (struct FillOperationData *opdata)
  * It launches the next operation if there is one left, or call the user's
  * handler if done or on error. */
 static void
-nautilus_srm_fill_finished_handler (GsdFillOperation         *operation,
-                                    gboolean                  success,
-                                    const gchar              *message,
-                                    struct FillOperationData *opdata)
+nautilus_wipe_fill_finished_handler (GsdFillOperation         *operation,
+                                     gboolean                  success,
+                                     const gchar              *message,
+                                     struct FillOperationData *opdata)
 {
   opdata->n_op_done++;
   /* remove the directory just proceeded */
-  nautilus_srm_fill_pop_dir (opdata);
+  nautilus_wipe_fill_pop_dir (opdata);
   /* if the last operation succeeded and we have work left */
   if (success && opdata->dir) {
     /* we can't launch the next operation right here since the previous must
@@ -275,15 +275,15 @@ nautilus_srm_fill_finished_handler (GsdFillOperation         *operation,
      * To work around this, we add a timeout function that will try to launch
      * the next operation if the current one is not busy, which fixes the
      * problem. */
-    g_timeout_add (10, (GSourceFunc)launch_next_sfill_operation, opdata);
+    g_timeout_add (10, (GSourceFunc)launch_next_fill_operation, opdata);
   } else {
     opdata->finished_handler (operation, success, message, opdata->cbdata);
-    nautilus_srm_fill_cleanup (opdata);
+    nautilus_wipe_fill_cleanup (opdata);
   }
 }
 
 /*
- * nautilus_srm_fill_operation_filter_files:
+ * nautilus_wipe_fill_operation_filter_files:
  * @paths: A list of paths to filter
  * @work_paths_: return location for filtered paths
  * @work_mounts_: return location for filtered paths' mounts
@@ -295,15 +295,15 @@ nautilus_srm_fill_finished_handler (GsdFillOperation         *operation,
  * The returned lists (@work_paths_ and @work_mounts_) have the same length, and
  * an index in a list correspond to the same in the other:
  * g_list_index(work_paths_, 0) is the path of g_list_index(work_mounts_, 0).
- * Free returned lists with nautilus_srm_path_list_free().
+ * Free returned lists with nautilus_wipe_path_list_free().
  * 
  * Returns: %TRUE on success, %FALSE otherwise.
  */
 gboolean
-nautilus_srm_fill_operation_filter_files (GList    *paths,
-                                          GList   **work_paths_,
-                                          GList   **work_mounts_,
-                                          GError  **error)
+nautilus_wipe_fill_operation_filter_files (GList    *paths,
+                                           GList   **work_paths_,
+                                           GList   **work_mounts_,
+                                           GError  **error)
 {
   GList  *work_paths  = NULL;
   GError *err         = NULL;
@@ -338,12 +338,12 @@ nautilus_srm_fill_operation_filter_files (GList    *paths,
     }
   }
   if (err || ! work_paths_) {
-    nautilus_srm_path_list_free (work_paths);
+    nautilus_wipe_path_list_free (work_paths);
   } else {
     *work_paths_ = work_paths;
   }
   if (err || ! work_mounts_) {
-    nautilus_srm_path_list_free (work_mounts);
+    nautilus_wipe_path_list_free (work_mounts);
   } else {
     *work_mounts_ = work_mounts;
   }
@@ -355,9 +355,9 @@ nautilus_srm_fill_operation_filter_files (GList    *paths,
 }
 
 /*
- * nautilus_srm_fill_operation:
+ * nautilus_wipe_fill_operation:
  * @directories: A list of paths to work on (should have been filtered with
- *               nautilus_srm_fill_operation_filter_files() or so)
+ *               nautilus_wipe_fill_operation_filter_files() or so)
  * @fast: The Gsd.SecureDeleteOperation:fast setting
  * @mode: The Gsd.SecureDeleteOperation:mode setting
  * @zeroise: The Gsd.ZeroableOperation:zeroise setting
@@ -367,21 +367,21 @@ nautilus_srm_fill_operation_filter_files (GList    *paths,
  * @error: Return location for errors or %NULL to ignore them. The errors are
  *         those from gsd_fill_operation_run().
  * 
- * "sfill"s the given directories.
+ * fills the given directories to overwrite available diskspace.
  * 
  * Returns: The operation object that was launched, or %NULL on failure.
  *          The operation object should be unref'd with g_object_unref() when
  *          no longer needed.
  */
 GsdAsyncOperation *
-nautilus_srm_fill_operation (GList                       *directories,
-                             gboolean                     fast,
-                             GsdSecureDeleteOperationMode mode,
-                             gboolean                     zeroise,
-                             GCallback                    finished_handler,
-                             GCallback                    progress_handler,
-                             gpointer                     data,
-                             GError                     **error)
+nautilus_wipe_fill_operation (GList                       *directories,
+                              gboolean                     fast,
+                              GsdSecureDeleteOperationMode mode,
+                              gboolean                     zeroise,
+                              GCallback                    finished_handler,
+                              GCallback                    progress_handler,
+                              gpointer                     data,
+                              GError                     **error)
 {
   gboolean                  success = FALSE;
   struct FillOperationData *opdata;
@@ -389,7 +389,7 @@ nautilus_srm_fill_operation (GList                       *directories,
   
   g_return_val_if_fail (directories != NULL, NULL);
   
-  dirs = nautilus_srm_path_list_copy (directories);
+  dirs = nautilus_wipe_path_list_copy (directories);
   if (dirs) {
     opdata = g_slice_alloc (sizeof *opdata);
     opdata->dir               = dirs;
@@ -403,13 +403,13 @@ nautilus_srm_fill_operation (GList                       *directories,
     gsd_secure_delete_operation_set_mode (GSD_SECURE_DELETE_OPERATION (opdata->operation), mode);
     gsd_zeroable_operation_set_zeroise (GSD_ZEROABLE_OPERATION (opdata->operation), zeroise);
     opdata->progress_hid = g_signal_connect (opdata->operation, "progress",
-                                             G_CALLBACK (nautilus_srm_fill_progress_handler), opdata);
+                                             G_CALLBACK (nautilus_wipe_fill_progress_handler), opdata);
     opdata->finished_hid = g_signal_connect (opdata->operation, "finished",
-                                             G_CALLBACK (nautilus_srm_fill_finished_handler), opdata);
+                                             G_CALLBACK (nautilus_wipe_fill_finished_handler), opdata);
     /* launches the operation */
-    success = do_sfill_operation (opdata, error);
+    success = do_fill_operation (opdata, error);
     if (! success) {
-      nautilus_srm_fill_cleanup (opdata);
+      nautilus_wipe_fill_cleanup (opdata);
     }
   }
   
