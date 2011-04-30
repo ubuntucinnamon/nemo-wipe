@@ -284,7 +284,7 @@ help_button_clicked_handler (GtkWidget *widget,
   GError     *err = NULL;
   
   if (! gtk_show_uri (gtk_widget_get_screen (widget),
-                      "ghelp:nautilus-wipe?nautilus-secure-delete-config",
+                      "ghelp:nautilus-wipe?nautilus-wipe-config",
                       gtk_get_current_event_time (),
                       &err)) {
     /* display the error.
