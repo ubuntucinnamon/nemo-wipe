@@ -189,7 +189,7 @@ do_sfill_operation (struct FillOperationData *opdata,
   g_message ("Starting work on %s", (const gchar *)opdata->dir->data);
   /* FIXME: don't launch sfill in a useful directory since it can leave a bunch
    * of files if it get interrupted (e.g. from a crash, a user kill or so) */
-  return gsd_fill_operation_run (opdata->operation, opdata->dir->data, 100, error);
+  return gsd_fill_operation_run (opdata->operation, opdata->dir->data, error);
 }
 
 /* Removes the current directory to proceed */

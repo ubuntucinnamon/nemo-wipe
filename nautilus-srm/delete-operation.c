@@ -99,7 +99,7 @@ nautilus_srm_delete_operation (GList                       *files,
     g_signal_connect_after (operation, "finished",
                             G_CALLBACK (g_object_unref), NULL);
     success = gsd_secure_delete_operation_run (GSD_SECURE_DELETE_OPERATION (operation),
-                                               100, error);
+                                               error);
   }
   /* if something failed, abort */
   if (! success) {
