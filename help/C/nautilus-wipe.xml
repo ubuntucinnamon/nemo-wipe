@@ -195,10 +195,10 @@
   <sect1 id="nautilus-wipe-data-deletion-intro">
     <title>An introduction to data deletion</title>
     <sect2 id="nautilus-wipe-not-the-data">
-      <title>Deleting doesn't affect data</title>
+      <title>Deletion doesn't affect data</title>
       <para>
         When you delete a file, even when bypassing or emptying the trash,
-        you only tell your computer that you don't care anymore for the
+        you only tell your computer that you don't care anymore about the
         file. The file's entry is removed from the list of existing files
         but the content of the file remains on the storage medium. The data
         will remain there until the operating system reuses the space for
@@ -213,7 +213,7 @@
       </para>
     </sect2>
     <sect2 id="nautilus-wipe-an-answer">
-      <title>An answer : overwriting data several times</title>
+      <title>An answer: overwriting data several times</title>
       <para>
         If you want to make the content of a file really hard to recover,
         you have to overwrite it with other data. But that's not enough. On
@@ -229,8 +229,8 @@
         </footnote>
         that the content can still be
         recovered by doing magnetic analysis of the hard disk surface. To
-        address this issue, it's possible to overwrite several times the
-        content to be deleted. That process is called &quot;wiping&quot;.
+        address this issue, it's possible to overwrite the content to be
+        deleted several times. That process is called &quot;wiping&quot;.
       </para>
       <para>
         If some sensible files have been already deleted without paying
