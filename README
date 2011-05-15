@@ -1,4 +1,6 @@
+=============
 Nautilus Wipe
+=============
 
 Overwiew
 ========
@@ -25,6 +27,8 @@ Build dependancies
 Quick installation instructions
 ===============================
 
-    $ ./configure
-    $ make
-    # make install
+::
+
+  $ ./configure
+  $ make
+  # make install
