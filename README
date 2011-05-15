@@ -19,6 +19,7 @@ Build dependancies
 
 - make
 - gcc
+- intltool
 - gnome-doc-utils
 
 Quick installation instructions
