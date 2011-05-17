@@ -170,8 +170,8 @@
       available diskspace from <application>Nautilus</application>.
     </para>
     <para>
-      Usually when you delete a file, even when bypassing the trash, it's
-      not accessible anymore, but its content still exists on the media
+      Usually when you delete a file, even when bypassing the trash, it is
+      not accessible anymore, but its content still exists on the medium
       that contained it until a new file is written over it.
       Consequently, it can be quite easy to recover it.
     </para>
@@ -205,11 +205,11 @@
         new data.
       </para>
       <para>
-        This could take weeks, months or years before this space is
-        actually used for new data, actually overwriting the content of the
-        deleted file. Until then, it's possible to recover it by reading
-        directly the data on the storage media. That's a quite simple
-        operation, automated by numerous softwares.
+        It could take weeks, months or years before this space get used for
+        new data, actually overwriting the content of the deleted file.
+        Until then, it is possible to recover the data by reading directly
+        on the storage medium. That's a quite simple operation, automated by
+        numerous software.
       </para>
     </sect2>
     <sect2 id="nautilus-wipe-an-answer">
@@ -217,7 +217,7 @@
       <para>
         If you want to make the content of a file really hard to recover,
         you have to overwrite it with other data. But that's not enough. On
-        a magnetic hard disk, it's known
+        a magnetic hard disk, it is known
         <footnote>
           <para>
             [2]. Peter Gutmann: Secure Deletion of Data from Magnetic and
@@ -229,14 +229,14 @@
         </footnote>
         that the content can still be
         recovered by doing magnetic analysis of the hard disk surface. To
-        address this issue, it's possible to overwrite the content to be
+        address this issue, it is possible to overwrite the content to be
         deleted several times. That process is called &quot;wiping&quot;.
       </para>
       <para>
         If some sensible files have been already deleted without paying
         attention to this issue, some of their data probably remains on the
-        storage media. It's thus also useful to wipe all the available free
-        space of a storage media.
+        storage medium. It is thus also useful to wipe all the available
+        free space of a storage medium.
       </para>
     </sect2>
     <sect2 id="nautilus-wipe-limitations">
@@ -263,8 +263,8 @@
         </listitem>
         <listitem>
           <para>
-            storage media features: modern storage mediums often reorganize
-            their content, e.g. to spread the writings over the media or to
+            storage media features: modern storage media often reorganize
+            their content, e.g. to spread the writings over the medium or to
             hide defective places to the operating system. Consequently, you
             can't be sure that the actual place occupied by your sensitive data
             was wiped;
@@ -285,7 +285,7 @@
         <listitem>
           <para>
             old algorithms: the wipe algorithms are old, and they are not
-            guaranteed to work as expected on new storage medias.
+            guaranteed to work as expected on new storage media.
           </para>
         </listitem>
       </itemizedlist>
@@ -434,7 +434,7 @@
             <para>
               Only one random pass is written. It should prevent software-only
               data recovery performed by analyzing raw data stored on the
-              storage media. However it is probably not sufficient against
+              storage medium. However it is probably not sufficient against
               magnetic analysis of the hard drive surface.
             </para>
           </listitem>
@@ -455,7 +455,7 @@
         <listitem>
           <para>
             do not ensure that overwriting data is actually written on the
-            storage media.
+            storage medium.
           </para>
         </listitem>
       </itemizedlist>
