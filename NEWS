@@ -1,3 +1,11 @@
+0.1.1 (2011-08-18):
+
+  Minor improvements of 0.1 release.
+
+  * Support for GTK 3.x (and thus Nautilus 3.x)
+  * Minor UI cleanup of the progress dialog
+
+
 0.1 (2011-05-15):
 
   Initial release.
