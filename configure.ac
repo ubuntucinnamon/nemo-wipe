@@ -16,6 +16,7 @@ LT_INIT([disable-static])
 AC_PROG_CC
 AM_PROG_CC_C_O
 IT_PROG_INTLTOOL
+PKG_PROG_PKG_CONFIG([0.9])
 
 GNOME_DOC_INIT
 
@@ -34,9 +35,26 @@ NAUTILUS_EXTENSION=2.0
 GSECUREDELETE_REQUIRED=0.1
 GIO_UNIX_REQUIRED=2.0
 
+# choose whether to use GTK2 or GTK3
+AC_ARG_WITH([gtk3],
+            [AS_HELP_STRING([--with-gtk3],
+                            [build for GTK3 instead of GTK2 [[default=auto]]])],
+            [with_gtk3="$withval"],
+            [with_gtk3=check])
+# use GTK2 by default but if not found
+AC_MSG_CHECKING([for GTK package to use])
+gtk_pkg="gtk+-2.0"
+AS_IF([test "x$with_gtk3" = xcheck],
+      [PKG_CHECK_EXISTS([$gtk_pkg >= ${GTK_REQUIRED}],
+                        [],
+                        [gtk_pkg="gtk+-3.0"])],
+      [test "x$with_gtk3" != xno],
+      [gtk_pkg="gtk+-3.0"])
+AC_MSG_RESULT([$gtk_pkg])
+
 # mandatory packages
 PKG_CHECK_MODULES([GLIB],                   glib-2.0              >= ${GLIB_REQUIRED})
-PKG_CHECK_MODULES([GTK],                    gtk+-2.0              >= ${GTK_REQUIRED})
+PKG_CHECK_MODULES([GTK],                    $gtk_pkg              >= ${GTK_REQUIRED})
 PKG_CHECK_MODULES([GCONF],                  gconf-2.0             >= ${GCONF_REQUIRED})
 PKG_CHECK_MODULES([LIBNAUTILUS_EXTENSION],  libnautilus-extension >= ${NAUTILUS_EXTENSION})
 PKG_CHECK_MODULES([GSECUREDELETE],          gsecuredelete         >= ${GSECUREDELETE_REQUIRED})

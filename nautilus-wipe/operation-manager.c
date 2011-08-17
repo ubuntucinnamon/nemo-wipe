@@ -169,7 +169,7 @@ free_opdata (struct NautilusWipeOperationData *opdata)
 /* if the parent window get destroyed, we honor gently the thing and leave it
  * to the death. doing this is useful not to have a bad window pointer later */
 static void
-opdata_window_destroy_handler (GtkObject                        *obj,
+opdata_window_destroy_handler (GtkWidget                        *obj,
                                struct NautilusWipeOperationData *opdata)
 {
   g_signal_handler_disconnect (opdata->window, opdata->window_destroy_hid);

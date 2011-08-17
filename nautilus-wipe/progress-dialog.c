@@ -153,7 +153,6 @@ update_action_area_visibility (NautilusWipeProgressDialog *dialog,
       g_list_free (children);
     }
     
-    gtk_dialog_set_has_separator (GTK_DIALOG (dialog), n_children > 0);
     if (n_children > 0) {
       gtk_widget_show (container);
     } else {
@@ -283,7 +282,9 @@ nautilus_wipe_progress_dialog_new (GtkWindow       *parent,
   va_end (ap);
   self = g_object_new (NAUTILUS_TYPE_WIPE_PROGRESS_DIALOG,
                        "transient-for",       parent,
-                       "has-separator",       ! (flags & GTK_DIALOG_NO_SEPARATOR),
+#if ! GTK_CHECK_VERSION (3, 0, 0)
+                       "has-separator",       FALSE,
+#endif
                        "modal",               flags & GTK_DIALOG_MODAL,
                        "destroy-with-parent", flags & GTK_DIALOG_DESTROY_WITH_PARENT,
                        "text",                text,
