@@ -164,6 +164,7 @@ update_action_area_visibility (NautilusWipeProgressDialog *dialog,
 static void
 nautilus_wipe_progress_dialog_init (NautilusWipeProgressDialog *self)
 {
+  GtkWidget *content_area;
   GtkWidget *vbox;
   
   self->priv = GET_PRIVATE (self);
@@ -175,11 +176,16 @@ nautilus_wipe_progress_dialog_init (NautilusWipeProgressDialog *self)
   self->priv->canceled = FALSE;
   self->priv->auto_hide_action_area = FALSE;
   
-  vbox = gtk_dialog_get_content_area (GTK_DIALOG (self));
-  gtk_container_set_border_width (GTK_CONTAINER (vbox), 10);
-  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (self->priv->label), TRUE, TRUE, 7);
+  gtk_container_set_border_width (GTK_CONTAINER (self), 5);
+  content_area = gtk_dialog_get_content_area (GTK_DIALOG (self));
+  vbox = g_object_new (GTK_TYPE_VBOX,
+                       "spacing", 10, /* we add 2 around the progress bar */
+                       "border-width", 5, NULL);
+  gtk_box_pack_start (GTK_BOX (content_area), vbox, TRUE, TRUE, 0);
+  gtk_widget_show (GTK_WIDGET (vbox));
+  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (self->priv->label), TRUE, TRUE, 0);
   gtk_widget_show (GTK_WIDGET (self->priv->label));
-  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (self->priv->progress), FALSE, TRUE, 7);
+  gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (self->priv->progress), FALSE, TRUE, 2);
   gtk_widget_show (GTK_WIDGET (self->priv->progress));
   
   gtk_progress_bar_set_ellipsize (self->priv->progress, PANGO_ELLIPSIZE_END);
