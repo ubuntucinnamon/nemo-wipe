@@ -240,9 +240,10 @@ nautilus_wipe_path_list_copy (GList *src)
   GList *paths = NULL;
   
   while (src) {
-    paths = g_list_append (paths, g_strdup (src->data));
+    paths = g_list_prepend (paths, g_strdup (src->data));
     src = g_list_next (src);
   }
+  paths = g_list_reverse (paths);
   
   return paths;
 }
@@ -263,7 +264,7 @@ nautilus_wipe_nfi_list_to_path_list (GList *nfis)
     
     path = nautilus_wipe_nfi_get_path (nfis->data);
     if (path) {
-      paths = g_list_append (paths, path);
+      paths = g_list_prepend (paths, path);
     } else {
       success = FALSE;
     }
@@ -272,6 +273,8 @@ nautilus_wipe_nfi_list_to_path_list (GList *nfis)
   if (! success) {
     nautilus_wipe_path_list_free (paths);
     paths = NULL;
+  } else {
+    paths = g_list_reverse (paths);
   }
   
   return paths;

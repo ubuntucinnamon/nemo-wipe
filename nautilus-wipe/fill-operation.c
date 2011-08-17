@@ -324,7 +324,7 @@ nautilus_wipe_fill_operation_filter_files (GList    *paths,
       } else {
         gchar *path;
         
-        work_mounts = g_list_append (work_mounts, mountpoint);
+        work_mounts = g_list_prepend (work_mounts, mountpoint);
         /* if it is not a directory, gets its container directory.
          * no harm since files cannot be mountpoint themselves, then it gets
          * at most the mountpoint itself */
@@ -333,19 +333,19 @@ nautilus_wipe_fill_operation_filter_files (GList    *paths,
         } else {
           path = g_strdup (file_path);
         }
-        work_paths = g_list_append (work_paths, path);
+        work_paths = g_list_prepend (work_paths, path);
       }
     }
   }
   if (err || ! work_paths_) {
     nautilus_wipe_path_list_free (work_paths);
   } else {
-    *work_paths_ = work_paths;
+    *work_paths_ = g_list_reverse (work_paths);
   }
   if (err || ! work_mounts_) {
     nautilus_wipe_path_list_free (work_mounts);
   } else {
-    *work_mounts_ = work_mounts;
+    *work_mounts_ = g_list_reverse (work_mounts);
   }
   if (err) {
     g_propagate_error (error, err);
