@@ -43,13 +43,13 @@ AC_ARG_WITH([gtk3],
             [with_gtk3=check])
 # use GTK2 by default but if not found
 AC_MSG_CHECKING([for GTK package to use])
-gtk_pkg="gtk+-2.0"
+gtk_pkg="gtk+-3.0"
 AS_IF([test "x$with_gtk3" = xcheck],
       [PKG_CHECK_EXISTS([$gtk_pkg >= ${GTK_REQUIRED}],
                         [],
-                        [gtk_pkg="gtk+-3.0"])],
-      [test "x$with_gtk3" != xno],
-      [gtk_pkg="gtk+-3.0"])
+                        [gtk_pkg="gtk+-2.0"])],
+      [test "x$with_gtk3" = xno],
+      [gtk_pkg="gtk+-2.0"])
 AC_MSG_RESULT([$gtk_pkg])
 
 # mandatory packages
