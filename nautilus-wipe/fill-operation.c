@@ -33,7 +33,7 @@
 # include <gio/gunixmounts.h>
 #endif
 #include <gsecuredelete/gsecuredelete.h>
-#include "nautilus-wipe.h"
+#include "path-list.h"
 
 
 GQuark

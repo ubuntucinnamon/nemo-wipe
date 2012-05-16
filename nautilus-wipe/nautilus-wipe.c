@@ -32,10 +32,10 @@
 #include <glib/gi18n-lib.h>
 #include <gtk/gtk.h>
 #include <gio/gio.h>
-#include <gconf/gconf-client.h>
 
 #include <gsecuredelete/gsecuredelete.h>
 
+#include "path-list.h"
 #include "operation-manager.h"
 #include "delete-operation.h"
 #include "fill-operation.h"
@@ -100,121 +100,6 @@ static void       run_fill_operation    (GtkWindow *parent,
                                          GList     *mountpoints);
 static void       run_delete_operation  (GtkWindow *parent,
                                          GList     *files);
-
-
-/* gets the Nautilus' desktop path (to handle x-nautilus-desktop:// URIs)
- * heavily based on the implementation from nautilus-open-terminal */
-static gchar *
-nautilus_wipe_get_desktop_path (void)
-{
-  gchar        *path = NULL;
-  GConfClient  *conf_client;
-  
-  conf_client = gconf_client_get_default ();
-  if (gconf_client_get_bool (conf_client,
-                             "/apps/nautilus/preferences/desktop_is_home_dir",
-                             NULL)) {
-    path = g_strdup (g_get_home_dir ());
-  } else {
-    path = g_strdup (g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP));
-  }
-  g_object_unref (conf_client);
-  
-  return path;
-}
-
-/* checks whether a #NautilusFileInfo have the given URI scheme */
-static gboolean
-nautilus_wipe_nfi_has_uri_scheme (NautilusFileInfo *nfi,
-                                  const gchar      *scheme)
-{
-  gboolean  matches = FALSE;
-  gchar    *nfi_scheme;
-  
-  nfi_scheme = nautilus_file_info_get_uri_scheme (nfi);
-  if (nfi_scheme == scheme || strcmp (nfi_scheme, scheme) == 0) {
-    matches = TRUE;
-  }
-  g_free (nfi_scheme);
-  
-  return matches;
-}
-
-/* gets the path of a #NautilusFileInfo.
- * this is different from getting if GFile then getting the path since it tries
- * handle x-nautilus-desktop */
-static gchar *
-nautilus_wipe_nfi_get_path (NautilusFileInfo *nfi)
-{
-  GFile *file;
-  gchar *path;
-  
-  file = nautilus_file_info_get_location (nfi);
-  path = g_file_get_path (file);
-  if (! path) {
-    if (nautilus_wipe_nfi_has_uri_scheme (nfi, "x-nautilus-desktop")) {
-      path = nautilus_wipe_get_desktop_path ();
-    }
-  }
-  
-  return path;
-}
-
-/* frees a list of paths */
-void
-nautilus_wipe_path_list_free (GList *paths)
-{
-  g_list_foreach (paths, (GFunc)g_free, NULL);
-  g_list_free (paths);
-}
-
-/* copies a list of paths
- * free the returned list with nautilus_wipe_path_list_free() */
-GList *
-nautilus_wipe_path_list_copy (GList *src)
-{
-  GList *paths = NULL;
-  
-  while (src) {
-    paths = g_list_prepend (paths, g_strdup (src->data));
-    src = g_list_next (src);
-  }
-  paths = g_list_reverse (paths);
-  
-  return paths;
-}
-
-/* converts a list of #NautilusFileInfo to a list of paths.
- * free the returned list with nautilus_wipe_path_list_free()
- * 
- * Returns: The list of paths on success, or %NULL on failure. This function
- *          will always fail on non-local-mounted (then without paths) files */
-static GList *
-nautilus_wipe_nfi_list_to_path_list (GList *nfis)
-{
-  gboolean  success = TRUE;
-  GList    *paths   = NULL;
-  
-  while (nfis && success) {
-    gchar *path;
-    
-    path = nautilus_wipe_nfi_get_path (nfis->data);
-    if (path) {
-      paths = g_list_prepend (paths, path);
-    } else {
-      success = FALSE;
-    }
-    nfis = g_list_next (nfis);
-  }
-  if (! success) {
-    nautilus_wipe_path_list_free (paths);
-    paths = NULL;
-  } else {
-    paths = g_list_reverse (paths);
-  }
-  
-  return paths;
-}
 
 
 /* Data needed to be able to start an operation.
@@ -361,7 +246,7 @@ nautilus_wipe_get_file_items (NautilusMenuProvider *provider,
   GList *items = NULL;
   GList *paths;
   
-  paths = nautilus_wipe_nfi_list_to_path_list (files);
+  paths = nautilus_wipe_path_list_new_from_nfi_list (files);
   if (paths) {
     ADD_ITEM (items, nautilus_wipe_menu_item_wipe (provider,
                                           "nautilus-wipe::files-items::wipe",
@@ -384,7 +269,7 @@ nautilus_wipe_get_background_items (NautilusMenuProvider *provider,
   GList *items = NULL;
   GList *paths = NULL;
   
-  paths = g_list_append (paths, nautilus_wipe_nfi_get_path (current_folder));
+  paths = g_list_append (paths, nautilus_wipe_path_from_nfi (current_folder));
   if (paths && paths->data) {
     ADD_ITEM (items, nautilus_wipe_menu_item_fill (provider,
                                                    "nautilus-wipe::background-items::fill",

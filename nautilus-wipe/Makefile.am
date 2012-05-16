@@ -13,6 +13,8 @@ libnautilus_wipe_la_SOURCES  = extension.c \
                                delete-operation.h \
                                fill-operation.c \
                                fill-operation.h \
+                               path-list.c \
+                               path-list.h \
                                progress-dialog.c \
                                progress-dialog.h \
                                type-utils.h \
