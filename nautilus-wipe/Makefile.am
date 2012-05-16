@@ -2,8 +2,6 @@ nautilus_extensiondir = $(NAUTILUS_EXTENSIONS_DIR)
 
 nautilus_extension_LTLIBRARIES = libnautilus-wipe.la
 
-noinst_PROGRAMS = test
-
 localedir = $(datadir)/locale
 
 libnautilus_wipe_la_SOURCES  = nautilus-wipe.c \
@@ -32,13 +30,3 @@ libnautilus_wipe_la_LDFLAGS  = -module -avoid-version \
                                @LIBNAUTILUS_EXTENSION_LIBS@ \
                                @GSECUREDELETE_LIBS@ \
                                @GIO_UNIX_LIBS@
-
-test_CFLAGS  = @GLIB_CFLAGS@ \
-               @GTK_CFLAGS@
-test_LDFLAGS = @GLIB_LIBS@ \
-               @GTK_LIBS@
-# Linking against a loadable module is not portable according to libtool.
-# However, I don't really care about portability issue here because it is only a
-# test program (that might even be removed at a time).
-test_LDADD   = libnautilus-wipe.la
-test_SOURCES = test.c
