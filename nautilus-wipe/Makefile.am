@@ -4,7 +4,8 @@ nautilus_extension_LTLIBRARIES = libnautilus-wipe.la
 
 localedir = $(datadir)/locale
 
-libnautilus_wipe_la_SOURCES  = nautilus-wipe.c \
+libnautilus_wipe_la_SOURCES  = extension.c \
+                               nautilus-wipe.c \
                                nautilus-wipe.h \
                                operation-manager.c \
                                operation-manager.h \

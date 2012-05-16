@@ -43,8 +43,6 @@
 #include "type-utils.h"
 
 
-static GType provider_types[1];
-
 /* private prototypes */
 static GList *nautilus_wipe_get_file_items            (NautilusMenuProvider *provider,
                                                        GtkWidget            *window,
@@ -54,37 +52,7 @@ static GList *nautilus_wipe_get_background_items      (NautilusMenuProvider *pro
                                                        NautilusFileInfo     *current_folder);
 static void   nautilus_wipe_menu_provider_iface_init  (NautilusMenuProviderIface *iface);
 
-/*=== Nautilus interface functions ===*/
 
-/* Initialize our extension */
-void
-nautilus_module_initialize (GTypeModule *module)
-{
-  g_message ("Initializing");
-  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
-  provider_types[0] = nautilus_wipe_register_type (module);
-}
-
-/* The next function returns the type of object Nautilus needs to create for your extension. */
-
-void
-nautilus_module_list_types (const GType **types,
-                            int          *num_types)
-{
-  *types = provider_types;
-  *num_types = G_N_ELEMENTS (provider_types);
-}
-
-/*Then comes the function that handles any tasks required to shut the Extension down cleanly.*/
-
-void
-nautilus_module_shutdown (void)
-{
-  /* Any module-specific shutdown code*/
-}
-
-
-/*=== Type registration ===*/
 
 GQuark
 nautilus_wipe_error_quark (void)
