@@ -1,7 +1,7 @@
 /*
  *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
- *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
+ *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -40,19 +40,19 @@
 #include "delete-operation.h"
 #include "fill-operation.h"
 #include "compat.h"
+#include "type-utils.h"
 
 
 static GType provider_types[1];
-static GType nautilus_wipe_type = 0;
 
 /* private prototypes */
-static void   nautilus_wipe_register_type     (GTypeModule *module);
-static GList *nautilus_wipe_get_file_items    (NautilusMenuProvider *provider,
-                                               GtkWidget            *window,
-                                               GList                *files);
-static GList *nautilus_wipe_get_background_items (NautilusMenuProvider *provider,
-                                               GtkWidget            *window,
-                                               NautilusFileInfo     *current_folder);
+static GList *nautilus_wipe_get_file_items            (NautilusMenuProvider *provider,
+                                                       GtkWidget            *window,
+                                                       GList                *files);
+static GList *nautilus_wipe_get_background_items      (NautilusMenuProvider *provider,
+                                                       GtkWidget            *window,
+                                                       NautilusFileInfo     *current_folder);
+static void   nautilus_wipe_menu_provider_iface_init  (NautilusMenuProviderIface *iface);
 
 /*=== Nautilus interface functions ===*/
 
@@ -62,8 +62,7 @@ nautilus_module_initialize (GTypeModule *module)
 {
   g_message ("Initializing");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
-  nautilus_wipe_register_type (module);
-  provider_types[0] = nautilus_wipe_get_type ();
+  provider_types[0] = nautilus_wipe_register_type (module);
 }
 
 /* The next function returns the type of object Nautilus needs to create for your extension. */
@@ -99,6 +98,12 @@ nautilus_wipe_error_quark (void)
   return error_quark;
 }
 
+NAUTILUS_WIPE_DEFINE_TYPE_MODULE_WITH_CODE (NautilusWipe,
+                                            nautilus_wipe,
+                                            G_TYPE_OBJECT,
+                                            NAUTILUS_WIPE_TYPE_MODULE_IMPLEMENT_INTERFACE (NAUTILUS_TYPE_MENU_PROVIDER,
+                                                                                           nautilus_wipe_menu_provider_iface_init))
+
 static void
 nautilus_wipe_menu_provider_iface_init (NautilusMenuProviderIface *iface)
 {
@@ -107,7 +112,7 @@ nautilus_wipe_menu_provider_iface_init (NautilusMenuProviderIface *iface)
 }
 
 static void 
-nautilus_wipe_instance_init (NautilusWipe *self)
+nautilus_wipe_init (NautilusWipe *self)
 {
   /* instance initialization */
 }
@@ -116,43 +121,6 @@ static void
 nautilus_wipe_class_init (NautilusWipeClass *class)
 {
   /* class initialization */
-}
-
-GType
-nautilus_wipe_get_type (void)
-{
-  return nautilus_wipe_type;
-}
-
-/* Register our type into glib */
-static void
-nautilus_wipe_register_type (GTypeModule *module)
-{
-  static const GTypeInfo info = {
-    sizeof (NautilusWipeClass),
-    (GBaseInitFunc) NULL,
-    (GBaseFinalizeFunc) NULL,
-    (GClassInitFunc) nautilus_wipe_class_init,
-    NULL,
-    NULL,
-    sizeof (NautilusWipe),
-    0,
-    (GInstanceInitFunc) nautilus_wipe_instance_init,
-  };
-  /* Nautilus Menu Provider Interface */
-  static const GInterfaceInfo menu_provider_iface_info = {
-    (GInterfaceInitFunc) nautilus_wipe_menu_provider_iface_init,
-     NULL,
-     NULL
-  };
-  
-  nautilus_wipe_type = g_type_module_register_type (module,
-                                                    G_TYPE_OBJECT,
-                                                    "NautilusWipe",
-                                                    &info, 0);
-  g_type_module_add_interface (module, nautilus_wipe_type,
-                               NAUTILUS_TYPE_MENU_PROVIDER,
-                               &menu_provider_iface_info);
 }
 
 

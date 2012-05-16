@@ -64,6 +64,7 @@ struct _NautilusWipeClass {
 };
 
 GType   nautilus_wipe_get_type        (void) G_GNUC_CONST;
+GType   nautilus_wipe_register_type   (GTypeModule *module);
 GQuark  nautilus_wipe_error_quark     (void) G_GNUC_CONST;
 
 void    nautilus_wipe_path_list_free  (GList *paths);

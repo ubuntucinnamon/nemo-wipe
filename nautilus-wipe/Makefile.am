@@ -14,6 +14,7 @@ libnautilus_wipe_la_SOURCES  = nautilus-wipe.c \
                                fill-operation.h \
                                progress-dialog.c \
                                progress-dialog.h \
+                               type-utils.h \
                                compat.h
 libnautilus_wipe_la_CPPFLAGS = -DG_LOG_DOMAIN=\"$(PACKAGE)\" \
                                -DLOCALEDIR=\"$(localedir)\"
