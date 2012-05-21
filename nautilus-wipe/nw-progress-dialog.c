@@ -41,8 +41,6 @@ struct _NwProgressDialogPrivate {
   gboolean        auto_hide_action_area;
 };
 
-#define GET_PRIVATE(obj)  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), NW_TYPE_PROGRESS_DIALOG, NwProgressDialogPrivate))
-
 enum
 {
   PROP_0,
@@ -167,7 +165,9 @@ nw_progress_dialog_init (NwProgressDialog *self)
   GtkWidget *content_area;
   GtkWidget *vbox;
   
-  self->priv = GET_PRIVATE (self);
+  self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self,
+                                            NW_TYPE_PROGRESS_DIALOG,
+                                            NwProgressDialogPrivate);
   self->priv->progress = GTK_PROGRESS_BAR (gtk_progress_bar_new ());
   self->priv->label = GTK_LABEL (gtk_label_new (""));
   self->priv->close_button = NULL;
