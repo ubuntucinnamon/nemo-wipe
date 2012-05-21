@@ -62,13 +62,15 @@ static void   nautilus_wipe_menu_provider_iface_init  (NautilusMenuProviderIface
 GQuark
 nautilus_wipe_error_quark (void)
 {
-  static GQuark error_quark = 0;
+  static volatile gsize quark = 0;
   
-  if (G_UNLIKELY (error_quark == 0)) {
-    error_quark = g_quark_from_static_string ("NautilusWipeError");
+  if (g_once_init_enter (&quark)) {
+    GQuark q = g_quark_from_static_string ("NautilusWipeError");
+    
+    g_once_init_leave (&quark, q);
   }
   
-  return error_quark;
+  return (GQuark) quark;
 }
 
 NAUTILUS_WIPE_DEFINE_TYPE_MODULE_WITH_CODE (NautilusWipe,

@@ -35,13 +35,15 @@
 GQuark
 nautilus_wipe_delete_operation_error_quark (void)
 {
-  static GQuark q = 0;
+  static volatile gsize quark = 0;
   
-  if (G_UNLIKELY (q == 0)) {
-    q = g_quark_from_static_string ("NautilusWipeDeleteOperationError");
+  if (g_once_init_enter (&quark)) {
+    GQuark q = g_quark_from_static_string ("NautilusWipeDeleteOperationError");
+    
+    g_once_init_leave (&quark, q);
   }
   
-  return q;
+  return (GQuark) quark;
 }
 
 /*

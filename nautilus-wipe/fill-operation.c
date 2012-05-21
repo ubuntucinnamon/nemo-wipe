@@ -39,13 +39,15 @@
 GQuark
 nautilus_wipe_fill_operation_error_quark (void)
 {
-  static GQuark q = 0;
+  static volatile gsize quark = 0;
   
-  if (G_UNLIKELY (q == 0)) {
-    q = g_quark_from_static_string ("NautilusWipeFillOperationError");
+  if (g_once_init_enter (&quark)) {
+    GQuark q = g_quark_from_static_string ("NautilusWipeFillOperationError");
+    
+    g_once_init_leave (&quark, q);
   }
   
-  return q;
+  return (GQuark) quark;
 }
 
 #if HAVE_GIO_UNIX
