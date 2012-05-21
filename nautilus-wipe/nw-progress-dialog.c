@@ -19,19 +19,19 @@
  *
  */
 
-#include "progress-dialog.h"
+#include "nw-progress-dialog.h"
 
 #include <stdarg.h>
 #include <glib.h>
 #include <gtk/gtk.h>
 
-#include "compat.h" /* for gtk_dialog_get_action_area(),
-                     *     gtk_dialog_get_content_area() and
-                     *     gtk_widget_get_sensitive() */
+#include "nw-compat.h" /* for gtk_dialog_get_action_area(),
+                        *     gtk_dialog_get_content_area() and
+                        *     gtk_widget_get_sensitive() */
 
 
 
-struct _NautilusWipeProgressDialogPrivate {
+struct _NwProgressDialogPrivate {
   GtkLabel       *label;
   GtkProgressBar *progress;
   GtkWidget      *cancel_button;
@@ -41,7 +41,7 @@ struct _NautilusWipeProgressDialogPrivate {
   gboolean        auto_hide_action_area;
 };
 
-#define GET_PRIVATE(obj)  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), NAUTILUS_TYPE_WIPE_PROGRESS_DIALOG, NautilusWipeProgressDialogPrivate))
+#define GET_PRIVATE(obj)  (G_TYPE_INSTANCE_GET_PRIVATE ((obj), NW_TYPE_PROGRESS_DIALOG, NwProgressDialogPrivate))
 
 enum
 {
@@ -52,31 +52,31 @@ enum
   PROP_AUTO_HIDE_ACTION_AREA
 };
 
-G_DEFINE_TYPE (NautilusWipeProgressDialog, nautilus_wipe_progress_dialog, GTK_TYPE_DIALOG)
+G_DEFINE_TYPE (NwProgressDialog, nw_progress_dialog, GTK_TYPE_DIALOG)
 
 static void
-nautilus_wipe_progress_dialog_set_property (GObject      *obj,
-                                            guint         prop_id,
-                                            const GValue *value,
-                                            GParamSpec   *pspec)
+nw_progress_dialog_set_property (GObject      *obj,
+                                 guint         prop_id,
+                                 const GValue *value,
+                                 GParamSpec   *pspec)
 {
-  NautilusWipeProgressDialog *self = NAUTILUS_WIPE_PROGRESS_DIALOG (obj);
+  NwProgressDialog *self = NW_PROGRESS_DIALOG (obj);
   
   switch (prop_id) {
     case PROP_TEXT:
-      nautilus_wipe_progress_dialog_set_text (self, "%s", g_value_get_string (value));
+      nw_progress_dialog_set_text (self, "%s", g_value_get_string (value));
       break;
     
     case PROP_HAS_CANCEL_BUTTON:
-      nautilus_wipe_progress_dialog_set_has_cancel_button (self, g_value_get_boolean (value));
+      nw_progress_dialog_set_has_cancel_button (self, g_value_get_boolean (value));
       break;
     
     case PROP_HAS_CLOSE_BUTTON:
-      nautilus_wipe_progress_dialog_set_has_close_button (self, g_value_get_boolean (value));
+      nw_progress_dialog_set_has_close_button (self, g_value_get_boolean (value));
       break;
     
     case PROP_AUTO_HIDE_ACTION_AREA:
-      nautilus_wipe_progress_dialog_set_auto_hide_action_area (self, g_value_get_boolean (value));
+      nw_progress_dialog_set_auto_hide_action_area (self, g_value_get_boolean (value));
       break;
     
     default:
@@ -85,28 +85,28 @@ nautilus_wipe_progress_dialog_set_property (GObject      *obj,
 }
 
 static void
-nautilus_wipe_progress_dialog_get_property (GObject    *obj,
-                                            guint       prop_id,
-                                            GValue     *value,
-                                            GParamSpec *pspec)
+nw_progress_dialog_get_property (GObject    *obj,
+                                 guint       prop_id,
+                                 GValue     *value,
+                                 GParamSpec *pspec)
 {
-  NautilusWipeProgressDialog *self = NAUTILUS_WIPE_PROGRESS_DIALOG (obj);
+  NwProgressDialog *self = NW_PROGRESS_DIALOG (obj);
   
   switch (prop_id) {
     case PROP_TEXT:
-      g_value_set_string (value, nautilus_wipe_progress_dialog_get_text (self));
+      g_value_set_string (value, nw_progress_dialog_get_text (self));
       break;
     
     case PROP_HAS_CANCEL_BUTTON:
-      g_value_set_boolean (value, nautilus_wipe_progress_dialog_get_has_cancel_button (self));
+      g_value_set_boolean (value, nw_progress_dialog_get_has_cancel_button (self));
       break;
     
     case PROP_HAS_CLOSE_BUTTON:
-      g_value_set_boolean (value, nautilus_wipe_progress_dialog_get_has_close_button (self));
+      g_value_set_boolean (value, nw_progress_dialog_get_has_close_button (self));
       break;
     
     case PROP_AUTO_HIDE_ACTION_AREA:
-      g_value_set_boolean (value, nautilus_wipe_progress_dialog_get_auto_hide_action_area (self));
+      g_value_set_boolean (value, nw_progress_dialog_get_auto_hide_action_area (self));
       break;
     
     default:
@@ -115,10 +115,10 @@ nautilus_wipe_progress_dialog_get_property (GObject    *obj,
 }
 
 static void
-nautilus_wipe_progress_dialog_response (GtkDialog *dialog,
-                                        gint       response_id)
+nw_progress_dialog_response (GtkDialog *dialog,
+                             gint       response_id)
 {
-  NautilusWipeProgressDialog *self = NAUTILUS_WIPE_PROGRESS_DIALOG (dialog);
+  NwProgressDialog *self = NW_PROGRESS_DIALOG (dialog);
   
   if (GTK_IS_WIDGET (self->priv->cancel_button)) {
     gtk_widget_set_sensitive (self->priv->cancel_button,
@@ -129,14 +129,14 @@ nautilus_wipe_progress_dialog_response (GtkDialog *dialog,
                               self->priv->finished || self->priv->canceled);
   }
   
-  if (GTK_DIALOG_CLASS (nautilus_wipe_progress_dialog_parent_class)->response) {
-    GTK_DIALOG_CLASS (nautilus_wipe_progress_dialog_parent_class)->response (dialog, response_id);
+  if (GTK_DIALOG_CLASS (nw_progress_dialog_parent_class)->response) {
+    GTK_DIALOG_CLASS (nw_progress_dialog_parent_class)->response (dialog, response_id);
   }
 }
 
 static void
-update_action_area_visibility (NautilusWipeProgressDialog *dialog,
-                               gboolean                    force_show)
+update_action_area_visibility (NwProgressDialog *dialog,
+                               gboolean          force_show)
 {
   if (dialog->priv->auto_hide_action_area || force_show) {
     GtkWidget  *container;
@@ -162,7 +162,7 @@ update_action_area_visibility (NautilusWipeProgressDialog *dialog,
 }
 
 static void
-nautilus_wipe_progress_dialog_init (NautilusWipeProgressDialog *self)
+nw_progress_dialog_init (NwProgressDialog *self)
 {
   GtkWidget *content_area;
   GtkWidget *vbox;
@@ -193,40 +193,40 @@ nautilus_wipe_progress_dialog_init (NautilusWipeProgressDialog *self)
 }
 
 static void
-nautilus_wipe_progress_dialog_finalize (GObject *obj)
+nw_progress_dialog_finalize (GObject *obj)
 {
-  NautilusWipeProgressDialog *self = NAUTILUS_WIPE_PROGRESS_DIALOG (obj);
+  NwProgressDialog *self = NW_PROGRESS_DIALOG (obj);
   
-  G_OBJECT_CLASS (nautilus_wipe_progress_dialog_parent_class)->finalize (obj);
+  G_OBJECT_CLASS (nw_progress_dialog_parent_class)->finalize (obj);
 }
 
 static gboolean
-nautilus_wipe_progress_dialog_delete_event (GtkWidget *widget,
-                                            /* The doc says GdkEvent but it is
-                                             * actually GdkEventAny. Nothing
-                                             * bad as it is a sort of "base
-                                             * class" for all other events.
-                                             * See the doc. */
-                                            GdkEventAny  *event)
+nw_progress_dialog_delete_event (GtkWidget *widget,
+                                 /* The doc says GdkEvent but it is
+                                  * actually GdkEventAny. Nothing
+                                  * bad as it is a sort of "base
+                                  * class" for all other events.
+                                  * See the doc. */
+                                 GdkEventAny  *event)
 {
   return TRUE;
 }
 
 static void
-nautilus_wipe_progress_dialog_class_init (NautilusWipeProgressDialogClass *klass)
+nw_progress_dialog_class_init (NwProgressDialogClass *klass)
 {
   GObjectClass   *object_class = G_OBJECT_CLASS (klass);
   GtkDialogClass *dialog_class = GTK_DIALOG_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
   
-  object_class->set_property = nautilus_wipe_progress_dialog_set_property;
-  object_class->get_property = nautilus_wipe_progress_dialog_get_property;
-  object_class->finalize     = nautilus_wipe_progress_dialog_finalize;
-  dialog_class->response     = nautilus_wipe_progress_dialog_response;
+  object_class->set_property = nw_progress_dialog_set_property;
+  object_class->get_property = nw_progress_dialog_get_property;
+  object_class->finalize     = nw_progress_dialog_finalize;
+  dialog_class->response     = nw_progress_dialog_response;
   /* our default handler prevent the dialog to be destroyed if the user tries to
    * close the dialog. This doesn't prevent the DELETE_EVENT response to be
    * triggered */
-  widget_class->delete_event = nautilus_wipe_progress_dialog_delete_event;
+  widget_class->delete_event = nw_progress_dialog_delete_event;
   
   g_object_class_install_property (object_class, PROP_TEXT,
                                    g_param_spec_string ("text",
@@ -256,28 +256,28 @@ nautilus_wipe_progress_dialog_class_init (NautilusWipeProgressDialogClass *klass
                                                          FALSE,
                                                          G_PARAM_READWRITE));
   
-  g_type_class_add_private (klass, sizeof (NautilusWipeProgressDialogPrivate));
+  g_type_class_add_private (klass, sizeof (NwProgressDialogPrivate));
 }
 
 
 /**
- * nautilus_wipe_progress_dialog_new:
+ * nw_progress_dialog_new:
  * @parent: The parent window for the dialog, or %NULL for none
  * @flags: Some #GtkDialogFlags or 0
  * @format: format for the dialog's text
  * @...: printf-like argument for @format.
  * 
- * Creates a new NautilusWipeProgressDialog.
+ * Creates a new NwProgressDialog.
  * For the @format and @... arguments, see
- * nautilus_wipe_progress_dialog_set_text().
+ * nw_progress_dialog_set_text().
  *
  * Returns: The newly created dialog.
  */
 GtkWidget *
-nautilus_wipe_progress_dialog_new (GtkWindow       *parent,
-                                   GtkDialogFlags   flags,
-                                   const gchar     *format,
-                                   ...)
+nw_progress_dialog_new (GtkWindow      *parent,
+                        GtkDialogFlags  flags,
+                        const gchar    *format,
+                        ...)
 {
   GtkWidget  *self;
   gchar      *text;
@@ -286,7 +286,7 @@ nautilus_wipe_progress_dialog_new (GtkWindow       *parent,
   va_start (ap, format);
   text = g_strdup_vprintf (format, ap);
   va_end (ap);
-  self = g_object_new (NAUTILUS_TYPE_WIPE_PROGRESS_DIALOG,
+  self = g_object_new (NW_TYPE_PROGRESS_DIALOG,
                        "transient-for",       parent,
 #if ! GTK_CHECK_VERSION (3, 0, 0)
                        "has-separator",       FALSE,
@@ -296,108 +296,108 @@ nautilus_wipe_progress_dialog_new (GtkWindow       *parent,
                        "text",                text,
                        NULL);
   g_free (text);
-  update_action_area_visibility (NAUTILUS_WIPE_PROGRESS_DIALOG (self), FALSE);
+  update_action_area_visibility (NW_PROGRESS_DIALOG (self), FALSE);
   
   return self;
 }
 
 /**
- * nautilus_wipe_progress_dialog_set_fraction:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_set_fraction:
+ * @dialog: A #NwProgressDialog
  * @fraction: The current progression.
  * 
  * See gtk_progress_bar_set_fraction().
  */
 void
-nautilus_wipe_progress_dialog_set_fraction (NautilusWipeProgressDialog *dialog,
-                                            gdouble                     fraction)
+nw_progress_dialog_set_fraction (NwProgressDialog  *dialog,
+                                 gdouble            fraction)
 {
-  g_return_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog));
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
   gtk_progress_bar_set_fraction (dialog->priv->progress, fraction);
 }
 
 /**
- * nautilus_wipe_progress_dialog_get_fraction:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_get_fraction:
+ * @dialog: A #NwProgressDialog
  * 
  * See gtk_progress_bar_get_fraction().
  * 
  * Returns: The current progress of the dialog's progress bar.
  */
 gdouble
-nautilus_wipe_progress_dialog_get_fraction (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_get_fraction (NwProgressDialog *dialog)
 {
-  g_return_val_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog), 0.0);
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), 0.0);
   
   return gtk_progress_bar_get_fraction (dialog->priv->progress);
 }
 
 /**
- * nautilus_wipe_progress_dialog_pulse:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_pulse:
+ * @dialog: A #NwProgressDialog
  * 
  * See gtk_progress_bar_pulse().
  */
 void
-nautilus_wipe_progress_dialog_pulse (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_pulse (NwProgressDialog *dialog)
 {
-  g_return_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog));
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
   gtk_progress_bar_pulse (dialog->priv->progress);
 }
 
 /**
- * nautilus_wipe_progress_dialog_set_pulse_step:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_set_pulse_step:
+ * @dialog: A #NwProgressDialog
  * @fraction: The pulse step of the dialog's progress bar.
  * 
  * See gtk_progress_bar_set_pulse_step().
  */
 void
-nautilus_wipe_progress_dialog_set_pulse_step (NautilusWipeProgressDialog *dialog,
-                                              gdouble                     fraction)
+nw_progress_dialog_set_pulse_step (NwProgressDialog  *dialog,
+                                   gdouble            fraction)
 {
-  g_return_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog));
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
   gtk_progress_bar_set_pulse_step (dialog->priv->progress, fraction);
 }
 
 /**
- * nautilus_wipe_progress_dialog_get_pulse_step:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_get_pulse_step:
+ * @dialog: A #NwProgressDialog
  * 
  * See gtk_progress_bar_get_pulse_step().
  * 
  * Returns: The progress step of the dialog's progress bar.
  */
 gdouble
-nautilus_wipe_progress_dialog_get_pulse_step (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_get_pulse_step (NwProgressDialog *dialog)
 {
-  g_return_val_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog), 0.0);
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), 0.0);
   
   return gtk_progress_bar_get_pulse_step (dialog->priv->progress);
 }
 
 /**
- * nautilus_wipe_progress_dialog_set_progress_text:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_set_progress_text:
+ * @dialog: A #NwProgressDialog
  * @format: Text format (printf-like)
  * @...: Arguments for @format
  * 
  * Sets the progress text. For details about @format and @..., see the
  * documentation of g_strdup_printf().
- * Don't mistake this function for nautilus_wipe_progress_dialog_set_text().
+ * Don't mistake this function for nw_progress_dialog_set_text().
  */
 void
-nautilus_wipe_progress_dialog_set_progress_text (NautilusWipeProgressDialog *dialog,
-                                                 const gchar                *format,
-                                                 ...)
+nw_progress_dialog_set_progress_text (NwProgressDialog *dialog,
+                                      const gchar      *format,
+                                      ...)
 {
   gchar  *text;
   va_list ap;
   
-  g_return_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog));
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
   va_start (ap, format);
   text = g_strdup_vprintf (format, ap);
@@ -407,43 +407,43 @@ nautilus_wipe_progress_dialog_set_progress_text (NautilusWipeProgressDialog *dia
 }
 
 /**
- * nautilus_wipe_progress_dialog_get_progress_text:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_get_progress_text:
+ * @dialog: A #NwProgressDialog
  * 
  * Gets the current progress text of @dialog. Don't mistake for
- * nautilus_wipe_progress_dialog_get_text().
+ * nw_progress_dialog_get_text().
  * 
  * Returns: The progress text of the dialog.
  */
 const gchar *
-nautilus_wipe_progress_dialog_get_progress_text (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_get_progress_text (NwProgressDialog *dialog)
 {
-  g_return_val_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog), NULL);
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), NULL);
   
   return gtk_progress_bar_get_text (dialog->priv->progress);
 }
 
 /**
- * nautilus_wipe_progress_dialog_set_text:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_set_text:
+ * @dialog: A #NwProgressDialog
  * @format: Text format (printf-like)
  * @...: Arguments for @format
  * 
  * Sets the dialog's text. For details about @format and @..., see the
  * documentation of g_strdup_printf().
  * Don't mistake this function for
- * nautilus_wipe_progress_dialog_set_progress_text() that do the same but for the
+ * nw_progress_dialog_set_progress_text() that do the same but for the
  * progress text instead of the dialog's main text.
  */
 void
-nautilus_wipe_progress_dialog_set_text (NautilusWipeProgressDialog *dialog,
-                                        const gchar                *format,
-                                        ...)
+nw_progress_dialog_set_text (NwProgressDialog *dialog,
+                             const gchar      *format,
+                             ...)
 {
   gchar  *text;
   va_list ap;
   
-  g_return_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog));
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
   va_start (ap, format);
   text = g_strdup_vprintf (format, ap);
@@ -453,26 +453,26 @@ nautilus_wipe_progress_dialog_set_text (NautilusWipeProgressDialog *dialog,
 }
 
 /**
- * nautilus_wipe_progress_dialog_get_text:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_get_text:
+ * @dialog: A #NwProgressDialog
  * 
  * Gets the text message of the dialog. Don't mistake this function for
- * nautilus_wipe_progress_dialog_get_progress_text().
+ * nw_progress_dialog_get_progress_text().
  * 
  * Returns: The text of @dialog.
  */
 const gchar *
-nautilus_wipe_progress_dialog_get_text (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_get_text (NwProgressDialog *dialog)
 {
-  g_return_val_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog), NULL);
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), NULL);
   
   return gtk_label_get_text (dialog->priv->label);
 }
 
 void
-nautilus_wipe_progress_dialog_cancel (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_cancel (NwProgressDialog *dialog)
 {
-  g_return_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog));
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
   if (! dialog->priv->canceled) {
     dialog->priv->canceled = TRUE;
@@ -483,57 +483,57 @@ nautilus_wipe_progress_dialog_cancel (NautilusWipeProgressDialog *dialog)
 }
 
 gboolean
-nautilus_wipe_progress_dialog_is_canceled (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_is_canceled (NwProgressDialog *dialog)
 {
-  g_return_val_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog), FALSE);
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), FALSE);
   
   return dialog->priv->canceled;
 }
 
 /**
- * nautilus_wipe_progress_dialog_finish:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_finish:
+ * @dialog: A #NwProgressDialog
  * @success: Whether the operation finished successfully or not
  * 
  * 
  */
 void
-nautilus_wipe_progress_dialog_finish (NautilusWipeProgressDialog *dialog,
-                                      gboolean                    success)
+nw_progress_dialog_finish (NwProgressDialog *dialog,
+                           gboolean          success)
 {
-  g_return_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog));
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
   dialog->priv->finished = TRUE;
   if (success) {
     /* ensure the progression is shown completed */
-    nautilus_wipe_progress_dialog_set_fraction (dialog, 1.0);
+    nw_progress_dialog_set_fraction (dialog, 1.0);
   }
   gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL,
                                      FALSE);
   gtk_dialog_response (GTK_DIALOG (dialog),
-                       NAUTILUS_WIPE_PROGRESS_DIALOG_RESPONSE_COMPLETE);
+                       NW_PROGRESS_DIALOG_RESPONSE_COMPLETE);
 }
 
 /**
- * nautilus_wipe_progress_dialog_is_finished:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_is_finished:
+ * @dialog: A #NwProgressDialog
  * 
  * Gets whether the operation that @dialog displays is finished or not.
- * This is set by nautilus_wipe_progress_dialog_finish().
+ * This is set by nw_progress_dialog_finish().
  * 
  * Returns: Whether the operation displayed by @dialog is finished or not.
  */
 gboolean
-nautilus_wipe_progress_dialog_is_finished (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_is_finished (NwProgressDialog *dialog)
 {
-  g_return_val_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog), FALSE);
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), FALSE);
   
   return dialog->priv->finished;
 }
 
 /**
- * nautilus_wipe_progress_dialog_set_has_close_button:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_set_has_close_button:
+ * @dialog: A #NwProgressDialog
  * @has_close_button: Whether the dialog should have a close button.
  * 
  * Sets whether the dialog has a close button. Enabling close button at the
@@ -542,10 +542,10 @@ nautilus_wipe_progress_dialog_is_finished (NautilusWipeProgressDialog *dialog)
  * either finished or canceled).
  */
 void
-nautilus_wipe_progress_dialog_set_has_close_button (NautilusWipeProgressDialog *dialog,
-                                                    gboolean                    has_close_button)
+nw_progress_dialog_set_has_close_button (NwProgressDialog *dialog,
+                                         gboolean          has_close_button)
 {
-  g_return_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog));
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
   if (has_close_button != (dialog->priv->close_button != NULL)) {
     if (has_close_button) {
@@ -563,22 +563,22 @@ nautilus_wipe_progress_dialog_set_has_close_button (NautilusWipeProgressDialog *
 }
 
 /**
- * nautilus_wipe_progress_dialog_get_has_close_button:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_get_has_close_button:
+ * @dialog: A #NwProgressDialog
  * 
  * Returns: Whether @dialog has a close button or not.
  */
 gboolean
-nautilus_wipe_progress_dialog_get_has_close_button (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_get_has_close_button (NwProgressDialog *dialog)
 {
-  g_return_val_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog), FALSE);
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), FALSE);
   
   return dialog->priv->close_button != NULL;
 }
 
 /**
- * nautilus_wipe_progress_dialog_set_has_cancel_button:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_set_has_cancel_button:
+ * @dialog: A #NwProgressDialog
  * @has_cancel_button: Whether the dialog should have a cancel button.
  * 
  * Sets whether the dialog has a cancel button. Enabling cancel button at the
@@ -587,10 +587,10 @@ nautilus_wipe_progress_dialog_get_has_close_button (NautilusWipeProgressDialog *
  * neither finished nor canceled).
  */
 void
-nautilus_wipe_progress_dialog_set_has_cancel_button (NautilusWipeProgressDialog *dialog,
-                                                     gboolean                    has_cancel_button)
+nw_progress_dialog_set_has_cancel_button (NwProgressDialog *dialog,
+                                          gboolean          has_cancel_button)
 {
-  g_return_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog));
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
   if (has_cancel_button != (dialog->priv->cancel_button != NULL)) {
     if (has_cancel_button) {
@@ -608,24 +608,24 @@ nautilus_wipe_progress_dialog_set_has_cancel_button (NautilusWipeProgressDialog 
 }
 
 /**
- * nautilus_wipe_progress_dialog_get_has_cancel_button:
- * @dialog: A #NautilusWipeProgressDialog
+ * nw_progress_dialog_get_has_cancel_button:
+ * @dialog: A #NwProgressDialog
  * 
  * Returns: Whether @dialog has a cancel button.
  */
 gboolean
-nautilus_wipe_progress_dialog_get_has_cancel_button (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_get_has_cancel_button (NwProgressDialog *dialog)
 {
-  g_return_val_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog), FALSE);
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), FALSE);
   
   return dialog->priv->cancel_button != NULL;
 }
 
 void
-nautilus_wipe_progress_dialog_set_auto_hide_action_area (NautilusWipeProgressDialog *dialog,
-                                                         gboolean                    auto_hide)
+nw_progress_dialog_set_auto_hide_action_area (NwProgressDialog *dialog,
+                                              gboolean          auto_hide)
 {
-  g_return_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog));
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
   if (auto_hide != dialog->priv->auto_hide_action_area) {
     dialog->priv->auto_hide_action_area = auto_hide;
@@ -634,9 +634,9 @@ nautilus_wipe_progress_dialog_set_auto_hide_action_area (NautilusWipeProgressDia
 }
 
 gboolean
-nautilus_wipe_progress_dialog_get_auto_hide_action_area (NautilusWipeProgressDialog *dialog)
+nw_progress_dialog_get_auto_hide_action_area (NwProgressDialog *dialog)
 {
-  g_return_val_if_fail (NAUTILUS_IS_WIPE_PROGRESS_DIALOG (dialog), FALSE);
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), FALSE);
   
   return dialog->priv->auto_hide_action_area;
 }

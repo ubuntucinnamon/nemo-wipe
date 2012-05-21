@@ -21,8 +21,8 @@
 
 /* Contains compatibility things for old GLib, GTK and Nautilus */
 
-#ifndef NAUTILUS_WIPE_COMPAT_H
-#define NAUTILUS_WIPE_COMPAT_H
+#ifndef NW_COMPAT_H
+#define NW_COMPAT_H
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef NAUTILUS_WIPE_H
-#define NAUTILUS_WIPE_H
+#ifndef NW_EXTENSION_H
+#define NW_EXTENSION_H
 
 #include <glib.h>
 #include <glib-object.h>
@@ -28,34 +28,34 @@
 G_BEGIN_DECLS
 
 
-#define NAUTILUS_TYPE_WIPE  (nautilus_wipe_get_type ())
-#define NAUTILUS_WIPE(o)    (G_TYPE_CHECK_INSTANCE_CAST ((o), NAUTILUS_TYPE_WIPE, NautilusWipe))
-#define NAUTILUS_IS_WIPE(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), NAUTILUS_TYPE_WIPE))
-typedef struct _NautilusWipe      NautilusWipe;
-typedef struct _NautilusWipeClass NautilusWipeClass;
+#define NW_TYPE_EXTENSION   (nw_extension_get_type ())
+#define NW_EXTENSION(o)     (G_TYPE_CHECK_INSTANCE_CAST ((o), NW_TYPE_EXTENSION, NwExtension))
+#define NW_IS_EXTENSION(o)  (G_TYPE_CHECK_INSTANCE_TYPE ((o), NW_TYPE_EXTENSION))
+typedef struct _NwExtension       NwExtension;
+typedef struct _NwExtensionClass  NwExtensionClass;
 
-#define NAUTILUS_WIPE_ERROR (nautilus_wipe_error_quark ())
+#define NW_EXTENSION_ERROR (nw_extension_error_quark ())
 
 typedef enum {
-  NAUTILUS_WIPE_ERROR_SPAWN_FAILED,
-  NAUTILUS_WIPE_ERROR_CHILD_CRASHED,
-  NAUTILUS_WIPE_ERROR_CHILD_FAILED,
-  NAUTILUS_WIPE_ERROR_UNSUPPORTED_LOCATION,
-  NAUTILUS_WIPE_ERROR_NOT_IMPLEMENTED,
-  NAUTILUS_WIPE_ERROR_FAILED
-} NautilusWipeError;
+  NW_EXTENSION_ERROR_SPAWN_FAILED,
+  NW_EXTENSION_ERROR_CHILD_CRASHED,
+  NW_EXTENSION_ERROR_CHILD_FAILED,
+  NW_EXTENSION_ERROR_UNSUPPORTED_LOCATION,
+  NW_EXTENSION_ERROR_NOT_IMPLEMENTED,
+  NW_EXTENSION_ERROR_FAILED
+} NwExtensionError;
 
-struct _NautilusWipe {
+struct _NwExtension {
   GObject parent_slot;
 };
 
-struct _NautilusWipeClass {
+struct _NwExtensionClass {
   GObjectClass parent_slot;
 };
 
-GType   nautilus_wipe_get_type        (void) G_GNUC_CONST;
-GType   nautilus_wipe_register_type   (GTypeModule *module);
-GQuark  nautilus_wipe_error_quark     (void) G_GNUC_CONST;
+GType   nw_extension_get_type         (void) G_GNUC_CONST;
+GType   nw_extension_register_type    (GTypeModule *module);
+GQuark  nw_extension_error_quark      (void) G_GNUC_CONST;
 
 
 G_END_DECLS

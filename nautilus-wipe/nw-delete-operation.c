@@ -23,7 +23,7 @@
 # include "config.h"
 #endif
 
-#include "delete-operation.h"
+#include "nw-delete-operation.h"
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>
@@ -33,12 +33,12 @@
 
 
 GQuark
-nautilus_wipe_delete_operation_error_quark (void)
+nw_delete_operation_error_quark (void)
 {
   static volatile gsize quark = 0;
   
   if (g_once_init_enter (&quark)) {
-    GQuark q = g_quark_from_static_string ("NautilusWipeDeleteOperationError");
+    GQuark q = g_quark_from_static_string ("NwDeleteOperationError");
     
     g_once_init_leave (&quark, q);
   }
@@ -47,7 +47,7 @@ nautilus_wipe_delete_operation_error_quark (void)
 }
 
 /*
- * nautilus_wipe_delete_operation:
+ * nw_delete_operation:
  * @files: A list of paths to delete.
  * @fast: The Gsd.SecureDeleteOperation:fast setting
  * @mode: The Gsd.SecureDeleteOperation:mode setting
@@ -65,14 +65,14 @@ nautilus_wipe_delete_operation_error_quark (void)
  *          no longer needed.
  */
 GsdAsyncOperation *
-nautilus_wipe_delete_operation (GList                       *files,
-                                gboolean                     fast,
-                                GsdSecureDeleteOperationMode mode,
-                                gboolean                     zeroise,
-                                GCallback                    finished_handler,
-                                GCallback                    progress_handler,
-                                gpointer                     data,
-                                GError                     **error)
+nw_delete_operation (GList                       *files,
+                     gboolean                     fast,
+                     GsdSecureDeleteOperationMode mode,
+                     gboolean                     zeroise,
+                     GCallback                    finished_handler,
+                     GCallback                    progress_handler,
+                     gpointer                     data,
+                     GError                     **error)
 {
   gboolean            success = TRUE;
   GsdDeleteOperation *operation;
@@ -85,8 +85,8 @@ nautilus_wipe_delete_operation (GList                       *files,
   }
   if (n_files < 1) {
     g_set_error (error,
-                 NAUTILUS_WIPE_DELETE_OPERATION_ERROR,
-                 NAUTILUS_WIPE_DELETE_OPERATION_ERROR_FAILED,
+                 NW_DELETE_OPERATION_ERROR,
+                 NW_DELETE_OPERATION_ERROR_FAILED,
                  _("Nothing to do!"));
     success = FALSE;
   } else {

@@ -23,7 +23,7 @@
 # include "config.h"
 #endif
 
-#include "path-list.h"
+#include "nw-path-list.h"
 
 #include <string.h>
 #include <glib.h>
@@ -73,7 +73,7 @@ get_desktop_path (void)
  * this is different from getting if GFile then getting the path since it tries
  * handle x-nautilus-desktop */
 gchar *
-nautilus_wipe_path_from_nfi (NautilusFileInfo *nfi)
+nw_path_from_nfi (NautilusFileInfo *nfi)
 {
   GFile *file;
   gchar *path;
@@ -91,16 +91,16 @@ nautilus_wipe_path_from_nfi (NautilusFileInfo *nfi)
 
 /* frees a list of paths */
 void
-nautilus_wipe_path_list_free (GList *paths)
+nw_path_list_free (GList *paths)
 {
   g_list_foreach (paths, (GFunc) g_free, NULL);
   g_list_free (paths);
 }
 
 /* copies a list of paths
- * free the returned list with nautilus_wipe_path_list_free() */
+ * free the returned list with nw_path_list_free() */
 GList *
-nautilus_wipe_path_list_copy (GList *src)
+nw_path_list_copy (GList *src)
 {
   GList *paths = NULL;
   
@@ -114,12 +114,12 @@ nautilus_wipe_path_list_copy (GList *src)
 }
 
 /* converts a list of #NautilusFileInfo to a list of paths.
- * free the returned list with nautilus_wipe_path_list_free()
+ * free the returned list with nw_path_list_free()
  * 
  * Returns: The list of paths on success, or %NULL on failure. This function
  *          will always fail on non-local-mounted (then without paths) files */
 GList *
-nautilus_wipe_path_list_new_from_nfi_list (GList *nfis)
+nw_path_list_new_from_nfi_list (GList *nfis)
 {
   gboolean  success = TRUE;
   GList    *paths   = NULL;
@@ -127,7 +127,7 @@ nautilus_wipe_path_list_new_from_nfi_list (GList *nfis)
   while (nfis && success) {
     gchar *path;
     
-    path = nautilus_wipe_path_from_nfi (nfis->data);
+    path = nw_path_from_nfi (nfis->data);
     if (path) {
       paths = g_list_prepend (paths, path);
     } else {
@@ -136,7 +136,7 @@ nautilus_wipe_path_list_new_from_nfi_list (GList *nfis)
     nfis = g_list_next (nfis);
   }
   if (! success) {
-    nautilus_wipe_path_list_free (paths);
+    nw_path_list_free (paths);
     paths = NULL;
   } else {
     paths = g_list_reverse (paths);

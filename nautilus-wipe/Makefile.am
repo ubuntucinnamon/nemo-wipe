@@ -5,20 +5,20 @@ nautilus_extension_LTLIBRARIES = libnautilus-wipe.la
 localedir = $(datadir)/locale
 
 libnautilus_wipe_la_SOURCES  = extension.c \
-                               nautilus-wipe.c \
-                               nautilus-wipe.h \
-                               operation-manager.c \
-                               operation-manager.h \
-                               delete-operation.c \
-                               delete-operation.h \
-                               fill-operation.c \
-                               fill-operation.h \
-                               path-list.c \
-                               path-list.h \
-                               progress-dialog.c \
-                               progress-dialog.h \
-                               type-utils.h \
-                               compat.h
+                               nw-compat.h \
+                               nw-delete-operation.c \
+                               nw-delete-operation.h \
+                               nw-extension.c \
+                               nw-extension.h \
+                               nw-fill-operation.c \
+                               nw-fill-operation.h \
+                               nw-operation-manager.c \
+                               nw-operation-manager.h \
+                               nw-path-list.c \
+                               nw-path-list.h \
+                               nw-progress-dialog.c \
+                               nw-progress-dialog.h \
+                               nw-type-utils.h
 libnautilus_wipe_la_CPPFLAGS = -DG_LOG_DOMAIN=\"$(PACKAGE)\" \
                                -DLOCALEDIR=\"$(localedir)\"
 libnautilus_wipe_la_CFLAGS   = @GLIB_CFLAGS@ \

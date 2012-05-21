@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef NAUTILUS_WIPE_PATH_LIST_H
-#define NAUTILUS_WIPE_PATH_LIST_H
+#ifndef NW_PATH_LIST_H
+#define NW_PATH_LIST_H
 
 #include <glib.h>
 
@@ -29,10 +29,10 @@
 G_BEGIN_DECLS
 
 
-gchar  *nautilus_wipe_path_from_nfi               (NautilusFileInfo *nfi);
-GList  *nautilus_wipe_path_list_new_from_nfi_list (GList *nfis);
-void    nautilus_wipe_path_list_free              (GList *paths);
-GList  *nautilus_wipe_path_list_copy              (GList *src);
+gchar  *nw_path_from_nfi                (NautilusFileInfo *nfi);
+GList  *nw_path_list_new_from_nfi_list  (GList *nfis);
+void    nw_path_list_free               (GList *paths);
+GList  *nw_path_list_copy               (GList *src);
 
 
 G_END_DECLS

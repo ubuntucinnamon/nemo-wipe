@@ -23,7 +23,7 @@
 # include "config.h"
 #endif
 
-#include "nautilus-wipe.h"
+#include "nw-extension.h"
 
 #include <libnautilus-extension/nautilus-menu-provider.h>
 #include <libnautilus-extension/nautilus-file-info.h>
@@ -35,37 +35,37 @@
 
 #include <gsecuredelete/gsecuredelete.h>
 
-#include "path-list.h"
-#include "operation-manager.h"
-#include "delete-operation.h"
-#include "fill-operation.h"
-#include "compat.h"
-#include "type-utils.h"
+#include "nw-path-list.h"
+#include "nw-operation-manager.h"
+#include "nw-delete-operation.h"
+#include "nw-fill-operation.h"
+#include "nw-compat.h"
+#include "nw-type-utils.h"
 
 
 /* private prototypes */
-static GList *nautilus_wipe_real_get_file_items       (NautilusMenuProvider *provider,
+static GList *nw_extension_real_get_file_items        (NautilusMenuProvider *provider,
                                                        GtkWidget            *window,
                                                        GList                *files);
-static GList *nautilus_wipe_real_get_background_items (NautilusMenuProvider *provider,
+static GList *nw_extension_real_get_background_items  (NautilusMenuProvider *provider,
                                                        GtkWidget            *window,
                                                        NautilusFileInfo     *current_folder);
-static void   nautilus_wipe_menu_provider_iface_init  (NautilusMenuProviderIface *iface);
+static void   nw_extension_menu_provider_iface_init   (NautilusMenuProviderIface *iface);
 
 
-#define ITEM_DATA_MOUNTPOINTS_KEY "NautilusWipe::mountpoints"
-#define ITEM_DATA_PATHS_KEY       "NautilusWipe::paths"
-#define ITEM_DATA_WINDOW_KEY      "NautilusWipe::parent-window"
+#define ITEM_DATA_MOUNTPOINTS_KEY "Nw::Extension::mountpoints"
+#define ITEM_DATA_PATHS_KEY       "Nw::Extension::paths"
+#define ITEM_DATA_WINDOW_KEY      "Nw::Extension::parent-window"
 
 
 
 GQuark
-nautilus_wipe_error_quark (void)
+nw_extension_error_quark (void)
 {
   static volatile gsize quark = 0;
   
   if (g_once_init_enter (&quark)) {
-    GQuark q = g_quark_from_static_string ("NautilusWipeError");
+    GQuark q = g_quark_from_static_string ("NwExtensionError");
     
     g_once_init_leave (&quark, q);
   }
@@ -73,35 +73,35 @@ nautilus_wipe_error_quark (void)
   return (GQuark) quark;
 }
 
-NAUTILUS_WIPE_DEFINE_TYPE_MODULE_WITH_CODE (NautilusWipe,
-                                            nautilus_wipe,
-                                            G_TYPE_OBJECT,
-                                            NAUTILUS_WIPE_TYPE_MODULE_IMPLEMENT_INTERFACE (NAUTILUS_TYPE_MENU_PROVIDER,
-                                                                                           nautilus_wipe_menu_provider_iface_init))
+NW_DEFINE_TYPE_MODULE_WITH_CODE (NwExtension,
+                                 nw_extension,
+                                 G_TYPE_OBJECT,
+                                 NW_TYPE_MODULE_IMPLEMENT_INTERFACE (NAUTILUS_TYPE_MENU_PROVIDER,
+                                                                     nw_extension_menu_provider_iface_init))
 
 
 
 static void
-nautilus_wipe_menu_provider_iface_init (NautilusMenuProviderIface *iface)
+nw_extension_menu_provider_iface_init (NautilusMenuProviderIface *iface)
 {
-  iface->get_file_items       = nautilus_wipe_real_get_file_items;
-  iface->get_background_items = nautilus_wipe_real_get_background_items;
+  iface->get_file_items       = nw_extension_real_get_file_items;
+  iface->get_background_items = nw_extension_real_get_background_items;
 }
 
 static void
-nautilus_wipe_class_init (NautilusWipeClass *class)
+nw_extension_class_init (NwExtensionClass *class)
 {
 }
 
 static void
-nautilus_wipe_init (NautilusWipe *self)
+nw_extension_init (NwExtension *self)
 {
 }
 
 /* Runs the wipe operation */
 static void
-nautilus_wipe_run_delete_operation (GtkWindow *parent,
-                                    GList     *files)
+nw_extension_run_delete_operation (GtkWindow *parent,
+                                   GList     *files)
 {
   gchar  *confirm_primary_text = NULL;
   guint   n_items;
@@ -120,7 +120,7 @@ nautilus_wipe_run_delete_operation (GtkWindow *parent,
                                             name);
     g_free (name);
   }
-  nautilus_wipe_operation_manager_run (
+  nw_operation_manager_run (
     parent, files,
     /* confirm dialog */
     confirm_primary_text,
@@ -130,7 +130,7 @@ nautilus_wipe_run_delete_operation (GtkWindow *parent,
     /* progress dialog */
     _("Wiping files..."),
     /* operation launcher */
-    nautilus_wipe_delete_operation,
+    nw_delete_operation,
     /* failed dialog */
     _("Wipe failed."),
     /* success dialog */
@@ -142,9 +142,9 @@ nautilus_wipe_run_delete_operation (GtkWindow *parent,
 
 /* Runs the fill operation */
 static void
-nautilus_wipe_run_fill_operation (GtkWindow *parent,
-                                  GList     *paths,
-                                  GList     *mountpoints)
+nw_extension_run_fill_operation (GtkWindow *parent,
+                                 GList     *paths,
+                                 GList     *mountpoints)
 {
   gchar  *confirm_primary_text = NULL;
   gchar  *success_secondary_text = NULL;
@@ -196,7 +196,7 @@ nautilus_wipe_run_fill_operation (GtkWindow *parent,
                                               name);
     g_free (name);
   }
-  nautilus_wipe_operation_manager_run (
+  nw_operation_manager_run (
     parent, paths,
     /* confirm dialog */
     confirm_primary_text,
@@ -206,7 +206,7 @@ nautilus_wipe_run_fill_operation (GtkWindow *parent,
     /* progress dialog */
     _("Wiping available diskspace..."),
     /* operation launcher */
-    nautilus_wipe_fill_operation,
+    nw_fill_operation,
     /* failed dialog */
     _("Wipe failed"),
     /* success dialog */
@@ -222,8 +222,8 @@ static void
 wipe_menu_item_activate_handler (GObject *item,
                                  gpointer data)
 {
-  nautilus_wipe_run_delete_operation (g_object_get_data (item, ITEM_DATA_WINDOW_KEY),
-                                      g_object_get_data (item, ITEM_DATA_PATHS_KEY));
+  nw_extension_run_delete_operation (g_object_get_data (item, ITEM_DATA_WINDOW_KEY),
+                                     g_object_get_data (item, ITEM_DATA_PATHS_KEY));
 }
 
 static NautilusMenuItem *
@@ -240,8 +240,8 @@ create_wipe_menu_item (NautilusMenuProvider *provider,
                                  GTK_STOCK_DELETE);
   g_object_set_data (G_OBJECT (item), ITEM_DATA_WINDOW_KEY, window);
   g_object_set_data_full (G_OBJECT (item), ITEM_DATA_PATHS_KEY,
-                          nautilus_wipe_path_list_copy (paths),
-                          (GDestroyNotify) nautilus_wipe_path_list_free);
+                          nw_path_list_copy (paths),
+                          (GDestroyNotify) nw_path_list_free);
   g_signal_connect (item, "activate",
                     G_CALLBACK (wipe_menu_item_activate_handler), NULL);
   
@@ -252,9 +252,9 @@ static void
 fill_menu_item_activate_handler (GObject *item,
                                  gpointer data)
 {
-  nautilus_wipe_run_fill_operation (g_object_get_data (item, ITEM_DATA_WINDOW_KEY),
-                                    g_object_get_data (item, ITEM_DATA_PATHS_KEY),
-                                    g_object_get_data (item, ITEM_DATA_MOUNTPOINTS_KEY));
+  nw_extension_run_fill_operation (g_object_get_data (item, ITEM_DATA_WINDOW_KEY),
+                                   g_object_get_data (item, ITEM_DATA_PATHS_KEY),
+                                   g_object_get_data (item, ITEM_DATA_MOUNTPOINTS_KEY));
 }
 
 static NautilusMenuItem *
@@ -268,8 +268,7 @@ create_fill_menu_item (NautilusMenuProvider *provider,
   GList            *folders     = NULL;
   GError           *err         = NULL;
   
-  if (! nautilus_wipe_fill_operation_filter_files (files, &folders,
-                                                   &mountpoints, &err)) {
+  if (! nw_fill_operation_filter_files (files, &folders, &mountpoints, &err)) {
     g_warning (_("File filtering failed: %s"), err->message);
     g_error_free (err);
   } else {
@@ -280,10 +279,10 @@ create_fill_menu_item (NautilusMenuProvider *provider,
     g_object_set_data (G_OBJECT (item), ITEM_DATA_WINDOW_KEY, window);
     g_object_set_data_full (G_OBJECT (item), ITEM_DATA_PATHS_KEY,
                             folders,
-                            (GDestroyNotify) nautilus_wipe_path_list_free);
+                            (GDestroyNotify) nw_path_list_free);
     g_object_set_data_full (G_OBJECT (item), ITEM_DATA_MOUNTPOINTS_KEY,
                             mountpoints,
-                            (GDestroyNotify) nautilus_wipe_path_list_free);
+                            (GDestroyNotify) nw_path_list_free);
     g_signal_connect (item, "activate",
                       G_CALLBACK (fill_menu_item_activate_handler), NULL);
   }
@@ -303,14 +302,14 @@ create_fill_menu_item (NautilusMenuProvider *provider,
 
 /* populates Nautilus' file menu */
 static GList *
-nautilus_wipe_real_get_file_items (NautilusMenuProvider *provider,
-                                   GtkWidget            *window,
-                                   GList                *files)
+nw_extension_real_get_file_items (NautilusMenuProvider *provider,
+                                  GtkWidget            *window,
+                                  GList                *files)
 {
   GList *items = NULL;
   GList *paths;
   
-  paths = nautilus_wipe_path_list_new_from_nfi_list (files);
+  paths = nw_path_list_new_from_nfi_list (files);
   if (paths) {
     ADD_ITEM (items, create_wipe_menu_item (provider,
                                             "nautilus-wipe::files-items::wipe",
@@ -319,27 +318,27 @@ nautilus_wipe_real_get_file_items (NautilusMenuProvider *provider,
                                             "nautilus-wipe::files-items::fill",
                                             window, paths));
   }
-  nautilus_wipe_path_list_free (paths);
+  nw_path_list_free (paths);
   
   return items;
 }
 
 /* populates Nautilus' background menu */
 static GList *
-nautilus_wipe_real_get_background_items (NautilusMenuProvider *provider,
-                                         GtkWidget            *window,
-                                         NautilusFileInfo     *current_folder)
+nw_extension_real_get_background_items (NautilusMenuProvider *provider,
+                                        GtkWidget            *window,
+                                        NautilusFileInfo     *current_folder)
 {
   GList *items = NULL;
   GList *paths = NULL;
   
-  paths = g_list_append (paths, nautilus_wipe_path_from_nfi (current_folder));
+  paths = g_list_append (paths, nw_path_from_nfi (current_folder));
   if (paths && paths->data) {
     ADD_ITEM (items, create_fill_menu_item (provider,
                                             "nautilus-wipe::background-items::fill",
                                             window, paths));
   }
-  nautilus_wipe_path_list_free (paths);
+  nw_path_list_free (paths);
   
   return items;
 }

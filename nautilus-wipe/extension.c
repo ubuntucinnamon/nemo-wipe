@@ -25,7 +25,7 @@
 # include "config.h"
 #endif
 
-#include "nautilus-wipe.h"
+#include "nw-extension.h"
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>
@@ -40,7 +40,7 @@ nautilus_module_initialize (GTypeModule *module)
 {
   g_message ("Initializing");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
-  provider_types[0] = nautilus_wipe_register_type (module);
+  provider_types[0] = nw_extension_register_type (module);
 }
 
 /* extension points types registration */

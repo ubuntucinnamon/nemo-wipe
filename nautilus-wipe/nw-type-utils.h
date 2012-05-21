@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef NAUTILUS_WIPE_TYPE_UTILS_H
-#define NAUTILUS_WIPE_TYPE_UTILS_H
+#ifndef NW_TYPE_UTILS_H
+#define NW_TYPE_UTILS_H
 
 #include <glib.h>
 #include <glib-object.h>
@@ -28,7 +28,7 @@
 G_BEGIN_DECLS
 
 
-#define _NAUTILUS_WIPE_DEFINE_TYPE_MODULE_EXTENDED_BEGIN(TN, t_n, T_P, _f_)    \
+#define _NW_DEFINE_TYPE_MODULE_EXTENDED_BEGIN(TN, t_n, T_P, _f_)               \
                                                                                \
 static void     t_n##_init              (TN        *self);                     \
 static void     t_n##_class_init        (TN##Class *klass);                    \
@@ -73,26 +73,26 @@ t_n##_register_type (GTypeModule *nw_define_type_module_module)                \
                                                           &type_info, _f_);    \
   t_n##__GType = nw_define_type_module_id;                                     \
   { /* custom code follows */
-#define _NAUTILUS_WIPE_DEFINE_TYPE_MODULE_EXTENDED_END()                       \
+#define _NW_DEFINE_TYPE_MODULE_EXTENDED_END()                                  \
     /* following custom code */                                                \
   }                                                                            \
   return nw_define_type_module_id;                                             \
 }
 
-#define NAUTILUS_WIPE_DEFINE_TYPE_MODULE_EXTENDED(TN, t_n, T_P, _f_, _C_)      \
-  _NAUTILUS_WIPE_DEFINE_TYPE_MODULE_EXTENDED_BEGIN (TN, t_n, T_P, _f_)         \
+#define NW_DEFINE_TYPE_MODULE_EXTENDED(TN, t_n, T_P, _f_, _C_)                 \
+  _NW_DEFINE_TYPE_MODULE_EXTENDED_BEGIN (TN, t_n, T_P, _f_)                    \
   { _C_; }                                                                     \
-  _NAUTILUS_WIPE_DEFINE_TYPE_MODULE_EXTENDED_END ()
+  _NW_DEFINE_TYPE_MODULE_EXTENDED_END ()
 
-#define NAUTILUS_WIPE_DEFINE_TYPE_MODULE_WITH_CODE(TN, t_n, T_P, _C_)          \
-  _NAUTILUS_WIPE_DEFINE_TYPE_MODULE_EXTENDED_BEGIN (TN, t_n, T_P, 0)           \
+#define NW_DEFINE_TYPE_MODULE_WITH_CODE(TN, t_n, T_P, _C_)                     \
+  _NW_DEFINE_TYPE_MODULE_EXTENDED_BEGIN (TN, t_n, T_P, 0)                      \
   { _C_; }                                                                     \
-  _NAUTILUS_WIPE_DEFINE_TYPE_MODULE_EXTENDED_END ()
+  _NW_DEFINE_TYPE_MODULE_EXTENDED_END ()
 
-#define NAUTILUS_WIPE_DEFINE_TYPE_MODULE(TN, t_n, T_P)                         \
-  NAUTILUS_WIPE_DEFINE_TYPE_MODULE_EXTENDED (TN, t_n, T_P, 0, {})
+#define NW_DEFINE_TYPE_MODULE(TN, t_n, T_P)                                    \
+  NW_DEFINE_TYPE_MODULE_EXTENDED (TN, t_n, T_P, 0, {})
 
-#define NAUTILUS_WIPE_TYPE_MODULE_IMPLEMENT_INTERFACE(TYPE_IFACE, iface_init)  \
+#define NW_TYPE_MODULE_IMPLEMENT_INTERFACE(TYPE_IFACE, iface_init)             \
 {                                                                              \
   static const GInterfaceInfo nw_type_module_implement_interface_info = {      \
     (GInterfaceInitFunc) iface_init, NULL, NULL                                \
