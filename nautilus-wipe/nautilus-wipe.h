@@ -27,10 +27,6 @@
 
 G_BEGIN_DECLS
 
-/* Declarations for the open terminal extension object.  This object will be
- * instantiated by nautilus.  It implements the GInterfaces 
- * exported by libnautilus. */
-
 
 #define NAUTILUS_TYPE_WIPE  (nautilus_wipe_get_type ())
 #define NAUTILUS_WIPE(o)    (G_TYPE_CHECK_INSTANCE_CAST ((o), NAUTILUS_TYPE_WIPE, NautilusWipe))
