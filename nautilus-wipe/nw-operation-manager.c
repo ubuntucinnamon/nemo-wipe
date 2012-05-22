@@ -1,7 +1,7 @@
 /*
  *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
- *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
+ *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -140,7 +140,7 @@ string_last_line (const gchar *str)
 
 struct NwOperationData
 {
-  GsdAsyncOperation  *operation;
+  NwOperation        *operation;
   GtkWindow          *window;
   gulong              window_destroy_hid;
   NwProgressDialog   *progress_dialog;
@@ -474,7 +474,7 @@ progress_dialog_response_handler (GtkDialog *dialog,
                           _("Resume operation"), GTK_RESPONSE_REJECT,
                           _("Cancel operation"), GTK_RESPONSE_ACCEPT,
                           NULL) == GTK_RESPONSE_ACCEPT) {
-        gsd_async_operation_cancel (opdata->operation);
+        gsd_async_operation_cancel (GSD_ASYNC_OPERATION (opdata->operation));
       }
       break;
     
@@ -495,7 +495,7 @@ progress_dialog_response_handler (GtkDialog *dialog,
  *                       or %NULL for none or the default (e.g. if
  *                       @confirm_button_text is a stock item that have an icon)
  * @progress_dialog_text: Text for the progress dialog
- * @operation_launcher_func: the function that will be launched to do the operation
+ * @operation: (transfer:full): the operation object
  * @failed_primary_text: Primary text of the dialog displayed if operation failed.
  *                       (secondary is the error message)
  * @success_primary_text: Primary text for the the success dialog
@@ -504,28 +504,30 @@ progress_dialog_response_handler (GtkDialog *dialog,
  * 
  */
 void
-nw_operation_manager_run (GtkWindow      *parent,
-                          GList          *files,
-                          const gchar    *confirm_primary_text,
-                          const gchar    *confirm_secondary_text,
-                          const gchar    *confirm_button_text,
-                          GtkWidget      *confirm_button_icon,
-                          const gchar    *progress_dialog_text,
-                          NwOperationFunc operation_launcher_func,
-                          const gchar    *failed_primary_text,
-                          const gchar    *success_primary_text,
-                          const gchar    *success_secondary_text)
+nw_operation_manager_run (GtkWindow    *parent,
+                          GList        *files,
+                          const gchar  *confirm_primary_text,
+                          const gchar  *confirm_secondary_text,
+                          const gchar  *confirm_button_text,
+                          GtkWidget    *confirm_button_icon,
+                          const gchar  *progress_dialog_text,
+                          NwOperation  *operation,
+                          const gchar  *failed_primary_text,
+                          const gchar  *success_primary_text,
+                          const gchar  *success_secondary_text)
 {
   /* if the user confirms, try to launch the operation */
   gboolean                      fast        = FALSE;
   GsdSecureDeleteOperationMode  delete_mode = GSD_SECURE_DELETE_OPERATION_MODE_INSECURE;
   gboolean                      zeroise     = FALSE;
   
-  if (operation_confirm_dialog (parent,
-                                confirm_primary_text, confirm_secondary_text,
-                                confirm_button_text, confirm_button_icon,
-                                &fast, &delete_mode, &zeroise)) {
-    GError                           *err = NULL;
+  if (! operation_confirm_dialog (parent,
+                                  confirm_primary_text, confirm_secondary_text,
+                                  confirm_button_text, confirm_button_icon,
+                                  &fast, &delete_mode, &zeroise)) {
+    g_object_unref (operation);
+  } else {
+    GError                 *err = NULL;
     struct NwOperationData *opdata;
     
     opdata = g_slice_alloc (sizeof *opdata);
@@ -540,11 +542,20 @@ nw_operation_manager_run (GtkWindow      *parent,
     opdata->failed_primary_text = g_strdup (failed_primary_text);
     opdata->success_primary_text = g_strdup (success_primary_text);
     opdata->success_secondary_text = g_strdup (success_secondary_text);
-    opdata->operation = operation_launcher_func (files, fast, delete_mode, zeroise,
-                                                 G_CALLBACK (operation_finished_handler),
-                                                 G_CALLBACK (operation_progress_handler),
-                                                 opdata, &err);
-    if (! opdata->operation) {
+    opdata->operation = operation;
+    g_object_set (operation,
+                  "fast", fast,
+                  "mode", delete_mode,
+                  "zeroise", zeroise,
+                  NULL);
+    g_signal_connect (opdata->operation, "finished",
+                      G_CALLBACK (operation_finished_handler), opdata);
+    g_signal_connect (opdata->operation, "progress",
+                      G_CALLBACK (operation_progress_handler), opdata);
+    
+    nw_operation_add_files (opdata->operation, files);
+    if (! gsd_secure_delete_operation_run (GSD_SECURE_DELETE_OPERATION (opdata->operation),
+                                           &err)) {
       if (err->code == G_SPAWN_ERROR_NOENT) {
         gchar *message;
         

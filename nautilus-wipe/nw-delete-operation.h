@@ -1,7 +1,7 @@
 /*
  *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
- *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
+ *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -26,36 +26,32 @@
 #include <glib-object.h>
 #include <gsecuredelete/gsecuredelete.h>
 
+#include "nw-operation.h"
+
 G_BEGIN_DECLS
 
 
-/**
- * NwDeleteOperationError:
- * @NW_DELETE_OPERATION_ERROR_FAILED: An error occurred
- * 
- * Possible errors from the %NW_DELETE_OPERATION_ERROR domain.
- */
-typedef enum
-{
-  NW_DELETE_OPERATION_ERROR_FAILED
-} NwDeleteOperationError;
+#define NW_TYPE_DELETE_OPERATION         (nw_delete_operation_get_type ())
+#define NW_DELETE_OPERATION(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), NW_TYPE_DELETE_OPERATION, NwDeleteOperation))
+#define NW_DELETE_OPERATION_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST ((k), NW_TYPE_DELETE_OPERATION, NwDeleteOperationClass))
+#define NW_IS_DELETE_OPERATION(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), NW_TYPE_DELETE_OPERATION))
+#define NW_IS_DELETE_OPERATION_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), NW_TYPE_DELETE_OPERATION))
+#define NW_DELETE_OPERATION_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), NW_TYPE_DELETE_OPERATION, NwDeleteOperationClass))
 
-/**
- * NW_DELETE_OPERATION_ERROR:
- * 
- * Domain for error coming from a NautilusWipe's delete operation.
- */
-#define NW_DELETE_OPERATION_ERROR (nw_delete_operation_error_quark ())
+typedef struct _NwDeleteOperation         NwDeleteOperation;
+typedef struct _NwDeleteOperationClass    NwDeleteOperationClass;
 
-GQuark              nw_delete_operation_error_quark (void) G_GNUC_CONST;
-GsdAsyncOperation  *nw_delete_operation  (GList                       *files,
-                                          gboolean                     fast,
-                                          GsdSecureDeleteOperationMode mode,
-                                          gboolean                     zeroise,
-                                          GCallback                    finished_handler,
-                                          GCallback                    progress_handler,
-                                          gpointer                     data,
-                                          GError                     **error);
+struct _NwDeleteOperation {
+  GsdDeleteOperation parent;
+};
+
+struct _NwDeleteOperationClass {
+  GsdDeleteOperationClass parent;
+};
+
+
+GType         nw_delete_operation_get_type    (void) G_GNUC_CONST;
+NwOperation  *nw_delete_operation_new         (void);
 
 
 G_END_DECLS

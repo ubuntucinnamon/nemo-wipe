@@ -12,6 +12,8 @@ libnautilus_wipe_la_SOURCES  = extension.c \
                                nw-extension.h \
                                nw-fill-operation.c \
                                nw-fill-operation.h \
+                               nw-operation.c \
+                               nw-operation.h \
                                nw-operation-manager.c \
                                nw-operation-manager.h \
                                nw-path-list.c \

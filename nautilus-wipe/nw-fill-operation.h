@@ -1,7 +1,7 @@
 /*
  *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
- *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
+ *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -26,8 +26,30 @@
 #include <glib-object.h>
 #include <gsecuredelete/gsecuredelete.h>
 
+#include "nw-operation.h"
+
 G_BEGIN_DECLS
 
+
+#define NW_TYPE_FILL_OPERATION          (nw_fill_operation_get_type ())
+#define NW_FILL_OPERATION(o)            (G_TYPE_CHECK_INSTANCE_CAST ((o), NW_TYPE_FILL_OPERATION, NwFillOperation))
+#define NW_FILL_OPERATION_CLASS(k)      (G_TYPE_CHECK_CLASS_CAST ((k), NW_TYPE_FILL_OPERATION, NwFillOperationClass))
+#define NW_IS_FILL_OPERATION(o)         (G_TYPE_CHECK_INSTANCE_TYPE ((o), NW_TYPE_FILL_OPERATION))
+#define NW_IS_FILL_OPERATION_CLASS(k)   (G_TYPE_CHECK_CLASS_TYPE ((k), NW_TYPE_FILL_OPERATION))
+#define NW_FILL_OPERATION_GET_CLASS(o)  (G_TYPE_INSTANCE_GET_CLASS ((o), NW_TYPE_FILL_OPERATION, NwFillOperationClass))
+
+typedef struct _NwFillOperation         NwFillOperation;
+typedef struct _NwFillOperationClass    NwFillOperationClass;
+typedef struct _NwFillOperationPrivate  NwFillOperationPrivate;
+
+struct _NwFillOperation {
+  GsdFillOperation parent;
+  NwFillOperationPrivate *priv;
+};
+
+struct _NwFillOperationClass {
+  GsdFillOperationClass parent;
+};
 
 /**
  * NwFillOperationError:
@@ -51,19 +73,14 @@ typedef enum
  */
 #define NW_FILL_OPERATION_ERROR (nw_fill_operation_error_quark ())
 
-GQuark   nw_fill_operation_error_quark  (void) G_GNUC_CONST;
-gboolean nw_fill_operation_filter_files (GList    *paths,
-                                         GList   **work_paths_,
-                                         GList   **work_mounts_,
-                                         GError  **error);
-GsdAsyncOperation  *nw_fill_operation   (GList                       *files,
-                                         gboolean                     fast,
-                                         GsdSecureDeleteOperationMode mode,
-                                         gboolean                     zeroise,
-                                         GCallback                    finished_handler,
-                                         GCallback                    progress_handler,
-                                         gpointer                     data,
-                                         GError                     **error);
+GQuark        nw_fill_operation_error_quark   (void) G_GNUC_CONST;
+GType         nw_fill_operation_get_type      (void) G_GNUC_CONST;
+
+gboolean      nw_fill_operation_filter_files  (GList    *paths,
+                                               GList   **work_paths_,
+                                               GList   **work_mounts_,
+                                               GError  **error);
+NwOperation  *nw_fill_operation_new           (void);
 
 
 G_END_DECLS

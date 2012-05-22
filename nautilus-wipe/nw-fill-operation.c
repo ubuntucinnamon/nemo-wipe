@@ -1,7 +1,7 @@
 /*
  *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
- *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
+ *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -33,6 +33,8 @@
 # include <gio/gunixmounts.h>
 #endif
 #include <gsecuredelete/gsecuredelete.h>
+
+#include "nw-operation.h"
 #include "nw-path-list.h"
 
 
@@ -49,6 +51,186 @@ nw_fill_operation_error_quark (void)
   
   return (GQuark) quark;
 }
+
+
+static void     nw_fill_operation_operation_iface_init  (NwOperationInterface *iface);
+static void     nw_fill_operation_real_add_file         (NwOperation *op,
+                                                         const gchar *path);
+static void     nw_fill_operation_finalize              (GObject *object);
+static void     nw_fill_operation_finished_handler      (GsdFillOperation *operation,
+                                                         gboolean          success,
+                                                         const gchar      *message,
+                                                         NwFillOperation  *self);
+static void     nw_fill_operation_progress_handler      (GsdFillOperation *operation,
+                                                         gdouble           fraction,
+                                                         NwFillOperation  *self);
+
+
+struct _NwFillOperationPrivate {
+  GList  *directories;
+  
+  guint   n_op;
+  guint   n_op_done;
+  
+  gulong  progress_hid;
+  gulong  finished_hid;
+};
+
+G_DEFINE_TYPE_WITH_CODE (NwFillOperation,
+                         nw_fill_operation,
+                         GSD_TYPE_FILL_OPERATION,
+                         G_IMPLEMENT_INTERFACE (NW_TYPE_OPERATION,
+                                                nw_fill_operation_operation_iface_init))
+
+
+static void
+nw_fill_operation_operation_iface_init (NwOperationInterface *iface)
+{
+  iface->add_file = nw_fill_operation_real_add_file;
+}
+
+static void
+nw_fill_operation_class_init (NwFillOperationClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  
+  object_class->finalize = nw_fill_operation_finalize;
+  
+  g_type_class_add_private (klass, sizeof (NwFillOperationPrivate));
+}
+
+static void
+nw_fill_operation_init (NwFillOperation *self)
+{
+  self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self,
+                                            NW_TYPE_FILL_OPERATION,
+                                            NwFillOperationPrivate);
+  
+  self->priv->directories = NULL;
+  self->priv->n_op = 0;
+  self->priv->n_op_done = 0;
+  
+  self->priv->finished_hid = g_signal_connect (self, "finished",
+                                               G_CALLBACK (nw_fill_operation_finished_handler),
+                                               self);
+  self->priv->progress_hid = g_signal_connect (self, "progress",
+                                               G_CALLBACK (nw_fill_operation_progress_handler),
+                                               self);
+}
+
+static void
+nw_fill_operation_finalize (GObject *object)
+{
+  NwFillOperation *self = NW_FILL_OPERATION (object);
+  
+  g_list_foreach (self->priv->directories, (GFunc) g_free, NULL);
+  g_list_free (self->priv->directories);
+  self->priv->directories = NULL;
+  
+  G_OBJECT_CLASS (nw_fill_operation_parent_class)->finalize (object);
+}
+
+static void
+nw_fill_operation_real_add_file (NwOperation *op,
+                                 const gchar *path)
+{
+  NwFillOperation *self = NW_FILL_OPERATION (op);
+  
+  /* FIXME: filter file? */
+  self->priv->directories = g_list_prepend (self->priv->directories,
+                                            g_strdup (path));
+  self->priv->n_op ++;
+  
+  gsd_fill_operation_set_directory (GSD_FILL_OPERATION (self),
+                                    self->priv->directories->data);
+}
+
+/* wrapper for the progress handler returning the current progression over all
+ * operations  */
+static void
+nw_fill_operation_progress_handler (GsdFillOperation *operation,
+                                    gdouble           fraction,
+                                    NwFillOperation  *self)
+{
+  /* abort emission and replace by our overridden one.  Not to do that
+   * recursively, we block our handler during the re-emission */
+  g_signal_stop_emission_by_name (operation, "progress");
+  g_signal_handler_block (operation, self->priv->progress_hid);
+  g_signal_emit_by_name (operation, "progress", 0,
+                         (self->priv->n_op_done + fraction) / self->priv->n_op);
+  g_signal_handler_unblock (operation, self->priv->progress_hid);
+}
+
+/* timeout function to launch next operation after finish of the previous
+ * operation.
+ * we need this kind of hack since operation are locked while running. */
+static gboolean
+launch_next_operation (NwFillOperation *self)
+{
+  gboolean busy;
+  
+  busy = gsd_async_operation_get_busy (GSD_ASYNC_OPERATION (self));
+  if (! busy) {
+    GError   *err = NULL;
+    gboolean  success;
+    
+    success = gsd_fill_operation_run (GSD_FILL_OPERATION (self),
+                                      self->priv->directories->data,
+                                      &err);
+    if (! success) {
+      g_signal_handler_block (self, self->priv->finished_hid);
+      g_signal_emit_by_name (self, "finished", 0, success, err->message);
+      g_signal_handler_unblock (self, self->priv->finished_hid);
+      g_error_free (err);
+    }
+  }
+  
+  return busy; /* keeps our timeout function until lock is released */
+}
+
+/* Removes the current directory to proceed */
+static void
+nw_fill_operation_pop_dir (NwFillOperation *self)
+{
+  GList *tmp;
+  
+  tmp = self->priv->directories;
+  if (tmp) {
+    self->priv->directories = tmp->next;
+    g_free (tmp->data);
+    g_list_free_1 (tmp);
+  }
+}
+
+/* Wrapper for the finished handler.  It launches the next operation if there
+ * is one left. */
+static void
+nw_fill_operation_finished_handler (GsdFillOperation *operation,
+                                    gboolean          success,
+                                    const gchar      *message,
+                                    NwFillOperation  *self)
+{
+  if (success) {
+    self->priv->n_op_done++;
+    /* remove the directory just proceeded */
+    nw_fill_operation_pop_dir (self);
+    
+    /* if we have work left to be done... */
+    if (self->priv->directories) {
+      /* block signal emission, it's not the last one */
+      g_signal_stop_emission_by_name (operation, "finished");
+      
+      /* we can't launch the next operation right here since the previous must
+       * release its lock before, which is done just after return of the current
+       * function.
+       * To work around this, we add a timeout function that will try to launch
+       * the next operation if the current one is not busy, which fixes the
+       * problem. */
+      g_timeout_add (10, (GSourceFunc) launch_next_operation, self);
+    }
+  }
+}
+
 
 #if HAVE_GIO_UNIX
 /*
@@ -145,145 +327,6 @@ find_mountpoint (const gchar *path,
   return mountpoint_path;
 }
 
-
-
-
-typedef void  (*FillFinishedFunc) (GsdFillOperation  *self,
-                                   gboolean           success,
-                                   const gchar       *message,
-                                   gpointer           data);
-typedef void  (*FillProgressFunc) (GsdFillOperation  *self,
-                                   gdouble            fraction,
-                                   gpointer           data);
-/* The data structure that holds the operation state and data */
-struct FillOperationData
-{
-  GsdFillOperation *operation;
-  /* the current directory to work on (dir->data) */
-  GList *dir;
-  /* GObject's signals handlers IDs */
-  gulong finished_hid;
-  gulong progress_hid;
-  /* operation status */
-  guint n_op;
-  guint n_op_done;
-  
-  /* caller's handlers for wrapping */
-  FillFinishedFunc  finished_handler;
-  FillProgressFunc  progress_handler;
-  gpointer          cbdata;
-};
-
-static void   nw_fill_finished_handler  (GsdFillOperation         *operation,
-                                         gboolean                  success,
-                                         const gchar              *message,
-                                         struct FillOperationData *opdata);
-static void   nw_fill_progress_handler  (GsdFillOperation         *operation,
-                                         gdouble                   fraction,
-                                         struct FillOperationData *opdata);
-
-
-/* Actually calls libgsecuredelete */
-static gboolean
-do_fill_operation (struct FillOperationData *opdata,
-                   GError                  **error)
-{
-  g_message ("Starting work on %s", (const gchar *)opdata->dir->data);
-  /* FIXME: don't launch sfill in a useful directory since it can leave a bunch
-   * of files if it get interrupted (e.g. from a crash, a user kill or so) */
-  return gsd_fill_operation_run (opdata->operation, opdata->dir->data, error);
-}
-
-/* Removes the current directory to proceed */
-static void
-nw_fill_pop_dir (struct FillOperationData *opdata)
-{
-  GList *tmp;
-  
-  tmp = opdata->dir;
-  opdata->dir = g_list_next (opdata->dir);
-  g_free (tmp->data);
-  g_list_free_1 (tmp);
-}
-
-/* Cleans up the opdata structure and frees it */
-static void
-nw_fill_cleanup (struct FillOperationData *opdata)
-{
-  g_signal_handler_disconnect (opdata->operation, opdata->progress_hid);
-  g_signal_handler_disconnect (opdata->operation, opdata->finished_hid);
-  if (opdata->operation) {
-    g_object_unref (opdata->operation);
-  }
-  while (opdata->dir) {
-    nw_fill_pop_dir (opdata);
-  }
-  g_slice_free1 (sizeof *opdata, opdata);
-}
-
-/* wrapper for the progress handler returning the current progression over all
- * operations  */
-static void
-nw_fill_progress_handler (GsdFillOperation         *operation,
-                          gdouble                   fraction,
-                          struct FillOperationData *opdata)
-{
-  opdata->progress_handler (operation,
-                            (opdata->n_op_done + fraction) / opdata->n_op,
-                            opdata->cbdata);
-}
-
-/* timeout function to launch next operation after finish of the previous
- * operation.
- * we need this kind of hack since operation are locked while running. */
-static gboolean
-launch_next_fill_operation (struct FillOperationData *opdata)
-{
-  gboolean busy;
-  
-  busy = gsd_async_operation_get_busy (GSD_ASYNC_OPERATION (opdata->operation));
-  if (! busy) {
-    GError   *err = NULL;
-    gboolean  success;
-    
-    success = do_fill_operation (opdata, &err);
-    if (! success) {
-      nw_fill_finished_handler (opdata->operation,
-                                           success, err->message, opdata);
-      g_error_free (err);
-    }
-  }
-  
-  return busy; /* keeps our timeout function until lock is released */
-}
-
-/* Wrapper for the finished handler.
- * It launches the next operation if there is one left, or call the user's
- * handler if done or on error. */
-static void
-nw_fill_finished_handler (GsdFillOperation         *operation,
-                          gboolean                  success,
-                          const gchar              *message,
-                          struct FillOperationData *opdata)
-{
-  opdata->n_op_done++;
-  /* remove the directory just proceeded */
-  nw_fill_pop_dir (opdata);
-  /* if the last operation succeeded and we have work left */
-  if (success && opdata->dir) {
-    /* we can't launch the next operation right here since the previous must
-     * release its lock before, which is done just after return of the current
-     * function.
-     * To work around this, we add a timeout function that will try to launch
-     * the next operation if the current one is not busy, which fixes the
-     * problem. */
-    g_timeout_add (10, (GSourceFunc)launch_next_fill_operation, opdata);
-  } else {
-    opdata->finished_handler (operation, success, message, opdata->cbdata);
-    nw_fill_cleanup (opdata);
-  }
-}
-
 /*
  * nw_fill_operation_filter_files:
  * @paths: A list of paths to filter
@@ -291,7 +334,7 @@ nw_fill_finished_handler (GsdFillOperation         *operation,
  * @work_mounts_: return location for filtered paths' mounts
  * @error: return location for errors, or %NULL to ignore them
  * 
- * Ties to get usable paths (local directories) and keep only one per
+ * Tries to get usable paths (local directories) and keep only one per
  * mountpoint.
  * 
  * The returned lists (@work_paths_ and @work_mounts_) have the same length, and
@@ -356,65 +399,8 @@ nw_fill_operation_filter_files (GList    *paths,
   return ! err;
 }
 
-/*
- * nw_fill_operation:
- * @directories: A list of paths to work on (should have been filtered with
- *               nw_fill_operation_filter_files() or so)
- * @fast: The Gsd.SecureDeleteOperation:fast setting
- * @mode: The Gsd.SecureDeleteOperation:mode setting
- * @zeroise: The Gsd.ZeroableOperation:zeroise setting
- * @finished_handler: A handler for GsdAsyncOperation::finished
- * @progress_handler: A handler for GsdAsyncOperation::progress
- * @data: User data to pass to @finished_handler and @progress_handler
- * @error: Return location for errors or %NULL to ignore them. The errors are
- *         those from gsd_fill_operation_run().
- * 
- * fills the given directories to overwrite available diskspace.
- * 
- * Returns: The operation object that was launched, or %NULL on failure.
- *          The operation object should be unref'd with g_object_unref() when
- *          no longer needed.
- */
-GsdAsyncOperation *
-nw_fill_operation (GList                       *directories,
-                   gboolean                     fast,
-                   GsdSecureDeleteOperationMode mode,
-                   gboolean                     zeroise,
-                   GCallback                    finished_handler,
-                   GCallback                    progress_handler,
-                   gpointer                     data,
-                   GError                     **error)
+NwOperation *
+nw_fill_operation_new (void)
 {
-  gboolean                  success = FALSE;
-  struct FillOperationData *opdata;
-  GList                    *dirs;
-  
-  g_return_val_if_fail (directories != NULL, NULL);
-  
-  dirs = nw_path_list_copy (directories);
-  if (dirs) {
-    opdata = g_slice_alloc (sizeof *opdata);
-    opdata->dir               = dirs;
-    opdata->finished_handler  = (FillFinishedFunc)finished_handler;
-    opdata->progress_handler  = (FillProgressFunc)progress_handler;
-    opdata->cbdata            = data;
-    opdata->n_op              = g_list_length (opdata->dir);
-    opdata->n_op_done         = 0;
-    opdata->operation         = gsd_fill_operation_new ();
-    gsd_secure_delete_operation_set_fast (GSD_SECURE_DELETE_OPERATION (opdata->operation), fast);
-    gsd_secure_delete_operation_set_mode (GSD_SECURE_DELETE_OPERATION (opdata->operation), mode);
-    gsd_zeroable_operation_set_zeroise (GSD_ZEROABLE_OPERATION (opdata->operation), zeroise);
-    opdata->progress_hid = g_signal_connect (opdata->operation, "progress",
-                                             G_CALLBACK (nw_fill_progress_handler), opdata);
-    opdata->finished_hid = g_signal_connect (opdata->operation, "finished",
-                                             G_CALLBACK (nw_fill_finished_handler), opdata);
-    /* launches the operation */
-    success = do_fill_operation (opdata, error);
-    if (! success) {
-      nw_fill_cleanup (opdata);
-    }
-  }
-  
-  return success ? g_object_ref (opdata->operation) : NULL;
+  return g_object_new (NW_TYPE_FILL_OPERATION, NULL);
 }
-

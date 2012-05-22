@@ -130,7 +130,7 @@ nw_extension_run_delete_operation (GtkWindow *parent,
     /* progress dialog */
     _("Wiping files..."),
     /* operation launcher */
-    nw_delete_operation,
+    nw_delete_operation_new (),
     /* failed dialog */
     _("Wipe failed."),
     /* success dialog */
@@ -206,7 +206,7 @@ nw_extension_run_fill_operation (GtkWindow *parent,
     /* progress dialog */
     _("Wiping available diskspace..."),
     /* operation launcher */
-    nw_fill_operation,
+    nw_fill_operation_new (),
     /* failed dialog */
     _("Wipe failed"),
     /* success dialog */

@@ -1,7 +1,7 @@
 /*
  *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
- *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
+ *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -19,96 +19,52 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "nw-delete-operation.h"
 
 #include <glib.h>
-#include <glib/gi18n-lib.h>
 #include <glib-object.h>
-#include <gio/gio.h>
 #include <gsecuredelete/gsecuredelete.h>
 
+#include "nw-operation.h"
 
-GQuark
-nw_delete_operation_error_quark (void)
+
+static void   nw_delete_operation_opeartion_iface_init  (NwOperationInterface *iface);
+static void   nw_delete_operation_real_add_file         (NwOperation *self,
+                                                         const gchar *file);
+
+
+G_DEFINE_TYPE_WITH_CODE (NwDeleteOperation,
+                         nw_delete_operation,
+                         GSD_TYPE_DELETE_OPERATION,
+                         G_IMPLEMENT_INTERFACE (NW_TYPE_OPERATION,
+                                                nw_delete_operation_opeartion_iface_init))
+
+
+static void
+nw_delete_operation_opeartion_iface_init (NwOperationInterface *iface)
 {
-  static volatile gsize quark = 0;
-  
-  if (g_once_init_enter (&quark)) {
-    GQuark q = g_quark_from_static_string ("NwDeleteOperationError");
-    
-    g_once_init_leave (&quark, q);
-  }
-  
-  return (GQuark) quark;
+  iface->add_file = nw_delete_operation_real_add_file;
 }
 
-/*
- * nw_delete_operation:
- * @files: A list of paths to delete.
- * @fast: The Gsd.SecureDeleteOperation:fast setting
- * @mode: The Gsd.SecureDeleteOperation:mode setting
- * @zeroise: The Gsd.ZeroableOperation:zeroise setting
- * @finished_handler: A handler for GsdAsyncOperation::finished
- * @progress_handler: A handler for GsdAsyncOperation::progress
- * @data: User data to pass to @finished_handler and @progress_handler
- * @error: Return location for errors or %NULL to ignore them. The errors are
- *         those from gsd_secure_delete_operation_run().
- * 
- * Deletes the given files with libgsecuredelete.
- * 
- * Returns: The operation object that was launched, or %NULL on failure.
- *          The operation object should be unref'd with g_object_unref() when
- *          no longer needed.
- */
-GsdAsyncOperation *
-nw_delete_operation (GList                       *files,
-                     gboolean                     fast,
-                     GsdSecureDeleteOperationMode mode,
-                     gboolean                     zeroise,
-                     GCallback                    finished_handler,
-                     GCallback                    progress_handler,
-                     gpointer                     data,
-                     GError                     **error)
+static void
+nw_delete_operation_class_init (NwDeleteOperationClass *klass)
 {
-  gboolean            success = TRUE;
-  GsdDeleteOperation *operation;
-  guint               n_files = 0;
-  
-  operation = gsd_delete_operation_new ();
-  for (; files; files = g_list_next (files)) {
-    gsd_delete_operation_add_path (operation, files->data);
-    n_files ++;
-  }
-  if (n_files < 1) {
-    g_set_error (error,
-                 NW_DELETE_OPERATION_ERROR,
-                 NW_DELETE_OPERATION_ERROR_FAILED,
-                 _("Nothing to do!"));
-    success = FALSE;
-  } else {
-    /* if file addition succeeded, try to launch operation */
-    gsd_secure_delete_operation_set_fast (GSD_SECURE_DELETE_OPERATION (operation), fast);
-    gsd_secure_delete_operation_set_mode (GSD_SECURE_DELETE_OPERATION (operation), mode);
-    gsd_zeroable_operation_set_zeroise (GSD_ZEROABLE_OPERATION (operation), zeroise);
-    g_signal_connect (operation, "progress", progress_handler, data);
-    g_signal_connect (operation, "finished", finished_handler, data);
-    /* unrefs the operation when done (notice that it is called after the default
-     * handler) */
-    g_signal_connect_after (operation, "finished",
-                            G_CALLBACK (g_object_unref), NULL);
-    success = gsd_secure_delete_operation_run (GSD_SECURE_DELETE_OPERATION (operation),
-                                               error);
-  }
-  /* if something failed, abort */
-  if (! success) {
-    /* on failure here the callback will not be called, then unref right here */
-    g_object_unref (operation);
-  }
-  
-  return success ? g_object_ref (operation) : NULL;
 }
 
+static void
+nw_delete_operation_init (NwDeleteOperation *self)
+{
+}
+
+static void
+nw_delete_operation_real_add_file (NwOperation *self,
+                                   const gchar *file)
+{
+  gsd_delete_operation_add_path (GSD_DELETE_OPERATION (self), file);
+}
+
+NwOperation *
+nw_delete_operation_new (void)
+{
+  return g_object_new (NW_TYPE_DELETE_OPERATION, NULL);
+}

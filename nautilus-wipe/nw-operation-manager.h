@@ -1,7 +1,7 @@
 /*
  *  nautilus-wipe - a nautilus extension to wipe file(s)
  * 
- *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
+ *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -25,47 +25,23 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
-#include <gsecuredelete/gsecuredelete.h>
+
+#include "nw-operation.h"
 
 G_BEGIN_DECLS
 
 
-/**
- * NwOperationFunc:
- * @files: Paths to work on
- * @fast: The Gsd.SecureDeleteOperation:fast setting
- * @mode: The Gsd.SecureDeleteOperation:mode setting
- * @zeroise: The Gsd.ZeroableOperation:zeroise setting
- * @finished_handler: Handler for GsdAsyncOperation::finished
- * @progress_handler: Handler for GsdAsyncOperation::progress
- * @data: User data for @finished_hanlder and @progress_handler
- * @error: Return location for errors, or %NULL to ignore them
- * 
- * 
- * Returns: The operation object that was launched, or %NULL on failure.
- *          The operation object should be unref'd with g_object_unref() when
- *          no longer needed.
- */
-typedef GsdAsyncOperation  *(*NwOperationFunc)  (GList                       *files,
-                                                 gboolean                     fast,
-                                                 GsdSecureDeleteOperationMode mode,
-                                                 gboolean                     zeroise,
-                                                 GCallback                    finished_handler,
-                                                 GCallback                    progress_handler,
-                                                 gpointer                     data,
-                                                 GError                     **error);
-
-void    nw_operation_manager_run  (GtkWindow       *parent,
-                                   GList           *files,
-                                   const gchar     *confirm_primary_text,
-                                   const gchar     *confirm_secondary_text,
-                                   const gchar     *confirm_button_text,
-                                   GtkWidget       *confirm_button_icon,
-                                   const gchar     *progress_dialog_text,
-                                   NwOperationFunc  operation_launcher_func,
-                                   const gchar     *failed_primary_text,
-                                   const gchar     *success_primary_text,
-                                   const gchar     *success_secondary_text);
+void    nw_operation_manager_run  (GtkWindow   *parent,
+                                   GList       *files,
+                                   const gchar *confirm_primary_text,
+                                   const gchar *confirm_secondary_text,
+                                   const gchar *confirm_button_text,
+                                   GtkWidget   *confirm_button_icon,
+                                   const gchar *progress_dialog_text,
+                                   NwOperation *operation,
+                                   const gchar *failed_primary_text,
+                                   const gchar *success_primary_text,
+                                   const gchar *success_secondary_text);
 
 
 G_END_DECLS
