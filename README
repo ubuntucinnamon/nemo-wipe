@@ -11,10 +11,10 @@ Nautilus.
 Dependancies
 ============
 
-- libnautilus-extension
-- libgtk2.0
-- libgsecuredelete
-- libgconf2
+- libnautilus-extension 2.x or 3.x (http://live.gnome.org/Nautilus)
+- GTK2 >= 2.6 or GTK3 (http://www.gtk.org)
+- libgsecuredelete (http://wipetools.tuxfamily.org/libgsecuredelete.html)
+- GConf 2.x (http://projects.gnome.org/gconf/)
 
 Build dependancies
 ==================
@@ -24,6 +24,9 @@ Build dependancies
 - intltool
 - gnome-doc-utils
 
+Some distributions might also require one of `rarian-compat` or
+`scrollkeeper` together with `gnome-doc-utils`.
+
 Quick installation instructions
 ===============================
 
@@ -32,3 +35,7 @@ Quick installation instructions
   $ ./configure
   $ make
   # make install
+
+If you have both GTK2 and GTK3 development files installed and want to
+build againts GTK2, you should pass the ``--without-gtk3`` flag to
+``configure``.
