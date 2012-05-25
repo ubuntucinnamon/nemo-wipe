@@ -17,3 +17,5 @@
 * When one try to remove a single file on a flash device, explain that it's not
   useful at all rather than doing it, giving the user a false impression of
   security.
+
+* Get Nautilus 3.x settings?  GSettings?
