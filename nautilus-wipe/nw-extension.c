@@ -107,10 +107,18 @@ nw_extension_run_delete_operation (GtkWindow *parent,
   guint   n_items;
   
   n_items = g_list_length (files);
-  /* FIXME: can't truly use g_dngettext since the args are not the same */
   if (n_items > 1) {
-    confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe "
-                                              "the %u selected items?"), n_items);
+    confirm_primary_text = g_strdup_printf (g_dngettext(GETTEXT_PACKAGE,
+    /* TRANSLATORS: singular is not really used, N is strictly >1 */
+                                                        "Are you sure you want "
+                                                        "to wipe the %u "
+                                                        "selected items?",
+                                                        /* plural form */
+                                                        "Are you sure you want "
+                                                        "to wipe the %u "
+                                                        "selected items?",
+                                                        n_items),
+                                            n_items);
   } else if (n_items > 0) {
     gchar *name;
     
