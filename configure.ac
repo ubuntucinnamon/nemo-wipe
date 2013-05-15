@@ -38,10 +38,10 @@ GIO_UNIX_REQUIRED=2.0
 # choose whether to use GTK2 or GTK3
 AC_ARG_WITH([gtk3],
             [AS_HELP_STRING([--with-gtk3],
-                            [build for GTK3 instead of GTK2 [[default=auto]]])],
+                            [whether to build with GTK2 or GTK3 [[default=auto]]])],
             [with_gtk3="$withval"],
             [with_gtk3=check])
-# use GTK2 by default but if not found
+# use GTK3 by default but if not found
 AC_MSG_CHECKING([for GTK package to use])
 gtk_pkg="gtk+-3.0"
 AS_IF([test "x$with_gtk3" = xcheck],
