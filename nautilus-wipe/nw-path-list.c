@@ -28,7 +28,9 @@
 #include <string.h>
 #include <glib.h>
 #include <libnautilus-extension/nautilus-file-info.h>
-#include <gconf/gconf-client.h>
+#ifdef HAVE_GCONF
+# include <gconf/gconf-client.h>
+#endif
 
 
 /* checks whether a #NautilusFileInfo have the given URI scheme */
@@ -53,18 +55,25 @@ nfi_has_uri_scheme (NautilusFileInfo *nfi,
 static gchar *
 get_desktop_path (void)
 {
-  gchar        *path = NULL;
-  GConfClient  *conf_client;
+  gchar *path = NULL;
   
-  conf_client = gconf_client_get_default ();
-  if (gconf_client_get_bool (conf_client,
-                             "/apps/nautilus/preferences/desktop_is_home_dir",
-                             NULL)) {
-    path = g_strdup (g_get_home_dir ());
-  } else {
+#ifdef HAVE_GCONF
+  if (! path) {
+    GConfClient *conf_client;
+    
+    conf_client = gconf_client_get_default ();
+    if (gconf_client_get_bool (conf_client,
+                               "/apps/nautilus/preferences/desktop_is_home_dir",
+                               NULL)) {
+      path = g_strdup (g_get_home_dir ());
+    }
+    g_object_unref (conf_client);
+  }
+#endif /* HAVE_GCONF */
+  
+  if (! path) {
     path = g_strdup (g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP));
   }
-  g_object_unref (conf_client);
   
   return path;
 }

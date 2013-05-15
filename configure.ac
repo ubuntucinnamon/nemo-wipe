@@ -55,9 +55,12 @@ AC_MSG_RESULT([$gtk_pkg])
 # mandatory packages
 PKG_CHECK_MODULES([GLIB],                   glib-2.0              >= ${GLIB_REQUIRED})
 PKG_CHECK_MODULES([GTK],                    $gtk_pkg              >= ${GTK_REQUIRED})
-PKG_CHECK_MODULES([GCONF],                  gconf-2.0             >= ${GCONF_REQUIRED})
 PKG_CHECK_MODULES([LIBNAUTILUS_EXTENSION],  libnautilus-extension >= ${NAUTILUS_EXTENSION})
 PKG_CHECK_MODULES([GSECUREDELETE],          gsecuredelete         >= ${GSECUREDELETE_REQUIRED})
+# GConf is mandatory, but only for Nautilus 2.x
+AS_IF([test "$gtk_pkg" = "gtk+-2.0"],
+      [PKG_CHECK_MODULES([GCONF], gconf-2.0 >= ${GCONF_REQUIRED})
+       AC_DEFINE([HAVE_GCONF], [1], [Whether we have GConf])])
 
 # optional packages
 HAVE_GIO_UNIX=0

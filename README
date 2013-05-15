@@ -14,7 +14,7 @@ Dependancies
 - libnautilus-extension 2.x or 3.x (http://live.gnome.org/Nautilus)
 - GTK2 >= 2.6 or GTK3 (http://www.gtk.org)
 - libgsecuredelete (http://wipetools.tuxfamily.org/libgsecuredelete.html)
-- GConf 2.x (http://projects.gnome.org/gconf/)
+- GConf 2.x (http://projects.gnome.org/gconf/) -- only needed for Nautilus 2.x
 
 Build dependancies
 ==================
