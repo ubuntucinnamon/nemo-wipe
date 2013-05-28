@@ -1,3 +1,13 @@
+0.2 (2013-05-28):
+
+  Minor improvements release with major code changes.
+
+  * Code refactoring and cleanup
+  * Build for Nautilus 3.x by default
+  * Drop GConf dependency for Nautilus 3.x
+  * New translations: de, ru
+
+
 0.1.1 (2011-08-18):
 
   Minor improvements of 0.1 release.

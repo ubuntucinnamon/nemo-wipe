@@ -5,7 +5,7 @@
 # Valery Ryaboshapko <valera@creator.su>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: nautilus-wipe 0.1.1\n"
+"Project-Id-Version: nautilus-wipe 0.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-12 15:54+0200\n"
 "PO-Revision-Date: 2013-05-11 18:06+0400\n"
