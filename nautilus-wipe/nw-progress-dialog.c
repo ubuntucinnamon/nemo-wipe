@@ -195,8 +195,6 @@ nw_progress_dialog_init (NwProgressDialog *self)
 static void
 nw_progress_dialog_finalize (GObject *obj)
 {
-  NwProgressDialog *self = NW_PROGRESS_DIALOG (obj);
-  
   G_OBJECT_CLASS (nw_progress_dialog_parent_class)->finalize (obj);
 }
 
