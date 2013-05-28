@@ -58,7 +58,7 @@ GType         nw_progress_dialog_get_type                   (void) G_GNUC_CONST;
 GtkWidget    *nw_progress_dialog_new                        (GtkWindow       *parent,
                                                              GtkDialogFlags   flags,
                                                              const gchar     *format,
-                                                             ...);
+                                                             ...) G_GNUC_PRINTF (3, 4);
 void          nw_progress_dialog_set_fraction               (NwProgressDialog  *dialog,
                                                              gdouble            fraction);
 gdouble       nw_progress_dialog_get_fraction               (NwProgressDialog  *dialog);
@@ -68,11 +68,11 @@ void          nw_progress_dialog_set_pulse_step             (NwProgressDialog  *
 gdouble       nw_progress_dialog_get_pulse_step             (NwProgressDialog  *dialog);
 void          nw_progress_dialog_set_progress_text          (NwProgressDialog  *dialog,
                                                              const gchar       *format,
-                                                             ...);
+                                                             ...) G_GNUC_PRINTF (2, 3);
 const gchar  *nw_progress_dialog_get_progress_text          (NwProgressDialog  *dialog);
 void          nw_progress_dialog_set_text                   (NwProgressDialog  *dialog,
                                                              const gchar       *format,
-                                                             ...);
+                                                             ...) G_GNUC_PRINTF (2, 3);
 const gchar  *nw_progress_dialog_get_text                   (NwProgressDialog  *dialog);
 void          nw_progress_dialog_cancel                     (NwProgressDialog  *dialog);
 gboolean      nw_progress_dialog_is_canceled                (NwProgressDialog  *dialog);

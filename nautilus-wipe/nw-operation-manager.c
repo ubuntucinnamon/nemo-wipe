@@ -535,7 +535,7 @@ nw_operation_manager_run (GtkWindow    *parent,
     opdata->window_destroy_hid = g_signal_connect (opdata->window, "destroy",
                                                    G_CALLBACK (opdata_window_destroy_handler), opdata);
     opdata->progress_dialog = NW_PROGRESS_DIALOG (nw_progress_dialog_new (opdata->window, 0,
-                                                                          progress_dialog_text));
+                                                                          "%s", progress_dialog_text));
     nw_progress_dialog_set_has_cancel_button (opdata->progress_dialog, TRUE);
     g_signal_connect (opdata->progress_dialog, "response",
                       G_CALLBACK (progress_dialog_response_handler), opdata);
