@@ -5,7 +5,7 @@ AC_INIT([nautilus-wipe], [0.2], [ban@herbesfolles.org])
 AC_CONFIG_SRCDIR([nautilus-wipe/nw-extension.h])
 AC_CONFIG_AUX_DIR([build/aux])
 AC_CONFIG_MACRO_DIR([build/m4])
-AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror foreign])
+AM_INIT_AUTOMAKE([1.11.1 -Wall -Wno-portability -Werror foreign])
 AC_CONFIG_HEADERS([config.h])
 
 AM_SILENT_RULES([yes])
