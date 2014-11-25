@@ -204,7 +204,7 @@ nw_extension_run_fill_operation (GtkWindow *parent,
                                             name);
     success_secondary_text = g_strdup_printf (_("Available disk space on the "
                                                 "partition or device \"%s\" "
-                                                "have been successfully wiped."),
+                                                "has been successfully wiped."),
                                               name);
     g_free (name);
   }
