@@ -444,7 +444,7 @@
     <sect2 id="nautilus-wipe-fast-mode">
       <title>Fast and insecure mode (no /dev/urandom, no synchronize mode)</title>
       <para>
-        Fastens the wipe at the expense of security:
+        Speeds up the wipe at the expense of security:
       </para>
       <itemizedlist>
         <listitem>
