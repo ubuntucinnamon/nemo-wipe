@@ -360,6 +360,13 @@
           will be a <guimenuitem>Wipe available diskspace</guimenuitem> entry in the context
           menu.
         </para>
+        <para>
+          Only the unused diskspace will be wiped by this operation, and no
+          existing files will be affected. New files created while the
+          operation is running will not be affected either, but files deleted
+          in an insecure manner from the same storage medium during the
+          operation might be wiped.
+        </para>
       </sect3>
     </sect2>
     <sect2 id="nautilus-wipe-confirmation-dialog">
