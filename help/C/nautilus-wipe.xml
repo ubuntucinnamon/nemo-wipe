@@ -29,7 +29,7 @@
     <title>&app; Manual V&manrevision;</title>
 
     <abstract role="description">
-      <para>&app; allows you to wipe files or available diskspace from
+      <para>&app; allows you to wipe files or available disk space from
       <application>Nautilus</application></para>
     </abstract>
 
@@ -167,7 +167,7 @@
     <title>Overview</title>
     <para>
       &app; allows you to wipe files or
-      available diskspace from <application>Nautilus</application>.
+      available disk space from <application>Nautilus</application>.
     </para>
     <para>
       Usually when you delete a file, even when bypassing the trash, it is
@@ -326,7 +326,7 @@
           <listitem>
             <para>
               renaming of the file, so that an attacker can't draw any conclusion
-              from the filename on the contents of the deleted file.
+              from the file name on the contents of the deleted file.
             </para>
           </listitem>
           <listitem>
@@ -352,16 +352,16 @@
         </para>
       </sect3>
       <sect3 id="nautilus-wipe-fill">
-        <title>Wiping available diskspace on storage media</title>
+        <title>Wiping available disk space on storage media</title>
         <para>
           Select a file or a directory which is on the partition on which you
-          want to wipe the available diskspace, and right-click on it. If
+          want to wipe the available disk space, and right-click on it. If
           &app; is able to wipe it, there
-          will be a <guimenuitem>Wipe available diskspace</guimenuitem> entry in the context
+          will be a <guimenuitem>Wipe available disk space</guimenuitem> entry in the context
           menu.
         </para>
         <para>
-          Only the unused diskspace will be wiped by this operation, and no
+          Only the unused disk space will be wiped by this operation, and no
           existing files will be affected. New files created while the
           operation is running will not be affected either, but files deleted
           in an insecure manner from the same storage medium during the
@@ -382,11 +382,11 @@
       <para>
         If you confirm the wipe, a dialog will appear to let you see the
         progression of the deletion. For big files or partitions with a lot
-        of available diskspace, wiping can take hours.
+        of available disk space, wiping can take hours.
       </para>
       <para>
         It's possible, but discouraged, to cancel the wipe process. This
-        would kill the underlaying <application>secure-delete</application> program
+        would kill the underlying <application>secure-delete</application> program
         and could lead to strange things like files partially overwritten
         but not deleted or big junk files.
       </para>
