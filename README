@@ -22,10 +22,7 @@ Build dependencies
 - make
 - gcc
 - intltool
-- gnome-doc-utils
-
-Some distributions might also require one of `rarian-compat` or
-`scrollkeeper` together with `gnome-doc-utils`.
+- yelp-tools
 
 If you are building from Git rather than a tarball, you also need
 `autoconf`, `automake` (>= 1.11.1) and `libtool` (>= 2.2).

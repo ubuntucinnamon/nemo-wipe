@@ -1,9 +1,7 @@
-include $(top_srcdir)/build/aux/gnome-doc-utils.make
-dist-hook: doc-dist-hook
+@YELP_HELP_RULES@
 
-DOC_MODULE = nautilus-wipe
-DOC_ENTITIES = legal.xml
-DOC_INCLUDES = 
-DOC_FIGURES = 
+HELP_ID = nautilus-wipe
+HELP_FILES = index.docbook
+HELP_EXTRA = legal.xml
 
-DOC_LINGUAS = 
+HELP_LINGUAS = 

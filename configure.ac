@@ -18,7 +18,7 @@ AM_PROG_CC_C_O
 IT_PROG_INTLTOOL
 PKG_PROG_PKG_CONFIG([0.9])
 
-GNOME_DOC_INIT
+YELP_HELP_INIT
 
 # Checks for libraries.
 # 2.6 for gtk_message_dialog_format_secondary_text()

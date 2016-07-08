@@ -16,5 +16,3 @@ build/
 po/Makefile.in.in
 po/POTFILES
 po/*.gmo
-
-help/*.omf
