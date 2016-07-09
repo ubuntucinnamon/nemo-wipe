@@ -144,7 +144,10 @@ nw_extension_run_delete_operation (GtkWindow *parent,
     _("Wipe failed."),
     /* success dialog */
     _("Wipe successful."),
-    _("Item(s) have been successfully wiped.")
+    g_dngettext(GETTEXT_PACKAGE,
+                "The item has been successfully wiped.",
+                "The items have been successfully wiped.",
+                n_items)
   );
   g_free (confirm_primary_text);
 }
@@ -284,7 +287,12 @@ create_fill_menu_item (NautilusMenuProvider *provider,
   } else {
     item = nautilus_menu_item_new (item_name,
                                    _("Wipe available disk space"),
-                                   _("Overwrite available disk space in this device(s)"),
+                                   g_dngettext(GETTEXT_PACKAGE,
+                                               "Wipe available disk space on "
+                                               "this partition or device",
+                                               "Wipe available disk space on "
+                                               "these partitions or devices",
+                                               g_list_length (mountpoints)),
                                    GTK_STOCK_CLEAR);
     g_object_set_data (G_OBJECT (item), ITEM_DATA_WINDOW_KEY, window);
     g_object_set_data_full (G_OBJECT (item), ITEM_DATA_PATHS_KEY,
