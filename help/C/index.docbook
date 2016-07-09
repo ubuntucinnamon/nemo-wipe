@@ -182,7 +182,7 @@
       THC
         <footnote>
           <para>
-            [1]. Secure-delete, van Hauser / THC <email>vh@thc.org</email>,
+            Secure-delete, van Hauser / THC <email>vh@thc.org</email>,
             1997-2003
             <ulink url="http://www.thc.org">
               <literal>http://www.thc.org</literal>
@@ -220,7 +220,7 @@
         a magnetic hard disk, it is known
         <footnote>
           <para>
-            [2]. Peter Gutmann: Secure Deletion of Data from Magnetic and
+            Peter Gutmann: Secure Deletion of Data from Magnetic and
             Solid-State Memory, 6th Usenix Security Symposium, 1996
             <ulink url="http://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html">
               <literal>http://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html</literal>
