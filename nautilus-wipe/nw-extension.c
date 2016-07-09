@@ -214,7 +214,7 @@ nw_extension_run_fill_operation (GtkWindow *parent,
     /* confirm dialog */
     confirm_primary_text,
     _("This operation may take a while."),
-    _("_Wipe available disk space"),
+    _("_Wipe"),
     gtk_image_new_from_stock (GTK_STOCK_CLEAR, GTK_ICON_SIZE_BUTTON),
     /* progress dialog */
     _("Wiping available disk space..."),
