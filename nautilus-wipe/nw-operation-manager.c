@@ -39,6 +39,7 @@
 static GtkResponseType  display_dialog     (GtkWindow       *parent,
                                             GtkMessageType   type,
                                             gboolean         wait_for_response,
+                                            const gchar     *title,
                                             const gchar     *primary_text,
                                             const gchar     *secondary_text,
                                             const gchar     *first_button_text,
@@ -54,6 +55,7 @@ static GtkResponseType  display_dialog     (GtkWindow       *parent,
  *                     response. If this options is %TRUE, this function will
  *                     always return %GTK_RESPONSE_NONE.
  *                     Use this if you want a modal dialog.
+ * @title: GtkMessageDialog's title
  * @primary_text: GtkMessageDialog's primary text
  * @secondary_text: GtkMessageDialog's secondary text, or %NULL
  * @first_button_text: Text of the first button, or %NULL
@@ -67,6 +69,7 @@ static GtkResponseType
 display_dialog (GtkWindow       *parent,
                 GtkMessageType   type,
                 gboolean         wait_for_response,
+                const gchar     *title,
                 const gchar     *primary_text,
                 const gchar     *secondary_text,
                 const gchar     *first_button_text,
@@ -80,6 +83,7 @@ display_dialog (GtkWindow       *parent,
                                    GTK_DIALOG_DESTROY_WITH_PARENT,
                                    type, GTK_BUTTONS_NONE,
                                    "%s", primary_text);
+  gtk_window_set_title (GTK_WINDOW (dialog), title);
   if (secondary_text) {
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                               "%s", secondary_text);
@@ -144,6 +148,7 @@ struct NwOperationData
   GtkWindow          *window;
   gulong              window_destroy_hid;
   NwProgressDialog   *progress_dialog;
+  gchar              *title;
   gchar              *failed_primary_text;
   gchar              *success_primary_text;
   gchar              *success_secondary_text;
@@ -159,6 +164,7 @@ free_opdata (struct NwOperationData *opdata)
   if (opdata->operation) {
     g_object_unref (opdata->operation);
   }
+  g_free (opdata->title);
   g_free (opdata->failed_primary_text);
   g_free (opdata->success_primary_text);
   g_free (opdata->success_secondary_text);
@@ -193,6 +199,7 @@ display_operation_error (struct NwOperationData  *opdata,
                                    GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_ERROR, GTK_BUTTONS_NONE,
                                    "%s", opdata->failed_primary_text);
+  gtk_window_set_title (GTK_WINDOW (dialog), opdata->title);
   gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
   /* we hope that the last line in the error message is meaningful */
   short_error = string_last_line (error);
@@ -233,7 +240,7 @@ operation_finished_handler (GsdDeleteOperation *operation,
   if (! success) {
     display_operation_error (opdata, error);
   } else {
-    display_dialog (opdata->window, GTK_MESSAGE_INFO, FALSE,
+    display_dialog (opdata->window, GTK_MESSAGE_INFO, FALSE, opdata->title,
                     opdata->success_primary_text,
                     opdata->success_secondary_text,
                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
@@ -290,6 +297,7 @@ help_button_clicked_handler (GtkWidget *widget,
      * dialog ran by gtk_dialog_run(), then the dialog must be ran the same way
      * to get events */
     display_dialog (parent, GTK_MESSAGE_ERROR, TRUE,
+                    gtk_window_get_title (parent),
                     _("Failed to open help"),
                     err->message,
                     GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
@@ -301,6 +309,7 @@ help_button_clicked_handler (GtkWidget *widget,
 /*
  * operation_confirm_dialog:
  * @parent: Parent window, or %NULL for none
+ * @title: Dialog's title
  * @primary_text: Dialog's primary text
  * @secondary_text: Dialog's secondary text
  * @confirm_button_text: Text of the button to hit in order to confirm (can be a
@@ -317,6 +326,7 @@ help_button_clicked_handler (GtkWidget *widget,
  */
 static gboolean
 operation_confirm_dialog (GtkWindow                    *parent,
+                          const gchar                  *title,
                           const gchar                  *primary_text,
                           const gchar                  *secondary_text,
                           const gchar                  *confirm_button_text,
@@ -334,6 +344,7 @@ operation_confirm_dialog (GtkWindow                    *parent,
                                    GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
                                    "%s", primary_text);
+  gtk_window_set_title (GTK_WINDOW (dialog), title);
   action_area = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
   if (secondary_text) {
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
@@ -468,6 +479,7 @@ progress_dialog_response_handler (GtkDialog *dialog,
     case GTK_RESPONSE_CANCEL:
     case GTK_RESPONSE_DELETE_EVENT:
       if (display_dialog (GTK_WINDOW (dialog), GTK_MESSAGE_QUESTION, TRUE,
+                          opdata->title,
                           _("Are you sure you want to cancel this operation?"),
                           _("Canceling this operation might leave some item(s) in "
                             "an intermediate state."),
@@ -506,6 +518,7 @@ progress_dialog_response_handler (GtkDialog *dialog,
 void
 nw_operation_manager_run (GtkWindow    *parent,
                           GList        *files,
+                          const gchar  *title,
                           const gchar  *confirm_primary_text,
                           const gchar  *confirm_secondary_text,
                           const gchar  *confirm_button_text,
@@ -521,7 +534,7 @@ nw_operation_manager_run (GtkWindow    *parent,
   GsdSecureDeleteOperationMode  delete_mode = GSD_SECURE_DELETE_OPERATION_MODE_INSECURE;
   gboolean                      zeroise     = FALSE;
   
-  if (! operation_confirm_dialog (parent,
+  if (! operation_confirm_dialog (parent, title,
                                   confirm_primary_text, confirm_secondary_text,
                                   confirm_button_text, confirm_button_icon,
                                   &fast, &delete_mode, &zeroise)) {
@@ -536,9 +549,11 @@ nw_operation_manager_run (GtkWindow    *parent,
                                                    G_CALLBACK (opdata_window_destroy_handler), opdata);
     opdata->progress_dialog = NW_PROGRESS_DIALOG (nw_progress_dialog_new (opdata->window, 0,
                                                                           "%s", progress_dialog_text));
+    gtk_window_set_title (GTK_WINDOW (opdata->progress_dialog), title);
     nw_progress_dialog_set_has_cancel_button (opdata->progress_dialog, TRUE);
     g_signal_connect (opdata->progress_dialog, "response",
                       G_CALLBACK (progress_dialog_response_handler), opdata);
+    opdata->title = g_strdup (title);
     opdata->failed_primary_text = g_strdup (failed_primary_text);
     opdata->success_primary_text = g_strdup (success_primary_text);
     opdata->success_secondary_text = g_strdup (success_secondary_text);

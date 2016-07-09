@@ -130,6 +130,7 @@ nw_extension_run_delete_operation (GtkWindow *parent,
   }
   nw_operation_manager_run (
     parent, files,
+    _("Wipe Files"),
     /* confirm dialog */
     confirm_primary_text,
     _("If you wipe an item, it will not be recoverable."),
@@ -206,6 +207,7 @@ nw_extension_run_fill_operation (GtkWindow *parent,
   }
   nw_operation_manager_run (
     parent, paths,
+    _("Wipe Available Disk Space"),
     /* confirm dialog */
     confirm_primary_text,
     _("This operation may take a while."),

@@ -33,6 +33,7 @@ G_BEGIN_DECLS
 
 void    nw_operation_manager_run  (GtkWindow   *parent,
                                    GList       *files,
+                                   const gchar *title,
                                    const gchar *confirm_primary_text,
                                    const gchar *confirm_secondary_text,
                                    const gchar *confirm_button_text,
