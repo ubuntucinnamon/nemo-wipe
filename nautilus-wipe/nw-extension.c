@@ -182,10 +182,10 @@ nw_extension_run_fill_operation (GtkWindow *parent,
       g_free (name);
     }
     confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe "
-                                              "the available diskspace on the "
+                                              "the available disk space on the "
                                               "%s partitions or devices?"),
                                             devices->str);
-    success_secondary_text = g_strdup_printf (_("Available diskspace on the "
+    success_secondary_text = g_strdup_printf (_("Available disk space on the "
                                                 "partitions or devices %s "
                                                 "have been successfully wiped."),
                                               devices->str);
@@ -195,10 +195,10 @@ nw_extension_run_fill_operation (GtkWindow *parent,
     
     name = g_filename_display_name (mountpoints->data);
     confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe "
-                                              "the available diskspace on the "
+                                              "the available disk space on the "
                                               "\"%s\" partition or device?"),
                                             name);
-    success_secondary_text = g_strdup_printf (_("Available diskspace on the "
+    success_secondary_text = g_strdup_printf (_("Available disk space on the "
                                                 "partition or device \"%s\" "
                                                 "have been successfully wiped."),
                                               name);
@@ -209,10 +209,10 @@ nw_extension_run_fill_operation (GtkWindow *parent,
     /* confirm dialog */
     confirm_primary_text,
     _("This operation may take a while."),
-    _("_Wipe available diskspace"),
+    _("_Wipe available disk space"),
     gtk_image_new_from_stock (GTK_STOCK_CLEAR, GTK_ICON_SIZE_BUTTON),
     /* progress dialog */
-    _("Wiping available diskspace..."),
+    _("Wiping available disk space..."),
     /* operation launcher */
     nw_fill_operation_new (),
     /* failed dialog */
@@ -281,8 +281,8 @@ create_fill_menu_item (NautilusMenuProvider *provider,
     g_error_free (err);
   } else {
     item = nautilus_menu_item_new (item_name,
-                                   _("Wipe available diskspace"),
-                                   _("Overwrite available diskspace in this device(s)"),
+                                   _("Wipe available disk space"),
+                                   _("Overwrite available disk space in this device(s)"),
                                    GTK_STOCK_CLEAR);
     g_object_set_data (G_OBJECT (item), ITEM_DATA_WINDOW_KEY, window);
     g_object_set_data_full (G_OBJECT (item), ITEM_DATA_PATHS_KEY,
