@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-wipe 0.2\n"
 "Report-Msgid-Bugs-To: ban@herbesfolles.org\n"
-"POT-Creation-Date: 2016-07-09 03:02+0200\n"
-"PO-Revision-Date: 2013-05-12 15:49+0200\n"
+"POT-Creation-Date: 2016-07-09 04:58+0200\n"
+"PO-Revision-Date: 2016-07-09 05:03+0200\n"
 "Last-Translator: Colomban Wendling <ban@herbesfolles.org>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -40,181 +40,194 @@ msgstr[1] "Êtes-vous sûr de vouloir écraser les %u éléments sélectionnés�
 msgid "Are you sure you want to wipe \"%s\"?"
 msgstr "Êtes-vous sûr de vouloir écraser « %s » ?"
 
-#: nautilus-wipe/nw-extension.c:135
+#: nautilus-wipe/nw-extension.c:133
+msgid "Wipe Files"
+msgstr "Écraser des fichiers"
+
+#: nautilus-wipe/nw-extension.c:136
 msgid "If you wipe an item, it will not be recoverable."
 msgstr "Si vous écrasez un élément, il ne pourra plus être récupéré."
 
-#: nautilus-wipe/nw-extension.c:136
+#: nautilus-wipe/nw-extension.c:137
 msgid "_Wipe"
 msgstr "Éc_raser"
 
-#: nautilus-wipe/nw-extension.c:139
+#: nautilus-wipe/nw-extension.c:140
 msgid "Wiping files..."
 msgstr "Écrasement des fichiers…"
 
-#: nautilus-wipe/nw-extension.c:143
+#: nautilus-wipe/nw-extension.c:144
 msgid "Wipe failed."
 msgstr "L'écrasement a échoué."
 
-#: nautilus-wipe/nw-extension.c:145
+#: nautilus-wipe/nw-extension.c:146
 msgid "Wipe successful."
 msgstr "L'écrasement a réussi."
 
-#: nautilus-wipe/nw-extension.c:146
-msgid "Item(s) have been successfully wiped."
-msgstr "Le(s) élément(s) ont été écrasé(s) avec succès."
+#: nautilus-wipe/nw-extension.c:148
+msgid "The item has been successfully wiped."
+msgid_plural "The items have been successfully wiped."
+msgstr[0] "L'élément a été écrasé avec succès."
+msgstr[1] "Les éléments ont été écrasés avec succès."
 
 #. TRANSLATORS: this is the last device names separator
-#: nautilus-wipe/nw-extension.c:174
+#: nautilus-wipe/nw-extension.c:178
 msgid " and "
 msgstr " et "
 
 #. TRANSLATORS: this is the device names separator (except last)
-#: nautilus-wipe/nw-extension.c:177
+#: nautilus-wipe/nw-extension.c:181
 msgid ", "
 msgstr ", "
 
 #. TRANSLATORS: this is the device name
-#: nautilus-wipe/nw-extension.c:181
+#: nautilus-wipe/nw-extension.c:185
 #, c-format
 msgid "\"%s\""
 msgstr "« %s »"
 
-#: nautilus-wipe/nw-extension.c:184
+#: nautilus-wipe/nw-extension.c:188
 #, c-format
 msgid ""
-"Are you sure you want to wipe the available diskspace on the %s partitions "
+"Are you sure you want to wipe the available disk space on the %s partitions "
 "or devices?"
 msgstr ""
 "Êtes-vous sûr de vouloir écraser l'espace disque libre sur les partitions ou "
 "périphériques %s ?"
 
-#: nautilus-wipe/nw-extension.c:188
+#: nautilus-wipe/nw-extension.c:192
 #, c-format
 msgid ""
-"Available diskspace on the partitions or devices %s have been successfully "
+"Available disk space on the partitions or devices %s have been successfully "
 "wiped."
 msgstr ""
 "L'espace disque disponible sur les partitions ou périphériques %s a été "
 "écrasé avec succès."
 
-#: nautilus-wipe/nw-extension.c:197
+#: nautilus-wipe/nw-extension.c:201
 #, c-format
 msgid ""
-"Are you sure you want to wipe the available diskspace on the \"%s\" "
+"Are you sure you want to wipe the available disk space on the \"%s\" "
 "partition or device?"
 msgstr ""
 "Êtes-vous sûr de vouloir écraser l'espace disque disponible sur la partition "
 "ou le périphérique « %s » ?"
 
-#: nautilus-wipe/nw-extension.c:201
+#: nautilus-wipe/nw-extension.c:205
 #, c-format
 msgid ""
-"Available diskspace on the partition or device \"%s\" have been successfully "
-"wiped."
+"Available disk space on the partition or device \"%s\" have been "
+"successfully wiped."
 msgstr ""
 "L'espace disque disponible sur la partition ou le périphérique « %s » a été "
 "écrasé avec succès."
 
-#: nautilus-wipe/nw-extension.c:211
+#: nautilus-wipe/nw-extension.c:213
+msgid "Wipe Available Disk Space"
+msgstr "Écraser l'espace disque disponible"
+
+#: nautilus-wipe/nw-extension.c:216
 msgid "This operation may take a while."
 msgstr "Cette opération peut prendre du temps."
 
-#: nautilus-wipe/nw-extension.c:212
-msgid "_Wipe available diskspace"
+#: nautilus-wipe/nw-extension.c:217
+msgid "_Wipe available disk space"
 msgstr "Éc_raser l'espace disque disponible"
 
-#: nautilus-wipe/nw-extension.c:215
-msgid "Wiping available diskspace..."
+#: nautilus-wipe/nw-extension.c:220
+msgid "Wiping available disk space..."
 msgstr "Écrasement de l'espace disque disponible…"
 
-#: nautilus-wipe/nw-extension.c:219
+#: nautilus-wipe/nw-extension.c:224
 msgid "Wipe failed"
 msgstr "L'écrasement a échoué"
 
-#: nautilus-wipe/nw-extension.c:221
+#: nautilus-wipe/nw-extension.c:226
 msgid "Wipe successful"
 msgstr "L'écrasement a réussi"
 
-#: nautilus-wipe/nw-extension.c:246
+#: nautilus-wipe/nw-extension.c:251
 msgid "Wipe"
 msgstr "Écraser"
 
-#: nautilus-wipe/nw-extension.c:247
+#: nautilus-wipe/nw-extension.c:252
 msgid "Delete each selected item and overwrite its data"
 msgstr "Supprime chaque élément sélectionné et écraser son contenu"
 
-#: nautilus-wipe/nw-extension.c:280
+#: nautilus-wipe/nw-extension.c:285
 #, c-format
 msgid "File filtering failed: %s"
 msgstr "Le filtrage des fichiers a échoué : %s"
 
-#: nautilus-wipe/nw-extension.c:284
-msgid "Wipe available diskspace"
+#: nautilus-wipe/nw-extension.c:289
+msgid "Wipe available disk space"
 msgstr "Écraser l'espace disque disponible"
 
-#: nautilus-wipe/nw-extension.c:285
-msgid "Overwrite available diskspace in this device(s)"
-msgstr ""
-"Écrase l'espace disque disponible sur le(s) périphérique(s) sélectionné(s)"
+#: nautilus-wipe/nw-extension.c:291
+msgid "Wipe available disk space on this partition or device"
+msgid_plural "Wipe available disk space on these partitions or devices"
+msgstr[0] ""
+"Écrase l'espace disque disponible sur cette partition ou périphérique"
+msgstr[1] ""
+"Écrase l'espace disque disponible sur ces partitions ou périphérique"
 
-#: nautilus-wipe/nw-operation-manager.c:204
+#: nautilus-wipe/nw-operation-manager.c:211
 msgid "_Details"
 msgstr "_Détails"
 
-#: nautilus-wipe/nw-operation-manager.c:293
+#: nautilus-wipe/nw-operation-manager.c:301
 msgid "Failed to open help"
 msgstr "Impossible d'ouvrir l'aide"
 
-#: nautilus-wipe/nw-operation-manager.c:366
+#: nautilus-wipe/nw-operation-manager.c:377
 msgid "_Options"
 msgstr "_Options"
 
-#: nautilus-wipe/nw-operation-manager.c:380
+#: nautilus-wipe/nw-operation-manager.c:391
 msgid "Number of _passes:"
 msgstr "Nombre de _passes :"
 
-#: nautilus-wipe/nw-operation-manager.c:415
+#: nautilus-wipe/nw-operation-manager.c:426
 msgid "(Gutmann method for old disks)"
 msgstr "(méthode de Gutmann pour les vieux disques)"
 
-#: nautilus-wipe/nw-operation-manager.c:417
+#: nautilus-wipe/nw-operation-manager.c:428
 msgid "(advised for modern hard disks)"
 msgstr "(méthode recommandée pour les disques actuels)"
 
-#: nautilus-wipe/nw-operation-manager.c:419
+#: nautilus-wipe/nw-operation-manager.c:430
 msgid "(only protects against software attacks)"
 msgstr "(protège seulement des attaques logicielles)"
 
-#: nautilus-wipe/nw-operation-manager.c:432
+#: nautilus-wipe/nw-operation-manager.c:443
 msgid "_Fast and insecure mode (no /dev/urandom, no synchronize mode)"
 msgstr ""
 "_Mode rapide et peu sûr (pas de /dev/urandom, pas de mode de synchronisation)"
 
-#: nautilus-wipe/nw-operation-manager.c:444
+#: nautilus-wipe/nw-operation-manager.c:455
 msgid "Last pass with _zeros instead of random data"
 msgstr "Dernière passe avec des _zéros à la place de données aléatoires"
 
-#: nautilus-wipe/nw-operation-manager.c:471
+#: nautilus-wipe/nw-operation-manager.c:483
 msgid "Are you sure you want to cancel this operation?"
 msgstr "Êtes-vous sûr de vouloir annuler cette opération ?"
 
-#: nautilus-wipe/nw-operation-manager.c:472
+#: nautilus-wipe/nw-operation-manager.c:484
 msgid ""
 "Canceling this operation might leave some item(s) in an intermediate state."
 msgstr ""
 "Annuler cette opération peut laisser certains éléments dans un état "
 "intermédiaire."
 
-#: nautilus-wipe/nw-operation-manager.c:474
+#: nautilus-wipe/nw-operation-manager.c:486
 msgid "Resume operation"
 msgstr "Reprendre l'opération"
 
-#: nautilus-wipe/nw-operation-manager.c:475
+#: nautilus-wipe/nw-operation-manager.c:487
 msgid "Cancel operation"
 msgstr "Annuler l'opération"
 
-#: nautilus-wipe/nw-operation-manager.c:564
+#: nautilus-wipe/nw-operation-manager.c:579
 #, c-format
 msgid ""
 "%s. Please make sure you have the secure-delete package properly installed "
