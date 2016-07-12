@@ -185,6 +185,7 @@ opdata_window_destroy_handler (GtkWidget               *obj,
 /* Displays an operation's error */
 static void
 display_operation_error (struct NwOperationData  *opdata,
+                         gboolean                 is_warning,
                          const gchar             *error)
 {
   GtkWidget      *dialog;
@@ -197,14 +198,34 @@ display_operation_error (struct NwOperationData  *opdata,
   
   dialog = gtk_message_dialog_new (opdata->window,
                                    GTK_DIALOG_DESTROY_WITH_PARENT,
-                                   GTK_MESSAGE_ERROR, GTK_BUTTONS_NONE,
-                                   "%s", opdata->failed_primary_text);
+                                   is_warning ? GTK_MESSAGE_WARNING
+                                              : GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_NONE,
+                                   "%s",
+                                   is_warning ? opdata->success_primary_text
+                                              : opdata->failed_primary_text);
   gtk_window_set_title (GTK_WINDOW (dialog), opdata->title);
   gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
   /* we hope that the last line in the error message is meaningful */
   short_error = string_last_line (error);
-  gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
-                                            "%s", short_error);
+  if (is_warning) {
+    const gchar *conditional = _("However, the following warning was issued "
+                                 "during the operation:");
+    
+    if (opdata->success_secondary_text) {
+      gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                                "%s\n\n%s\n%s",
+                                                opdata->success_secondary_text,
+                                                conditional, short_error);
+    } else {
+      gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                                "%s\n%s",
+                                                conditional, short_error);
+    }
+  } else {
+    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                              "%s", short_error);
+  }
   g_free (short_error);
   /* add the details expander */
   content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
@@ -237,8 +258,8 @@ operation_finished_handler (GsdDeleteOperation *operation,
   struct NwOperationData *opdata = data;
   
   gtk_widget_destroy (GTK_WIDGET (opdata->progress_dialog));
-  if (! success) {
-    display_operation_error (opdata, error);
+  if (! success || error) {
+    display_operation_error (opdata, success, error);
   } else {
     display_dialog (opdata->window, GTK_MESSAGE_INFO, FALSE, opdata->title,
                     opdata->success_primary_text,
@@ -580,10 +601,10 @@ nw_operation_manager_run (GtkWindow    *parent,
                                      "Please make sure you have the secure-delete "
                                      "package properly installed on your system."),
                                    err->message);
-        display_operation_error (opdata, message);
+        display_operation_error (opdata, FALSE, message);
         g_free (message);
       } else {
-        display_operation_error (opdata, err->message);
+        display_operation_error (opdata, FALSE, err->message);
       }
       g_error_free (err);
       gtk_widget_destroy (GTK_WIDGET (opdata->progress_dialog));

@@ -67,13 +67,14 @@ static void     nw_fill_operation_progress_handler      (GsdFillOperation *opera
 
 
 struct _NwFillOperationPrivate {
-  GList  *directories;
+  GList    *directories;
   
-  guint   n_op;
-  guint   n_op_done;
+  guint     n_op;
+  guint     n_op_done;
+  GString  *message;
   
-  gulong  progress_hid;
-  gulong  finished_hid;
+  gulong    progress_hid;
+  gulong    finished_hid;
 };
 
 G_DEFINE_TYPE_WITH_CODE (NwFillOperation,
@@ -109,6 +110,7 @@ nw_fill_operation_init (NwFillOperation *self)
   self->priv->directories = NULL;
   self->priv->n_op = 0;
   self->priv->n_op_done = 0;
+  self->priv->message = NULL;
   
   self->priv->finished_hid = g_signal_connect (self, "finished",
                                                G_CALLBACK (nw_fill_operation_finished_handler),
@@ -126,6 +128,11 @@ nw_fill_operation_finalize (GObject *object)
   g_list_foreach (self->priv->directories, (GFunc) g_free, NULL);
   g_list_free (self->priv->directories);
   self->priv->directories = NULL;
+  
+  if (self->priv->message) {
+    g_string_free (self->priv->message, TRUE);
+    self->priv->message = NULL;
+  }
   
   G_OBJECT_CLASS (nw_fill_operation_parent_class)->finalize (object);
 }
@@ -161,6 +168,37 @@ nw_fill_operation_progress_handler (GsdFillOperation *operation,
   g_signal_handler_unblock (operation, self->priv->progress_hid);
 }
 
+static void
+append_error_message (NwFillOperation  *self,
+                      const gchar      *message)
+{
+  if (! self->priv->message) {
+    self->priv->message = g_string_new (message);
+  } else {
+    g_string_append (self->priv->message, "\n");
+    g_string_append (self->priv->message, message);
+  }
+}
+
+static void
+emit_final_finished (NwFillOperation *self,
+                     gboolean         success,
+                     const gchar     *message)
+{
+  const gchar *full_message;
+  
+  if (! self->priv->message) {
+    full_message = message;
+  } else {
+    append_error_message (self, message);
+    full_message = self->priv->message->str;
+  }
+  
+  g_signal_handler_block (self, self->priv->finished_hid);
+  g_signal_emit_by_name (self, "finished", success, full_message);
+  g_signal_handler_unblock (self, self->priv->finished_hid);
+}
+
 /* timeout function to launch next operation after finish of the previous
  * operation.
  * we need this kind of hack since operation are locked while running. */
@@ -178,9 +216,7 @@ launch_next_operation (NwFillOperation *self)
                                       self->priv->directories->data,
                                       &err);
     if (! success) {
-      g_signal_handler_block (self, self->priv->finished_hid);
-      g_signal_emit_by_name (self, "finished", success, err->message);
-      g_signal_handler_unblock (self, self->priv->finished_hid);
+      emit_final_finished (self, success, err->message);
       g_error_free (err);
     }
   }
@@ -210,6 +246,8 @@ nw_fill_operation_finished_handler (GsdFillOperation *operation,
                                     const gchar      *message,
                                     NwFillOperation  *self)
 {
+  gboolean last = TRUE;
+  
   if (success) {
     self->priv->n_op_done++;
     /* remove the directory just proceeded */
@@ -220,6 +258,11 @@ nw_fill_operation_finished_handler (GsdFillOperation *operation,
       /* block signal emission, it's not the last one */
       g_signal_stop_emission_by_name (operation, "finished");
       
+      /* remember any warning for the final signal */
+      if (message) {
+        append_error_message (self, message);
+      }
+      
       /* we can't launch the next operation right here since the previous must
        * release its lock before, which is done just after return of the current
        * function.
@@ -227,7 +270,13 @@ nw_fill_operation_finished_handler (GsdFillOperation *operation,
        * the next operation if the current one is not busy, which fixes the
        * problem. */
       g_timeout_add (10, (GSourceFunc) launch_next_operation, self);
+      last = FALSE;
     }
+  }
+  /* if we didn't schedule a new job, check if we have to alter the signal */
+  if (last && self->priv->message) {
+    g_signal_stop_emission_by_name (operation, "finished");
+    emit_final_finished (self, success, message);
   }
 }
 
