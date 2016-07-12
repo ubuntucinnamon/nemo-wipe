@@ -156,7 +156,7 @@ nw_fill_operation_progress_handler (GsdFillOperation *operation,
    * recursively, we block our handler during the re-emission */
   g_signal_stop_emission_by_name (operation, "progress");
   g_signal_handler_block (operation, self->priv->progress_hid);
-  g_signal_emit_by_name (operation, "progress", 0,
+  g_signal_emit_by_name (operation, "progress",
                          (self->priv->n_op_done + fraction) / self->priv->n_op);
   g_signal_handler_unblock (operation, self->priv->progress_hid);
 }
@@ -179,7 +179,7 @@ launch_next_operation (NwFillOperation *self)
                                       &err);
     if (! success) {
       g_signal_handler_block (self, self->priv->finished_hid);
-      g_signal_emit_by_name (self, "finished", 0, success, err->message);
+      g_signal_emit_by_name (self, "finished", success, err->message);
       g_signal_handler_unblock (self, self->priv->finished_hid);
       g_error_free (err);
     }
