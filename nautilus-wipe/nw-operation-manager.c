@@ -250,7 +250,7 @@ display_operation_error (struct NwOperationData  *opdata,
 }
 
 static void
-operation_finished_handler (GsdDeleteOperation *operation,
+operation_finished_handler (GsdAsyncOperation  *operation,
                             gboolean            success,
                             const gchar        *error,
                             gpointer            data)
@@ -271,7 +271,7 @@ operation_finished_handler (GsdDeleteOperation *operation,
 }
 
 static void
-operation_progress_handler (GsdDeleteOperation *operation,
+operation_progress_handler (GsdAsyncOperation  *operation,
                             gdouble             fraction,
                             gpointer            data)
 {
