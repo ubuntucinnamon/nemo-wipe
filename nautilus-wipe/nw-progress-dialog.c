@@ -188,7 +188,6 @@ nw_progress_dialog_init (NwProgressDialog *self)
   gtk_box_pack_start (GTK_BOX (vbox), GTK_WIDGET (self->priv->progress), FALSE, TRUE, 2);
   gtk_widget_show (GTK_WIDGET (self->priv->progress));
   
-  gtk_progress_bar_set_ellipsize (self->priv->progress, PANGO_ELLIPSIZE_END);
   update_action_area_visibility (self, FALSE);
 }
 
@@ -380,7 +379,7 @@ nw_progress_dialog_get_pulse_step (NwProgressDialog *dialog)
 /**
  * nw_progress_dialog_set_progress_text:
  * @dialog: A #NwProgressDialog
- * @format: Text format (printf-like)
+ * @format: Text format (printf-like), or %NULL to remove progress text.
  * @...: Arguments for @format
  * 
  * Sets the progress text. For details about @format and @..., see the
@@ -392,16 +391,25 @@ nw_progress_dialog_set_progress_text (NwProgressDialog *dialog,
                                       const gchar      *format,
                                       ...)
 {
-  gchar  *text;
-  va_list ap;
-  
   g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
   
-  va_start (ap, format);
-  text = g_strdup_vprintf (format, ap);
-  va_end (ap);
-  gtk_progress_bar_set_text (dialog->priv->progress, text);
-  g_free (text);
+  if (format) {
+    gchar  *text;
+    va_list ap;
+    
+    va_start (ap, format);
+    text = g_strdup_vprintf (format, ap);
+    va_end (ap);
+    gtk_progress_bar_set_text (dialog->priv->progress, text);
+    g_free (text);
+  }
+#if GTK_CHECK_VERSION (3, 0, 0)
+  gtk_progress_bar_set_show_text (dialog->priv->progress, format != NULL);
+#else
+  if (! format) {
+    gtk_progress_bar_set_text (dialog->priv->progress, NULL);
+  }
+#endif
 }
 
 /**
