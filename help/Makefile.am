@@ -4,4 +4,4 @@ HELP_ID = nautilus-wipe
 HELP_FILES = index.docbook
 HELP_EXTRA = legal.xml
 
-HELP_LINGUAS = 
+HELP_LINGUAS = fr
