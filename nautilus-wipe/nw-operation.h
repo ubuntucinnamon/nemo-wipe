@@ -39,19 +39,21 @@ typedef struct _NwOperationInterface  NwOperationInterface;
 struct _NwOperationInterface {
   GTypeInterface parent;
   
-  void   (*add_file)        (NwOperation *self,
-                             const gchar *path);
-  void   (*add_files)       (NwOperation *self,
-                             GList       *files);
+  void   (*add_file)            (NwOperation *self,
+                                 const gchar *path);
+  void   (*add_files)           (NwOperation *self,
+                                 GList       *files);
+  gchar *(*get_progress_step)   (NwOperation *self);
 };
 
 
-GType   nw_operation_get_type   (void) G_GNUC_CONST;
+GType   nw_operation_get_type           (void) G_GNUC_CONST;
 
-void    nw_operation_add_file   (NwOperation *self,
-                                 const gchar *path);
-void    nw_operation_add_files  (NwOperation *self,
-                                 GList       *files);
+void    nw_operation_add_file           (NwOperation *self,
+                                         const gchar *path);
+void    nw_operation_add_files          (NwOperation *self,
+                                         GList       *files);
+gchar  *nw_operation_get_progress_step  (NwOperation *self);
 
 
 G_END_DECLS

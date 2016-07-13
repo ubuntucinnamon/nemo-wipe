@@ -27,8 +27,9 @@
 #include <gsecuredelete/gsecuredelete.h>
 
 
-static void   nw_operation_real_add_files   (NwOperation *self,
-                                             GList       *files);
+static void   nw_operation_real_add_files           (NwOperation *self,
+                                                     GList       *files);
+static gchar *nw_operation_real_get_progress_step   (NwOperation *self);
 
 
 G_DEFINE_INTERFACE (NwOperation,
@@ -39,7 +40,8 @@ G_DEFINE_INTERFACE (NwOperation,
 static void
 nw_operation_default_init (NwOperationInterface *iface)
 {
-  iface->add_files = nw_operation_real_add_files;
+  iface->add_files          = nw_operation_real_add_files;
+  iface->get_progress_step  = nw_operation_real_get_progress_step;
 }
 
 static void
@@ -51,6 +53,12 @@ nw_operation_real_add_files (NwOperation *self,
   for (; files; files = files->next) {
     iface->add_file (self, files->data);
   }
+}
+
+static gchar *
+nw_operation_real_get_progress_step (NwOperation *self)
+{
+  return NULL;
 }
 
 void
@@ -67,3 +75,8 @@ nw_operation_add_files (NwOperation *self,
   NW_OPERATION_GET_INTERFACE (self)->add_files (self, files);
 }
 
+gchar *
+nw_operation_get_progress_step (NwOperation *self)
+{
+  return NW_OPERATION_GET_INTERFACE (self)->get_progress_step (self);
+}

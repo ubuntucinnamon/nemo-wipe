@@ -53,17 +53,18 @@ nw_fill_operation_error_quark (void)
 }
 
 
-static void     nw_fill_operation_operation_iface_init  (NwOperationInterface *iface);
-static void     nw_fill_operation_real_add_file         (NwOperation *op,
-                                                         const gchar *path);
-static void     nw_fill_operation_finalize              (GObject *object);
-static void     nw_fill_operation_finished_handler      (GsdFillOperation *operation,
-                                                         gboolean          success,
-                                                         const gchar      *message,
-                                                         NwFillOperation  *self);
-static void     nw_fill_operation_progress_handler      (GsdFillOperation *operation,
-                                                         gdouble           fraction,
-                                                         NwFillOperation  *self);
+static void     nw_fill_operation_operation_iface_init    (NwOperationInterface *iface);
+static void     nw_fill_operation_real_add_file           (NwOperation *op,
+                                                           const gchar *path);
+static gchar   *nw_fill_operation_real_get_progress_step  (NwOperation *op);
+static void     nw_fill_operation_finalize                (GObject *object);
+static void     nw_fill_operation_finished_handler        (GsdFillOperation *operation,
+                                                           gboolean          success,
+                                                           const gchar      *message,
+                                                           NwFillOperation  *self);
+static void     nw_fill_operation_progress_handler        (GsdFillOperation *operation,
+                                                           gdouble           fraction,
+                                                           NwFillOperation  *self);
 
 
 struct _NwFillOperationPrivate {
@@ -87,7 +88,8 @@ G_DEFINE_TYPE_WITH_CODE (NwFillOperation,
 static void
 nw_fill_operation_operation_iface_init (NwOperationInterface *iface)
 {
-  iface->add_file = nw_fill_operation_real_add_file;
+  iface->add_file           = nw_fill_operation_real_add_file;
+  iface->get_progress_step  = nw_fill_operation_real_get_progress_step;
 }
 
 static void
@@ -150,6 +152,24 @@ nw_fill_operation_real_add_file (NwOperation *op,
   
   gsd_fill_operation_set_directory (GSD_FILL_OPERATION (self),
                                     self->priv->directories->data);
+}
+
+static gchar *
+nw_fill_operation_real_get_progress_step (NwOperation *operation)
+{
+  NwFillOperation    *self  = NW_FILL_OPERATION (operation);
+  GsdAsyncOperation  *op    = GSD_SECURE_DELETE_OPERATION (operation);
+  
+  if (self->priv->n_op > 1) {
+    return g_strdup_printf (_("Device \"%s\" (%u out of %u), pass %u out of %u"),
+                            (const gchar *) self->priv->directories->data,
+                            self->priv->n_op_done + 1, self->priv->n_op,
+                            op->passes + 1, op->n_passes);
+  } else {
+    return g_strdup_printf (_("Device \"%s\", pass %u out of %u"),
+                            (const gchar *) self->priv->directories->data,
+                            op->passes + 1, op->n_passes);
+  }
 }
 
 /* wrapper for the progress handler returning the current progression over all
@@ -218,6 +238,9 @@ launch_next_operation (NwFillOperation *self)
     if (! success) {
       emit_final_finished (self, success, err->message);
       g_error_free (err);
+    } else {
+      /* as the step changed, report the progress changed */
+      g_signal_emit_by_name (self, "progress", 0.0);
     }
   }
   

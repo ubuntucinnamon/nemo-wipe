@@ -271,13 +271,24 @@ operation_finished_handler (GsdAsyncOperation  *operation,
 }
 
 static void
+update_operation_progress (struct NwOperationData  *opdata,
+                           gdouble                  fraction)
+{
+  gchar *step = nw_operation_get_progress_step (opdata->operation);
+  
+  nw_progress_dialog_set_fraction (opdata->progress_dialog, fraction);
+  nw_progress_dialog_set_progress_text (opdata->progress_dialog,
+                                        step ? "%s" : NULL, step);
+  
+  g_free (step);
+}
+
+static void
 operation_progress_handler (GsdAsyncOperation  *operation,
                             gdouble             fraction,
                             gpointer            data)
 {
-  struct NwOperationData *opdata = data;
-  
-  nw_progress_dialog_set_fraction (opdata->progress_dialog, fraction);
+  update_operation_progress (data, fraction);
 }
 
 /* sets @pref according to state of @toggle */
@@ -610,6 +621,9 @@ nw_operation_manager_run (GtkWindow    *parent,
       gtk_widget_destroy (GTK_WIDGET (opdata->progress_dialog));
       free_opdata (opdata);
     } else {
+      /* update the initial progress so the step is correct, too */
+      update_operation_progress (opdata, 0.0);
+      
       gtk_widget_show (GTK_WIDGET (opdata->progress_dialog));
     }
   }

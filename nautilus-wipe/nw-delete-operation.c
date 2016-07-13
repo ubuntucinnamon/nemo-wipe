@@ -19,18 +19,24 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "nw-delete-operation.h"
 
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 #include <glib-object.h>
 #include <gsecuredelete/gsecuredelete.h>
 
 #include "nw-operation.h"
 
 
-static void   nw_delete_operation_opeartion_iface_init  (NwOperationInterface *iface);
-static void   nw_delete_operation_real_add_file         (NwOperation *self,
-                                                         const gchar *file);
+static void   nw_delete_operation_opeartion_iface_init    (NwOperationInterface *iface);
+static void   nw_delete_operation_real_add_file           (NwOperation *self,
+                                                           const gchar *file);
+static gchar *nw_delete_operation_real_get_progress_step  (NwOperation *self);
 
 
 G_DEFINE_TYPE_WITH_CODE (NwDeleteOperation,
@@ -43,7 +49,8 @@ G_DEFINE_TYPE_WITH_CODE (NwDeleteOperation,
 static void
 nw_delete_operation_opeartion_iface_init (NwOperationInterface *iface)
 {
-  iface->add_file = nw_delete_operation_real_add_file;
+  iface->add_file           = nw_delete_operation_real_add_file;
+  iface->get_progress_step  = nw_delete_operation_real_get_progress_step;
 }
 
 static void
@@ -61,6 +68,24 @@ nw_delete_operation_real_add_file (NwOperation *self,
                                    const gchar *file)
 {
   gsd_delete_operation_add_path (GSD_DELETE_OPERATION (self), file);
+}
+
+static gchar *
+nw_delete_operation_real_get_progress_step (NwOperation *operation)
+{
+  /* it's a bit ugly here: we rely on the knowledge that
+   * GsdSecureDeleteOperation's get_max_progress() returns the individual
+   * pass count, and GsdDeleteOperation overrides it multiplying it by the
+   * file count.  But well, that gives us everything but the file name. */
+  GsdAsyncOperation      *op        = GSD_ASYNC_OPERATION (operation);
+  GsdAsyncOperationClass *delopcls  = g_type_class_peek (GSD_TYPE_SECURE_DELETE_OPERATION);
+  guint                   passes    = delopcls->get_max_progress (op);
+  guint                   n_files   = op->n_passes / passes;
+  guint                   file      = op->passes / passes;
+  guint                   pass      = op->passes % passes;
+  
+  return g_strdup_printf (_("File %u out of %u, pass %u out of %u"),
+                          file + 1, n_files, pass + 1, passes);
 }
 
 NwOperation *
