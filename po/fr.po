@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-wipe 0.2\n"
 "Report-Msgid-Bugs-To: ban@herbesfolles.org\n"
-"POT-Creation-Date: 2016-07-09 19:23+0200\n"
-"PO-Revision-Date: 2016-07-09 05:03+0200\n"
+"POT-Creation-Date: 2016-07-13 18:33+0200\n"
+"PO-Revision-Date: 2016-07-13 18:37+0200\n"
 "Last-Translator: Colomban Wendling <ban@herbesfolles.org>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -17,12 +17,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: nautilus-wipe/nw-fill-operation.c:303
+#: nautilus-wipe/nw-delete-operation.c:87
+#, c-format
+msgid "File %u out of %u, pass %u out of %u"
+msgstr "Fichier %u de %u, passe %u de %u"
+
+#: nautilus-wipe/nw-fill-operation.c:164
+#, c-format
+msgid "Device \"%s\" (%u out of %u), pass %u out of %u"
+msgstr "Périphérique « %s » (%u de %u), passe %u de %u"
+
+#: nautilus-wipe/nw-fill-operation.c:169
+#, c-format
+msgid "Device \"%s\", pass %u out of %u"
+msgstr "Périphérique « %s », passe %u de %u"
+
+#: nautilus-wipe/nw-fill-operation.c:375
 #, c-format
 msgid "Mount \"%s\" is not local"
 msgstr "Le montage « %s » n'est pas local"
 
-#: nautilus-wipe/nw-fill-operation.c:319
+#: nautilus-wipe/nw-fill-operation.c:391
 #, c-format
 msgid "No mount point found for path \"%s\""
 msgstr "Aucun point de montage trouvé pour le chemin « %s »"
@@ -116,8 +131,8 @@ msgstr ""
 #: nautilus-wipe/nw-extension.c:205
 #, c-format
 msgid ""
-"Available disk space on the partition or device \"%s\" have been "
-"successfully wiped."
+"Available disk space on the partition or device \"%s\" has been successfully "
+"wiped."
 msgstr ""
 "L'espace disque disponible sur la partition ou le périphérique « %s » a été "
 "écrasé avec succès."
@@ -167,63 +182,67 @@ msgstr[0] ""
 msgstr[1] ""
 "Écrase l'espace disque disponible sur ces partitions ou périphérique"
 
-#: nautilus-wipe/nw-operation-manager.c:211
+#: nautilus-wipe/nw-operation-manager.c:212
+msgid "However, the following warning was issued during the operation:"
+msgstr "Cependant, l'avertissement suivant a été émis durant l'opération :"
+
+#: nautilus-wipe/nw-operation-manager.c:232
 msgid "_Details"
 msgstr "_Détails"
 
-#: nautilus-wipe/nw-operation-manager.c:301
+#: nautilus-wipe/nw-operation-manager.c:333
 msgid "Failed to open help"
 msgstr "Impossible d'ouvrir l'aide"
 
-#: nautilus-wipe/nw-operation-manager.c:377
+#: nautilus-wipe/nw-operation-manager.c:409
 msgid "_Options"
 msgstr "_Options"
 
-#: nautilus-wipe/nw-operation-manager.c:391
+#: nautilus-wipe/nw-operation-manager.c:423
 msgid "Number of _passes:"
 msgstr "Nombre de _passes :"
 
-#: nautilus-wipe/nw-operation-manager.c:426
+#: nautilus-wipe/nw-operation-manager.c:458
 msgid "(Gutmann method for old disks)"
 msgstr "(méthode de Gutmann pour les vieux disques)"
 
-#: nautilus-wipe/nw-operation-manager.c:428
+#: nautilus-wipe/nw-operation-manager.c:460
 msgid "(advised for modern hard disks)"
 msgstr "(méthode recommandée pour les disques actuels)"
 
-#: nautilus-wipe/nw-operation-manager.c:430
+#: nautilus-wipe/nw-operation-manager.c:462
 msgid "(only protects against software attacks)"
 msgstr "(protège seulement des attaques logicielles)"
 
-#: nautilus-wipe/nw-operation-manager.c:443
+#: nautilus-wipe/nw-operation-manager.c:475
 msgid "_Fast and insecure mode (no /dev/urandom, no synchronize mode)"
 msgstr ""
 "_Mode rapide et peu sûr (pas de /dev/urandom, pas de mode de synchronisation)"
 
-#: nautilus-wipe/nw-operation-manager.c:455
+#: nautilus-wipe/nw-operation-manager.c:487
 msgid "Last pass with _zeros instead of random data"
 msgstr "Dernière passe avec des _zéros à la place de données aléatoires"
 
-#: nautilus-wipe/nw-operation-manager.c:483
+#: nautilus-wipe/nw-operation-manager.c:515
 msgid "Are you sure you want to cancel this operation?"
 msgstr "Êtes-vous sûr de vouloir annuler cette opération ?"
 
-#: nautilus-wipe/nw-operation-manager.c:484
+#: nautilus-wipe/nw-operation-manager.c:516
 msgid ""
 "Canceling this operation might leave some item(s) in an intermediate state."
 msgstr ""
 "Annuler cette opération peut laisser certains éléments dans un état "
 "intermédiaire."
 
-#: nautilus-wipe/nw-operation-manager.c:486
+#: nautilus-wipe/nw-operation-manager.c:518
 msgid "Resume operation"
 msgstr "Reprendre l'opération"
 
-#: nautilus-wipe/nw-operation-manager.c:487
+#: nautilus-wipe/nw-operation-manager.c:519
 msgid "Cancel operation"
 msgstr "Annuler l'opération"
 
-#: nautilus-wipe/nw-operation-manager.c:579
+#: nautilus-wipe/nw-operation-manager.c:611
 #, c-format
 msgid ""
 "%s. Please make sure you have the secure-delete package properly installed "
