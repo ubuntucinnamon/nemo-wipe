@@ -243,7 +243,7 @@ nw_progress_dialog_class_init (NwProgressDialogClass *klass)
                                                          "Whether the dialog has a close button",
                                                          FALSE,
                                                          G_PARAM_READWRITE));
-  g_object_class_install_property (object_class, PROP_HAS_CLOSE_BUTTON,
+  g_object_class_install_property (object_class, PROP_AUTO_HIDE_ACTION_AREA,
                                    g_param_spec_boolean ("auto-hide-action-area",
                                                          "Auto hide action area",
                                                          "Whether the action area should be hidden automatically "
