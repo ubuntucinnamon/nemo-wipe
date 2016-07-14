@@ -293,7 +293,7 @@
     <sect2>
       <title>The wipe algorithm</title>
       <para>
-        nautilus-wipe enables you to wipe files and free disk
+        &app; enables you to wipe files and free disk
         space from <application>Nautilus</application> using the
         <application>secure-delete</application> program written by van Hauser /
         THC
