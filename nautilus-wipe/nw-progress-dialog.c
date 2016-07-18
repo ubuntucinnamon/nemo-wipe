@@ -39,6 +39,7 @@ struct _NwProgressDialogPrivate {
   gboolean        finished;
   gboolean        canceled;
   gboolean        auto_hide_action_area;
+  gint            current_response;
 };
 
 enum
@@ -130,6 +131,18 @@ nw_progress_dialog_response (GtkDialog *dialog,
   if (GTK_DIALOG_CLASS (nw_progress_dialog_parent_class)->response) {
     GTK_DIALOG_CLASS (nw_progress_dialog_parent_class)->response (dialog, response_id);
   }
+  
+  self->priv->current_response = GTK_RESPONSE_NONE;
+}
+
+static void
+nw_progress_dialog_before_response (NwProgressDialog *self,
+                                    gint              response)
+{
+  /* track currently emitted response to implement
+   * nw_progress_dialog_emit_response().  reset in
+   * nw_progress_dialog_response() */
+  self->priv->current_response = response;
 }
 
 static void
@@ -175,6 +188,7 @@ nw_progress_dialog_init (NwProgressDialog *self)
   self->priv->finished = FALSE;
   self->priv->canceled = FALSE;
   self->priv->auto_hide_action_area = FALSE;
+  self->priv->current_response = GTK_RESPONSE_NONE;
   
   gtk_container_set_border_width (GTK_CONTAINER (self), 5);
   content_area = gtk_dialog_get_content_area (GTK_DIALOG (self));
@@ -189,6 +203,9 @@ nw_progress_dialog_init (NwProgressDialog *self)
   gtk_widget_show (GTK_WIDGET (self->priv->progress));
   
   update_action_area_visibility (self, FALSE);
+  
+  g_signal_connect (self, "response",
+                    G_CALLBACK (nw_progress_dialog_before_response), NULL);
 }
 
 static void
@@ -254,6 +271,21 @@ nw_progress_dialog_class_init (NwProgressDialogClass *klass)
                                                          G_PARAM_READWRITE));
   
   g_type_class_add_private (klass, sizeof (NwProgressDialogPrivate));
+}
+
+/*
+ * Calls gtk_dialog_response() if not currently inside the emission chain of
+ * the same response.  This is useful in setters that want to emit the response
+ * signal to notify calling code, yet not when called from inside a response
+ * handler for this very response.
+ */
+static void
+nw_progress_dialog_emit_response (NwProgressDialog *self,
+                                  gint              response)
+{
+  if (self->priv->current_response != response) {
+    gtk_dialog_response (GTK_DIALOG (self), response);
+  }
 }
 
 
@@ -484,7 +516,7 @@ nw_progress_dialog_cancel (NwProgressDialog *dialog)
     dialog->priv->canceled = TRUE;
     gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL,
                                        dialog->priv->canceled);
-    gtk_dialog_response (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL);
+    nw_progress_dialog_emit_response (dialog, GTK_RESPONSE_CANCEL);
   }
 }
 
@@ -516,8 +548,8 @@ nw_progress_dialog_finish (NwProgressDialog *dialog,
   }
   gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL,
                                      FALSE);
-  gtk_dialog_response (GTK_DIALOG (dialog),
-                       NW_PROGRESS_DIALOG_RESPONSE_COMPLETE);
+  nw_progress_dialog_emit_response (dialog,
+                                    NW_PROGRESS_DIALOG_RESPONSE_COMPLETE);
 }
 
 /**
