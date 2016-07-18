@@ -3,3 +3,4 @@ nautilus-wipe/nw-delete-operation.c
 nautilus-wipe/nw-fill-operation.c
 nautilus-wipe/nw-extension.c
 nautilus-wipe/nw-operation-manager.c
+nautilus-wipe/nw-progress-dialog.c

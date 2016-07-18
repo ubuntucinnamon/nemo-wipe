@@ -391,6 +391,9 @@
         but not deleted or big junk files.
       </para>
       <para>
+        It is also possible to pause, and later resume, the operation.
+      </para>
+      <para>
         When the wipe is finished, a dialog should inform you of the
         success of the deletion.
       </para>

@@ -19,10 +19,15 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "nw-progress-dialog.h"
 
 #include <stdarg.h>
 #include <glib.h>
+#include <glib/gi18n-lib.h>
 #include <gtk/gtk.h>
 
 #include "nw-compat.h" /* for gtk_dialog_get_action_area(),
@@ -35,9 +40,12 @@ struct _NwProgressDialogPrivate {
   GtkLabel       *label;
   GtkProgressBar *progress;
   GtkWidget      *cancel_button;
+  GtkWidget      *pause_button;
+  GtkWidget      *resume_button;
   GtkWidget      *close_button;
   gboolean        finished;
   gboolean        canceled;
+  gboolean        paused;
   gboolean        auto_hide_action_area;
   gint            current_response;
 };
@@ -48,6 +56,7 @@ enum
   PROP_TEXT,
   PROP_HAS_CANCEL_BUTTON,
   PROP_HAS_CLOSE_BUTTON,
+  PROP_HAS_PAUSE_BUTTON,
   PROP_AUTO_HIDE_ACTION_AREA
 };
 
@@ -72,6 +81,10 @@ nw_progress_dialog_set_property (GObject      *obj,
     
     case PROP_HAS_CLOSE_BUTTON:
       nw_progress_dialog_set_has_close_button (self, g_value_get_boolean (value));
+      break;
+        
+    case PROP_HAS_PAUSE_BUTTON:
+      nw_progress_dialog_set_has_pause_button (self, g_value_get_boolean (value));
       break;
     
     case PROP_AUTO_HIDE_ACTION_AREA:
@@ -104,6 +117,10 @@ nw_progress_dialog_get_property (GObject    *obj,
       g_value_set_boolean (value, nw_progress_dialog_get_has_close_button (self));
       break;
     
+    case PROP_HAS_PAUSE_BUTTON:
+      g_value_set_boolean (value, nw_progress_dialog_get_has_pause_button (self));
+      break;
+    
     case PROP_AUTO_HIDE_ACTION_AREA:
       g_value_set_boolean (value, nw_progress_dialog_get_auto_hide_action_area (self));
       break;
@@ -126,6 +143,18 @@ nw_progress_dialog_response (GtkDialog *dialog,
   if (GTK_IS_WIDGET (self->priv->close_button)) {
     gtk_widget_set_sensitive (self->priv->close_button,
                               self->priv->finished || self->priv->canceled);
+  }
+  if (GTK_IS_WIDGET (self->priv->pause_button)) {
+    gtk_widget_set_sensitive (self->priv->pause_button,
+                              ! self->priv->finished &&
+                              ! self->priv->canceled &&
+                              ! self->priv->paused);
+  }
+  if (GTK_IS_WIDGET (self->priv->resume_button)) {
+    gtk_widget_set_sensitive (self->priv->resume_button,
+                              ! self->priv->finished &&
+                              ! self->priv->canceled &&
+                              self->priv->paused);
   }
   
   if (GTK_DIALOG_CLASS (nw_progress_dialog_parent_class)->response) {
@@ -185,8 +214,11 @@ nw_progress_dialog_init (NwProgressDialog *self)
   self->priv->label = GTK_LABEL (gtk_label_new (""));
   self->priv->close_button = NULL;
   self->priv->cancel_button = NULL;
+  self->priv->pause_button = NULL;
+  self->priv->resume_button = NULL;
   self->priv->finished = FALSE;
   self->priv->canceled = FALSE;
+  self->priv->paused = FALSE;
   self->priv->auto_hide_action_area = FALSE;
   self->priv->current_response = GTK_RESPONSE_NONE;
   
@@ -258,6 +290,12 @@ nw_progress_dialog_class_init (NwProgressDialogClass *klass)
                                    g_param_spec_boolean ("has-close-button",
                                                          "Has close button",
                                                          "Whether the dialog has a close button",
+                                                         FALSE,
+                                                         G_PARAM_READWRITE));
+  g_object_class_install_property (object_class, PROP_HAS_PAUSE_BUTTON,
+                                   g_param_spec_boolean ("has-pause-button",
+                                                         "Has pause button",
+                                                         "Whether the dialog has a pause/resume button",
                                                          FALSE,
                                                          G_PARAM_READWRITE));
   g_object_class_install_property (object_class, PROP_AUTO_HIDE_ACTION_AREA,
@@ -528,6 +566,41 @@ nw_progress_dialog_is_canceled (NwProgressDialog *dialog)
   return dialog->priv->canceled;
 }
 
+void
+nw_progress_dialog_set_paused (NwProgressDialog  *dialog,
+                               gboolean           paused)
+{
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
+  
+  if (dialog->priv->paused != !! paused) {
+    dialog->priv->paused = !! paused;
+    gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog),
+                                       NW_PROGRESS_DIALOG_RESPONSE_PAUSE,
+                                       ! dialog->priv->paused);
+    gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog),
+                                       NW_PROGRESS_DIALOG_RESPONSE_RESUME,
+                                       dialog->priv->paused);
+    if (dialog->priv->pause_button) {
+      gtk_widget_set_visible (dialog->priv->pause_button, ! dialog->priv->paused);
+    }
+    if (dialog->priv->resume_button) {
+      gtk_widget_set_visible (dialog->priv->resume_button, dialog->priv->paused);
+    }
+    nw_progress_dialog_emit_response (dialog,
+                                      dialog->priv->paused
+                                      ? NW_PROGRESS_DIALOG_RESPONSE_PAUSE
+                                      : NW_PROGRESS_DIALOG_RESPONSE_RESUME);
+  }
+}
+
+gboolean
+nw_progress_dialog_get_paused (NwProgressDialog *dialog)
+{
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), FALSE);
+  
+  return dialog->priv->paused;
+}
+
 /**
  * nw_progress_dialog_finish:
  * @dialog: A #NwProgressDialog
@@ -548,6 +621,10 @@ nw_progress_dialog_finish (NwProgressDialog *dialog,
   }
   gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL,
                                      FALSE);
+  gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog),
+                                     NW_PROGRESS_DIALOG_RESPONSE_PAUSE, FALSE);
+  gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog),
+                                     NW_PROGRESS_DIALOG_RESPONSE_RESUME, FALSE);
   nw_progress_dialog_emit_response (dialog,
                                     NW_PROGRESS_DIALOG_RESPONSE_COMPLETE);
 }
@@ -657,6 +734,75 @@ nw_progress_dialog_get_has_cancel_button (NwProgressDialog *dialog)
   g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), FALSE);
   
   return dialog->priv->cancel_button != NULL;
+}
+
+/**
+ * nw_progress_dialog_set_has_pause_button:
+ * @dialog: A #NwProgressDialog
+ * @has_cancel_button: Whether the dialog should have a pause button.
+ * 
+ * Sets whether the dialog has a pause button. Enabling pause button at the
+ * progress dialog level enable automatic sensitivity update of the button
+ * according to the current operation state.
+ */
+void
+nw_progress_dialog_set_has_pause_button (NwProgressDialog *dialog,
+                                         gboolean          has_pause_button)
+{
+  g_return_if_fail (NW_IS_PROGRESS_DIALOG (dialog));
+  
+  if (has_pause_button != (dialog->priv->pause_button != NULL)) {
+    if (has_pause_button) {
+      dialog->priv->pause_button = gtk_dialog_add_button (GTK_DIALOG (dialog),
+                                                          _("Pause"),
+                                                          NW_PROGRESS_DIALOG_RESPONSE_PAUSE);
+      gtk_button_set_image (GTK_BUTTON (dialog->priv->pause_button),
+                            gtk_image_new_from_stock (GTK_STOCK_MEDIA_PAUSE,
+                                                      GTK_ICON_SIZE_BUTTON));
+      dialog->priv->resume_button = gtk_dialog_add_button (GTK_DIALOG (dialog),
+                                                           _("Resume"),
+                                                           NW_PROGRESS_DIALOG_RESPONSE_RESUME);
+      gtk_button_set_image (GTK_BUTTON (dialog->priv->resume_button),
+                            gtk_image_new_from_stock (GTK_STOCK_MEDIA_PLAY,
+                                                      GTK_ICON_SIZE_BUTTON));
+      gtk_widget_set_sensitive (dialog->priv->pause_button,
+                                ! dialog->priv->canceled &&
+                                ! dialog->priv->finished &&
+                                ! dialog->priv->paused);
+      gtk_widget_set_visible (dialog->priv->pause_button,
+                              ! dialog->priv->canceled &&
+                              ! dialog->priv->finished &&
+                              ! dialog->priv->paused);
+      gtk_widget_set_sensitive (dialog->priv->resume_button,
+                                ! dialog->priv->canceled &&
+                                ! dialog->priv->finished &&
+                                dialog->priv->paused);
+      gtk_widget_set_visible (dialog->priv->resume_button,
+                              ! dialog->priv->canceled &&
+                              ! dialog->priv->finished &&
+                              dialog->priv->paused);
+    } else {
+      gtk_widget_destroy (dialog->priv->pause_button);
+      dialog->priv->pause_button = NULL;
+      gtk_widget_destroy (dialog->priv->resume_button);
+      dialog->priv->resume_button = NULL;
+    }
+    update_action_area_visibility (dialog, FALSE);
+  }
+}
+
+/**
+ * nw_progress_dialog_get_has_pause_button:
+ * @dialog: A #NwProgressDialog
+ * 
+ * Returns: Whether @dialog has a pause button.
+ */
+gboolean
+nw_progress_dialog_get_has_pause_button (NwProgressDialog *dialog)
+{
+  g_return_val_if_fail (NW_IS_PROGRESS_DIALOG (dialog), FALSE);
+  
+  return dialog->priv->pause_button != NULL;
 }
 
 void

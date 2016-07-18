@@ -522,6 +522,16 @@ progress_dialog_response_handler (GtkDialog *dialog,
       }
       break;
     
+    case NW_PROGRESS_DIALOG_RESPONSE_PAUSE:
+      nw_progress_dialog_set_paused (NW_PROGRESS_DIALOG (dialog),
+                                     gsd_async_operation_pause (GSD_ASYNC_OPERATION (opdata->operation)));
+      break;
+    
+    case NW_PROGRESS_DIALOG_RESPONSE_RESUME:
+      nw_progress_dialog_set_paused (NW_PROGRESS_DIALOG (dialog),
+                                     ! gsd_async_operation_resume (GSD_ASYNC_OPERATION (opdata->operation)));
+      break;
+    
     default:
       break;
   }
@@ -582,6 +592,7 @@ nw_operation_manager_run (GtkWindow    *parent,
     opdata->progress_dialog = NW_PROGRESS_DIALOG (nw_progress_dialog_new (opdata->window, 0,
                                                                           "%s", progress_dialog_text));
     gtk_window_set_title (GTK_WINDOW (opdata->progress_dialog), title);
+    nw_progress_dialog_set_has_pause_button (opdata->progress_dialog, TRUE);
     nw_progress_dialog_set_has_cancel_button (opdata->progress_dialog, TRUE);
     g_signal_connect (opdata->progress_dialog, "response",
                       G_CALLBACK (progress_dialog_response_handler), opdata);

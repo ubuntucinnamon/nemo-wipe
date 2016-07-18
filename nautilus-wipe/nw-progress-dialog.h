@@ -50,7 +50,11 @@ struct _NwProgressDialogClass {
   GtkDialogClass parent_class;
 };
 
-#define NW_PROGRESS_DIALOG_RESPONSE_COMPLETE 1
+enum {
+  NW_PROGRESS_DIALOG_RESPONSE_COMPLETE = 1,
+  NW_PROGRESS_DIALOG_RESPONSE_PAUSE,
+  NW_PROGRESS_DIALOG_RESPONSE_RESUME
+};
 
 
 GType         nw_progress_dialog_get_type                   (void) G_GNUC_CONST;
@@ -76,6 +80,9 @@ void          nw_progress_dialog_set_text                   (NwProgressDialog  *
 const gchar  *nw_progress_dialog_get_text                   (NwProgressDialog  *dialog);
 void          nw_progress_dialog_cancel                     (NwProgressDialog  *dialog);
 gboolean      nw_progress_dialog_is_canceled                (NwProgressDialog  *dialog);
+void          nw_progress_dialog_set_paused                 (NwProgressDialog  *dialog,
+                                                             gboolean           paused);
+gboolean      nw_progress_dialog_get_paused                 (NwProgressDialog  *dialog);
 void          nw_progress_dialog_finish                     (NwProgressDialog  *dialog,
                                                              gboolean           success);
 gboolean      nw_progress_dialog_is_finished                (NwProgressDialog  *dialog);
@@ -85,6 +92,9 @@ gboolean      nw_progress_dialog_get_has_close_button       (NwProgressDialog  *
 void          nw_progress_dialog_set_has_cancel_button      (NwProgressDialog  *dialog,
                                                              gboolean           has_close_button);
 gboolean      nw_progress_dialog_get_has_cancel_button      (NwProgressDialog  *dialog);
+void          nw_progress_dialog_set_has_pause_button       (NwProgressDialog  *dialog,
+                                                             gboolean           has_pause_button);
+gboolean      nw_progress_dialog_get_has_pause_button       (NwProgressDialog  *dialog);
 
 void          nw_progress_dialog_set_auto_hide_action_area  (NwProgressDialog  *dialog,
                                                              gboolean           auto_hide);
