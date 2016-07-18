@@ -509,7 +509,14 @@ progress_dialog_response_handler (GtkDialog *dialog,
   
   switch (response_id) {
     case GTK_RESPONSE_CANCEL:
-    case GTK_RESPONSE_DELETE_EVENT:
+    case GTK_RESPONSE_DELETE_EVENT: {
+      gboolean was_paused = nw_progress_dialog_get_paused (NW_PROGRESS_DIALOG (dialog));
+      
+      if (! was_paused) {
+        /* we pause the operation while the user things on whether to really
+         * cancel or not, so the  */
+        gsd_async_operation_pause (GSD_ASYNC_OPERATION (opdata->operation));
+      }
       if (display_dialog (GTK_WINDOW (dialog), GTK_MESSAGE_QUESTION, TRUE,
                           opdata->title,
                           _("Are you sure you want to cancel this operation?"),
@@ -519,8 +526,11 @@ progress_dialog_response_handler (GtkDialog *dialog,
                           _("Cancel operation"), GTK_RESPONSE_ACCEPT,
                           NULL) == GTK_RESPONSE_ACCEPT) {
         gsd_async_operation_cancel (GSD_ASYNC_OPERATION (opdata->operation));
+      } else if (! was_paused) {
+        gsd_async_operation_resume (GSD_ASYNC_OPERATION (opdata->operation));
       }
       break;
+    }
     
     case NW_PROGRESS_DIALOG_RESPONSE_PAUSE:
       nw_progress_dialog_set_paused (NW_PROGRESS_DIALOG (dialog),
