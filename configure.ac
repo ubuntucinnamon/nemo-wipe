@@ -1,7 +1,8 @@
 # Initially based on NautilusActions configure & build system.
 
 AC_PREREQ([2.64])
-AC_INIT([nautilus-wipe], [0.2.1], [ban@herbesfolles.org])
+AC_INIT([nautilus-wipe], [0.2.1], [bugs@wipetools.tuxfamily.org],
+        [nautilus-wipe], [https://wipetools.tuxfamily.org/nautilus-wipe.html])
 AC_CONFIG_SRCDIR([nautilus-wipe/nw-extension.h])
 AC_CONFIG_AUX_DIR([build/aux])
 AC_CONFIG_MACRO_DIR([build/m4])
