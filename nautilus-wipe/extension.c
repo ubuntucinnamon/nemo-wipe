@@ -31,6 +31,8 @@
 #include <glib/gi18n-lib.h>
 #include <glib-object.h>
 
+#include <gsecuredelete/gsecuredelete.h>
+
 
 static GType provider_types[1];
 
@@ -40,6 +42,7 @@ nautilus_module_initialize (GTypeModule *module)
 {
   g_message ("Initializing");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+  gsd_intl_init ();
   provider_types[0] = nw_extension_register_type (module);
 }
 
