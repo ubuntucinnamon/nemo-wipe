@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2016-07-14 15:52+0200\n"
-"PO-Revision-Date: 2016-07-14 15:59+0200\n"
+"POT-Creation-Date: 2016-07-18 18:27+0200\n"
+"PO-Revision-Date: 2016-07-18 18:29+0200\n"
 "Last-Translator: Colomban Wendling <ban@herbesfolles.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: fr\n"
@@ -525,6 +525,13 @@ msgstr ""
 
 #. (itstool) path: sect2/para
 #: C/index.docbook:393
+msgid "It is also possible to pause, and later resume, the operation."
+msgstr ""
+"Il est aussi possible de mettre l'opération en pause, et de la reprendre "
+"après."
+
+#. (itstool) path: sect2/para
+#: C/index.docbook:396
 msgid ""
 "When the wipe is finished, a dialog should inform you of the success of the "
 "deletion."
@@ -533,12 +540,12 @@ msgstr ""
 "l'opération."
 
 #. (itstool) path: sect1/title
-#: C/index.docbook:400
+#: C/index.docbook:403
 msgid "Configuring <application>Nautilus Wipe</application>"
 msgstr "Configurer <application>Nautilus Wipe</application>"
 
 #. (itstool) path: sect1/para
-#: C/index.docbook:401
+#: C/index.docbook:404
 msgid ""
 "In the confirmation dialog, you can click on the arrow left to the "
 "<guilabel>Options</guilabel> word to display options. To understand these "
@@ -554,12 +561,12 @@ msgstr ""
 
 #. (itstool) path: sect2/title
 #. (itstool) path: variablelist/title
-#: C/index.docbook:408 C/index.docbook:415
+#: C/index.docbook:411 C/index.docbook:418
 msgid "Number of passes"
 msgstr "Nombre de passes"
 
 #. (itstool) path: sect2/para
-#: C/index.docbook:409
+#: C/index.docbook:412
 msgid ""
 "You can configure the number of times that the data to be wiped is "
 "overwritten by new data."
@@ -568,12 +575,12 @@ msgstr ""
 "écrasées par de nouvelles données."
 
 #. (itstool) path: varlistentry/term
-#: C/index.docbook:417
+#: C/index.docbook:420
 msgid "38"
 msgstr "38"
 
 #. (itstool) path: listitem/para
-#: C/index.docbook:419
+#: C/index.docbook:422
 msgid ""
 "Overwriting the data 38 times was the algorithm advised by Gutmann. It was "
 "designed to prevent data recovery through magnetic analysis of the hard "
@@ -586,12 +593,12 @@ msgstr ""
 "maintenant obsolètes. Il n'est dont plus conseillé."
 
 #. (itstool) path: varlistentry/term
-#: C/index.docbook:429
+#: C/index.docbook:432
 msgid "2"
 msgstr "2"
 
 #. (itstool) path: listitem/para
-#: C/index.docbook:431
+#: C/index.docbook:434
 msgid ""
 "Two passes are written: one mode with 0xff and a final mode random values. "
 "This seems to be enough on modern hard drives and is thus the default "
@@ -602,12 +609,12 @@ msgstr ""
 "donc le comportement par défaut."
 
 #. (itstool) path: varlistentry/term
-#: C/index.docbook:439
+#: C/index.docbook:442
 msgid "1"
 msgstr "1"
 
 #. (itstool) path: listitem/para
-#: C/index.docbook:441
+#: C/index.docbook:444
 msgid ""
 "Only one random pass is written. It should prevent software-only data "
 "recovery performed by analyzing raw data stored on the storage medium. "
@@ -620,25 +627,25 @@ msgstr ""
 "magnétique de la surface du disque."
 
 #. (itstool) path: sect2/title
-#: C/index.docbook:452
+#: C/index.docbook:455
 msgid "Fast and insecure mode (no /dev/urandom, no synchronize mode)"
 msgstr ""
 "Mode rapide et peu sûr (pas de /dev/urandom, pas de mode de synchronisation)"
 
 #. (itstool) path: sect2/para
-#: C/index.docbook:453
+#: C/index.docbook:456
 msgid "Speeds up the wipe at the expense of security:"
 msgstr "Accélère l'écrasement au détriment de la sécurité :"
 
 #. (itstool) path: listitem/para
-#: C/index.docbook:458
+#: C/index.docbook:461
 msgid "use a more predictable but faster pseudo-random number generator;"
 msgstr ""
 "utilise un générateur de nombres pseudo-aléatoires plus rapide mais plus "
 "prévisible ;"
 
 #. (itstool) path: listitem/para
-#: C/index.docbook:463
+#: C/index.docbook:466
 msgid ""
 "do not ensure that overwriting data is actually written on the storage "
 "medium."
@@ -647,12 +654,12 @@ msgstr ""
 "le médium de stockage."
 
 #. (itstool) path: sect2/title
-#: C/index.docbook:471
+#: C/index.docbook:474
 msgid "Last pass with zeros instead of random data"
 msgstr "Dernière passes avec des zéros à la place de données aléatoires"
 
 #. (itstool) path: sect2/para
-#: C/index.docbook:472
+#: C/index.docbook:475
 msgid ""
 "Use zeros for the last overwrite, which is the data that will be actually "
 "easy to read. The default is to use pseudo random data."
@@ -661,12 +668,12 @@ msgstr ""
 "faciles à lire. Des données pseudo-aléatoires sont utilisées par défaut."
 
 #. (itstool) path: sect1/title
-#: C/index.docbook:497
+#: C/index.docbook:500
 msgid "About <application>Nautilus Wipe</application>"
 msgstr "À propos de <application>Nautilus Wipe</application>"
 
 #. (itstool) path: sect1/para
-#: C/index.docbook:498
+#: C/index.docbook:501
 msgid ""
 "<application>Nautilus Wipe</application> was written by The Nautilus Wipe "
 "Team"
@@ -675,7 +682,7 @@ msgstr ""
 "Wipe"
 
 #. (itstool) path: sect1/para
-#: C/index.docbook:513
+#: C/index.docbook:516
 msgid ""
 "This program is distributed under the terms of the GNU General Public "
 "license as published by the Free Software Foundation; either version 3 of "
