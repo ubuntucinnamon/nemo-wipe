@@ -13,6 +13,8 @@ config.*
 .libs/
 build/
 
+*.pot
+
 po/Makefile.in.in
 po/POTFILES
 po/Makevars.template
@@ -21,3 +23,6 @@ po/*.gmo
 po/*.header
 po/*.sed
 po/*.sin
+
+help/*/
+!help/C/
