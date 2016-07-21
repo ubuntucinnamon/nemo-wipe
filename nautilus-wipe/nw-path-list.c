@@ -95,6 +95,8 @@ nw_path_from_nfi (NautilusFileInfo *nfi)
     }
   }
   
+  g_object_unref (file);
+  
   return path;
 }
 
