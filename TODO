@@ -6,8 +6,6 @@
   passes would be nice. However, this would require to use an other backend,
   e.g. scrub (cf. http://code.google.com/p/diskscrub/) instead of secure-delete.
 
-* Use a secure fill algorithm that works on vfat (i.e. use multiples files < 4G)
-
 * Perhaps cleanup a bit progress dialog, it is currently overkill
 
 * Add our entries in the same section on the context's menu that
@@ -17,3 +15,17 @@
 * When one try to remove a single file on a flash device, explain that it's not
   useful at all rather than doing it, giving the user a false impression of
   security.
+
+* Handle the trash
+  * the trash itself (trash:///) could be done by "simply" finding out the
+    various trash locations.  Easier said than done, but doable.
+  * Individual items in it (e.g. trash:///foo.txt).  that's even harder,
+    because Nautilus doesn't seem able to give a local path for those.
+    The best I can think of right now is try and find an item in one of the
+    trash locations (as in first point above) that matches (e.g. in case of
+    trash:///foo.txt, find /foo.txt in any of the trash locations).  It's not
+    awesome, and it gets especially tricky if 2 files with the same path are
+    trashed in different trash folders (which one to choose?).  Maybe GIO's
+    G_FILE_ATTRIBUTE_TRASH_ORIG_PATH can help, as we should then be able to
+    locate the appropriate trash.
+  * maybe cleanup the .trashinfo in the info/ part of the trash?
