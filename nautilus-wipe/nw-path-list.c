@@ -33,23 +33,6 @@
 #endif
 
 
-/* checks whether a #NautilusFileInfo have the given URI scheme */
-static gboolean
-nfi_has_uri_scheme (NautilusFileInfo *nfi,
-                    const gchar      *scheme)
-{
-  gboolean  matches = FALSE;
-  gchar    *nfi_scheme;
-  
-  nfi_scheme = nautilus_file_info_get_uri_scheme (nfi);
-  if (nfi_scheme == scheme || strcmp (nfi_scheme, scheme) == 0) {
-    matches = TRUE;
-  }
-  g_free (nfi_scheme);
-  
-  return matches;
-}
-
 /* gets the Nautilus' desktop path (to handle x-nautilus-desktop:// URIs)
  * heavily based on the implementation from nautilus-open-terminal */
 static gchar *
@@ -87,15 +70,34 @@ nw_path_from_nfi (NautilusFileInfo *nfi)
   GFile *file;
   gchar *path;
   
+  g_object_ref (nfi);
+  
   file = nautilus_file_info_get_location (nfi);
   path = g_file_get_path (file);
   if (! path) {
-    if (nfi_has_uri_scheme (nfi, "x-nautilus-desktop")) {
-      path = get_desktop_path ();
+    /* if we don't have a path, let's see if it's got a different activation
+     * URI, and if so what it points to */
+    gchar *activation_uri = nautilus_file_info_get_activation_uri (nfi);
+    
+    g_object_unref (nfi);
+    g_object_unref (file);
+    nfi = nautilus_file_info_create_for_uri (activation_uri);
+    file = nautilus_file_info_get_location (nfi);
+    path = g_file_get_path (file);
+    
+    if (! path) {
+      /* if we still don't have a path, handle some specific URIs manually */
+      if (g_strcmp0 (activation_uri, "x-nautilus-desktop:///") == 0) {
+        path = get_desktop_path ();
+      }
+      /* TODO: implement trash:/// */
     }
+    
+    g_free (activation_uri);
   }
   
   g_object_unref (file);
+  g_object_unref (nfi);
   
   return path;
 }
