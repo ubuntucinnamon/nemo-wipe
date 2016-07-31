@@ -27,7 +27,7 @@
 
 #include <string.h>
 #include <glib.h>
-#include <libnautilus-extension/nautilus-file-info.h>
+#include "nw-api-impl.h"
 #ifdef HAVE_GCONF
 # include <gconf/gconf-client.h>
 #endif

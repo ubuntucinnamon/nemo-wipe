@@ -87,7 +87,7 @@ gtk_show_uri (GdkScreen    *screen,
 # define HAVE_NAUTILUS_FILE_INFO_GET_LOCATION 1
 
 #include <gio/gio.h>
-#include <libnautilus-extension/nautilus-file-info.h>
+#include "nw-api-impl.h"
 
 static GFile *
 nautilus_file_info_get_location (NautilusFileInfo *nfi)

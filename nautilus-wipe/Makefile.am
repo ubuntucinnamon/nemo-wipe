@@ -4,7 +4,10 @@ nautilus_extension_LTLIBRARIES = libnautilus-wipe.la
 
 localedir = $(datadir)/locale
 
+EXTRA_DIST = nw-api-impl.i
+
 libnautilus_wipe_la_SOURCES  = extension.c \
+                               nw-api-impl.h \
                                nw-compat.h \
                                nw-delete-operation.c \
                                nw-delete-operation.h \

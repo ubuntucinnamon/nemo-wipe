@@ -24,7 +24,7 @@
 
 #include <glib.h>
 
-#include <libnautilus-extension/nautilus-file-info.h>
+#include "nw-api-impl.h"
 
 G_BEGIN_DECLS
 

@@ -31,6 +31,8 @@
 #include <glib/gi18n-lib.h>
 #include <glib-object.h>
 
+#include "nw-api-impl.h"
+
 #include <gsecuredelete/gsecuredelete.h>
 
 

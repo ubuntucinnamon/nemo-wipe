@@ -1,0 +1,15 @@
+#define NAUTILUS_TYPE_MENU_PROVIDER PREFIX(_TYPE_MENU_PROVIDER)
+
+#define nautilus_file_info_create_for_uri     prefix(_file_info_create_for_uri)
+#define nautilus_file_info_get_activation_uri prefix(_file_info_get_activation_uri)
+#define nautilus_file_info_get_location       prefix(_file_info_get_location)
+#define nautilus_file_info_get_uri            prefix(_file_info_get_uri)
+#define nautilus_menu_item_new                prefix(_menu_item_new)
+#define nautilus_module_initialize            prefix(_module_initialize)
+#define nautilus_module_list_types            prefix(_module_list_types)
+#define nautilus_module_shutdown              prefix(_module_shutdown)
+
+#define NautilusFileInfo          Prefix(FileInfo)
+#define NautilusMenuItem          Prefix(MenuItem)
+#define NautilusMenuProvider      Prefix(MenuProvider)
+#define NautilusMenuProviderIface Prefix(MenuProviderIface)

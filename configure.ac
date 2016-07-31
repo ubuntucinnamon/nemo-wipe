@@ -32,8 +32,27 @@ GLIB_REQUIRED=2.10
 GOBJECT_REQUIRED=2.4.0
 GCONF_REQUIRED=2.0
 NAUTILUS_EXTENSION=2.0
+# FIXME: check Caja and Nemo requirement
+CAJA_EXTENSION=1.0
+NEMO_EXTENSION=3.0
 GSECUREDELETE_REQUIRED=0.1
 GIO_UNIX_REQUIRED=2.0
+
+AC_ARG_WITH([nautilus],
+            [AS_HELP_STRING([--with-nautilus=NAME],
+                            [the name of the nautilus-compatible API @<:@default=nautilus@:>@])],
+            [with_nautilus="$withval"],
+            [with_nautilus=nautilus])
+AS_CASE([$with_nautilus],
+        [nautilus],
+        [AC_DEFINE([NW_NAUTILUS_IS_NAUTILUS], [1], [Define to 1 if Nautilus is Nautilus])],
+        [caja],
+        [NAUTILUS_EXTENSION=$CAJA_EXTENSION
+         AC_DEFINE([NW_NAUTILUS_IS_CAJA], [1], [Define to 1 if Nautilus is Caja])],
+        [nemo],
+        [NAUTILUS_EXTENSION=$NEMO_EXTENSION
+         AC_DEFINE([NW_NAUTILUS_IS_NEMO], [1], [Define to 1 if Nautilus is Nemo])],
+        [AC_MSG_ERROR([Unknown Nautilus API "$withval"])])
 
 # choose whether to use GTK2 or GTK3
 AC_ARG_WITH([gtk3],
@@ -53,10 +72,10 @@ AS_IF([test "x$with_gtk3" = xauto],
 AC_MSG_RESULT([$gtk_pkg])
 
 # mandatory packages
-PKG_CHECK_MODULES([GLIB],                   glib-2.0              >= ${GLIB_REQUIRED})
-PKG_CHECK_MODULES([GTK],                    $gtk_pkg              >= ${GTK_REQUIRED})
-PKG_CHECK_MODULES([LIBNAUTILUS_EXTENSION],  libnautilus-extension >= ${NAUTILUS_EXTENSION})
-PKG_CHECK_MODULES([GSECUREDELETE],          gsecuredelete         >= ${GSECUREDELETE_REQUIRED})
+PKG_CHECK_MODULES([GLIB],                   glib-2.0                      >= ${GLIB_REQUIRED})
+PKG_CHECK_MODULES([GTK],                    $gtk_pkg                      >= ${GTK_REQUIRED})
+PKG_CHECK_MODULES([LIBNAUTILUS_EXTENSION],  lib${with_nautilus}-extension >= ${NAUTILUS_EXTENSION})
+PKG_CHECK_MODULES([GSECUREDELETE],          gsecuredelete                 >= ${GSECUREDELETE_REQUIRED})
 # GConf is mandatory, but only for Nautilus 2.x
 AS_IF([test "$gtk_pkg" = "gtk+-2.0"],
       [PKG_CHECK_MODULES([GCONF], gconf-2.0 >= ${GCONF_REQUIRED})
@@ -85,13 +104,15 @@ AM_GNU_GETTEXT([external])
 
 # when working in a test environment, nautilus is typically installed in
 # a non-standard location ; lets specify this here
-NA_NAUTILUS_EXTDIR
+NW_NAUTILUS_EXTDIR([$with_nautilus])
 
 # Checks for library functions.
 # If we are here we're sure we have libnautilus-extension, but we need this for
 # the check below to work (for the lib to be found).
-AC_CHECK_LIB([nautilus-extension], [nautilus_menu_provider_get_file_items])
-AC_CHECK_FUNCS([nautilus_file_info_get_location])
+AC_CHECK_LIB([${with_nautilus}-extension], [${with_nautilus}_menu_provider_get_file_items])
+AC_CHECK_FUNCS([${with_nautilus}_file_info_get_location],
+               [AC_DEFINE([HAVE_NAUTILUS_FILE_INFO_GET_LOCATION], [1],
+                          [Define to 1 if you have the 'nautilus_file_info_get_location' function.])])
 
 # Output
 AC_CONFIG_FILES([Makefile

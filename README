@@ -42,3 +42,10 @@ build against GTK2, you should pass the ``--without-gtk3`` flag to
 
 If you are building from Git, you first need to run ``./autogen.sh``,
 which will prepare the build system and generate the `configure` script.
+
+Support for Caja and Nemo
+-------------------------
+
+Caja and Nemo are supported through the ``--with-nautilus=caja`` and
+``--with-nautilus=nemo`` flags.  The support is however currently
+experimental.

@@ -25,8 +25,7 @@
 
 #include "nw-extension.h"
 
-#include <libnautilus-extension/nautilus-menu-provider.h>
-#include <libnautilus-extension/nautilus-file-info.h>
+#include "nw-api-impl.h"
 
 #include <glib.h>
 #include <glib/gi18n-lib.h>

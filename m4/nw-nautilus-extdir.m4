@@ -4,6 +4,7 @@
 # Copyright (C) 2005 The GNOME Foundation
 # Copyright (C) 2006, 2007, 2008 Frederic Ruaudel and others (see AUTHORS)
 # Copyright (C) 2009 Pierre Wieser and others (see AUTHORS)
+# Copyright (C) 2016 Colomban Wendling (see AUTHORS)
 #
 # This Program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,16 +25,21 @@
 #   Frederic Ruaudel <grumz@grumz.net>
 #   Rodrigo Moya <rodrigo@gnome-db.org>
 #   Pierre Wieser <pwieser@trychlos.org>
+#   Colomban Wendling <ban@herbesfolles.org>
 #   ... and many others (see AUTHORS)
 
-# serial 2 change NACT_ prefix to NA_ (Nautilus Actions)
+# serial 3 support for alternative nautilus name
 
 # let the user specify an alternate nautilus-extension dir
 # --with-nautilus-extdir=<dir>
 
-AC_DEFUN([NA_NAUTILUS_EXTDIR],[
-	AC_REQUIRE([_AC_ARG_NA_NAUTILUS_EXTDIR])dnl
-	AC_REQUIRE([_AC_NA_CHECK_NAUTILUS_EXTDIR])dnl
+AC_DEFUN([NW_NAUTILUS_EXTDIR],[
+	AC_REQUIRE([_AC_ARG_NW_NAUTILUS_EXTDIR])dnl
+	AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+	if test "x${ac_with_nact_nautilus_extdir}" = "x"; then
+		nautilus=m4_default([$1], [nautilus])
+		ac_with_nact_nautilus_extdir="`${PKG_CONFIG} --variable=extensiondir lib${nautilus}-extension`"
+	fi
 	if test "x${ac_with_nact_nautilus_extdir}" = "x"; then
 		AC_MSG_ERROR([Unable to determine nautilus extension folder, please use --with-nautilus-extdir option])
 	else
@@ -42,7 +48,7 @@ AC_DEFUN([NA_NAUTILUS_EXTDIR],[
 	fi
 ])
 
-AC_DEFUN([_AC_ARG_NA_NAUTILUS_EXTDIR],[
+AC_DEFUN([_AC_ARG_NW_NAUTILUS_EXTDIR],[
 	AC_ARG_WITH(
 		[nautilus-extdir],
 		AC_HELP_STRING(
@@ -52,12 +58,4 @@ AC_DEFUN([_AC_ARG_NA_NAUTILUS_EXTDIR],[
 	[ac_with_nact_nautilus_extdir=$withval],
 	[ac_with_nact_nautilus_extdir=""]
 	)
-])
-
-AC_DEFUN([_AC_NA_CHECK_NAUTILUS_EXTDIR],[
-	if test "x${ac_with_nact_nautilus_extdir}" = "x"; then
-		if test "x${PKG_CONFIG}" != "x"; then
-			ac_with_nact_nautilus_extdir="`${PKG_CONFIG} --variable=extensiondir libnautilus-extension`"
-		fi
-	fi
 ])
