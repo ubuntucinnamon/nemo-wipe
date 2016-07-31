@@ -40,7 +40,8 @@ get_desktop_path (void)
 {
   gchar *path = NULL;
   
-#ifdef HAVE_GCONF
+#if defined(NW_NAUTILUS_IS_NAUTILUS)
+# ifdef HAVE_GCONF
   if (! path) {
     GConfClient *conf_client;
     
@@ -52,7 +53,23 @@ get_desktop_path (void)
     }
     g_object_unref (conf_client);
   }
-#endif /* HAVE_GCONF */
+# endif /* HAVE_GCONF */
+#elif defined(NW_NAUTILUS_IS_CAJA) || defined(NW_NAUTILUS_IS_NEMO)
+  if (! path) {
+# if defined(NW_NAUTILUS_IS_CAJA)
+    const gchar *const schema = "org.mate.caja.preferences";
+# elif defined(NW_NAUTILUS_IS_NEMO)
+    const gchar *const schema = "org.nemo.preferences";
+# endif /* Caja/Nemo */
+    GSettings *settings = g_settings_new(schema);
+    
+    if (g_settings_get_boolean(settings, "desktop-is-home-dir")) {
+      path = g_strdup (g_get_home_dir ());
+    }
+    
+    g_object_unref (settings);
+  }
+#endif /* Nautilus/Caja/Nemo */
   
   if (! path) {
     path = g_strdup (g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP));
@@ -87,7 +104,7 @@ nw_path_from_nfi (NautilusFileInfo *nfi)
     
     if (! path) {
       /* if we still don't have a path, handle some specific URIs manually */
-      if (g_strcmp0 (activation_uri, "x-nautilus-desktop:///") == 0) {
+      if (g_strcmp0 (activation_uri, NW_NAUTILUS_DESKTOP_URI) == 0) {
         path = get_desktop_path ();
       }
       /* TODO: implement trash:/// */

@@ -80,6 +80,9 @@ PKG_CHECK_MODULES([GSECUREDELETE],          gsecuredelete                 >= ${G
 AS_IF([test "$gtk_pkg" = "gtk+-2.0"],
       [PKG_CHECK_MODULES([GCONF], gconf-2.0 >= ${GCONF_REQUIRED})
        AC_DEFINE([HAVE_GCONF], [1], [Whether we have GConf])])
+# GSettings is mandatory for Caja and Nemo
+AS_CASE(["$with_nautilus"],
+        [caja|nemo], [PKG_CHECK_MODULES([GSETTINGS], [gio-2.0 >= 2.26])])
 
 # optional packages
 HAVE_GIO_UNIX=0

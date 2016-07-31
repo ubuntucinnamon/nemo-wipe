@@ -28,10 +28,13 @@
 # include "config.h"
 #endif
 
+/* Nautilus (GNOME) */
 #if defined(NW_NAUTILUS_IS_NAUTILUS)
 /* no mapping needed */
 # include <libnautilus-extension/nautilus-menu-provider.h>
 # include <libnautilus-extension/nautilus-file-info.h>
+# define NW_NAUTILUS_DESKTOP_URI "x-nautilus-desktop:///"
+/* Caja (MATE) */
 #elif defined(NW_NAUTILUS_IS_CAJA)
 # define PREFIX(x) CAJA##x
 # define prefix(x) caja##x
@@ -39,6 +42,8 @@
 # include "nw-api-impl.i"
 # include <libcaja-extension/caja-menu-provider.h>
 # include <libcaja-extension/caja-file-info.h>
+# define NW_NAUTILUS_DESKTOP_URI "x-caja-desktop:///"
+/* Nemo (Cinnamon) */
 #elif defined(NW_NAUTILUS_IS_NEMO)
 # define PREFIX(x) NEMO##x
 # define prefix(x) nemo##x
@@ -46,6 +51,7 @@
 # include "nw-api-impl.i"
 # include <libnemo-extension/nemo-menu-provider.h>
 # include <libnemo-extension/nemo-file-info.h>
+# define NW_NAUTILUS_DESKTOP_URI "x-nemo-desktop:///"
 #else
 # error "Unknown Nautilus API implementation"
 #endif
