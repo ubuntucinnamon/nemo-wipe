@@ -2,22 +2,22 @@
 # Deutsche Übersetzung für das Paket nautilus-wipe.
 # Copyright (C) 2010-2011 Christian Meyer <c2h5oh@web.de>
 # This file is distributed under the same license as the nautilus-wipe package.
+# u <u@451f.org>, 2016.
 # Christian Meyer <c2h5oh@web.de>, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-wipe 0.2.1\n"
 "Report-Msgid-Bugs-To: bugs@wipetools.tuxfamily.org\n"
 "POT-Creation-Date: 2016-07-18 20:38+0200\n"
-"PO-Revision-Date: 2016-07-24 09:35+0100\n"
-"Last-Translator: Christian Meyer <c2h5oh@web.de>\n"
+"PO-Revision-Date: 2016-11-18 10:56+0100\n"
+"Last-Translator: u <u@451f.org>\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Poedit-Language: German\n"
-"X-Poedit-Country: GERMANY\n"
+"X-Generator: Poedit 1.6.10\n"
 
 #: nautilus-wipe/nw-delete-operation.c:87
 #, c-format
@@ -27,12 +27,12 @@ msgstr "Datei %u von %u, Durchgang %u von %u"
 #: nautilus-wipe/nw-fill-operation.c:164
 #, c-format
 msgid "Device \"%s\" (%u out of %u), pass %u out of %u"
-msgstr "Gerät \"%s\" (%u von %u), Durchgang %u von %u"
+msgstr "Datenträger \"%s\" (%u von %u), Durchgang %u von %u"
 
 #: nautilus-wipe/nw-fill-operation.c:169
 #, c-format
 msgid "Device \"%s\", pass %u out of %u"
-msgstr "Gerät \"%s\", Durchgang %u von %u"
+msgstr "Datenträger \"%s\", Durchgang %u von %u"
 
 #: nautilus-wipe/nw-fill-operation.c:375
 #, c-format
@@ -49,13 +49,15 @@ msgstr "Kein Einhängepunkt gefunden für den Pfad \"%s\""
 #, c-format
 msgid "Are you sure you want to wipe the %u selected items?"
 msgid_plural "Are you sure you want to wipe the %u selected items?"
-msgstr[0] "Sind Sie sicher, dass Sie das %u ausgewählte Element endgültig löschen wollen?"
-msgstr[1] "Sind Sie sicher, dass Sie die %u ausgewählten Elemente endgültig löschen wollen?"
+msgstr[0] ""
+"Sind Sie sicher, dass Sie das %u ausgewählte Element sicher löschen wollen?"
+msgstr[1] ""
+"Sind Sie sicher, dass Sie die %u ausgewählten Elemente sicher löschen wollen?"
 
 #: nautilus-wipe/nw-extension.c:126
 #, c-format
 msgid "Are you sure you want to wipe \"%s\"?"
-msgstr "Sind Sie sicher, dass Sie  \"%s\" endgültig löschen wollen?"
+msgstr "Sind Sie sicher, dass Sie  \"%s\" sicher löschen wollen?"
 
 #: nautilus-wipe/nw-extension.c:133
 msgid "Wipe Files"
@@ -63,7 +65,8 @@ msgstr "Lösche Dateien"
 
 #: nautilus-wipe/nw-extension.c:136
 msgid "If you wipe an item, it will not be recoverable."
-msgstr "Wenn Sie ein Element endgültig Löschen kann es nicht wieder hergestellt werden."
+msgstr ""
+"Wenn Sie ein Element sicher löschen kann es nicht wieder hergestellt werden."
 
 #: nautilus-wipe/nw-extension.c:137 nautilus-wipe/nw-extension.c:217
 msgid "_Wipe"
@@ -84,8 +87,8 @@ msgstr "Sicheres Löschen war erfolgreich."
 #: nautilus-wipe/nw-extension.c:148
 msgid "The item has been successfully wiped."
 msgid_plural "The items have been successfully wiped."
-msgstr[0] "Das Element wurde erfolgreich gelöscht."
-msgstr[1] "Die Elemente wurden erfolgreich gelöscht."
+msgstr[0] "Das Element wurde erfolgreich sicher gelöscht."
+msgstr[1] "Die Elemente wurden erfolgreich sicher gelöscht."
 
 #. TRANSLATORS: this is the last device names separator
 #: nautilus-wipe/nw-extension.c:178
@@ -105,24 +108,37 @@ msgstr "\"%s\""
 
 #: nautilus-wipe/nw-extension.c:188
 #, c-format
-msgid "Are you sure you want to wipe the available disk space on the %s partitions or devices?"
-msgstr "Sind sie sicher, dass Sie den verfügbaren Speicherplatz auf %s sicher löschen möchten?"
+msgid ""
+"Are you sure you want to wipe the available disk space on the %s partitions "
+"or devices?"
+msgstr ""
+"Sind sie sicher, dass Sie den verfügbaren Speicherplatz auf %s sicher "
+"löschen möchten?"
 
 #: nautilus-wipe/nw-extension.c:192
-#, fuzzy, c-format
-msgid "Available disk space on the partitions or devices %s have been successfully wiped."
-msgstr "Der verfügbare Speicherplatz auf %s wurde erfolgreich gelöscht."
+#, c-format
+msgid ""
+"Available disk space on the partitions or devices %s have been successfully "
+"wiped."
+msgstr "Der verfügbare Speicherplatz auf %s wurde erfolgreich sicher gelöscht."
 
 # partition/device?
 #: nautilus-wipe/nw-extension.c:201
 #, c-format
-msgid "Are you sure you want to wipe the available disk space on the \"%s\" partition or device?"
-msgstr "Sind sie sicher, dass Sie den verfügbaren Speicherplatz auf \"%s\" endgültig löschen möchten?"
+msgid ""
+"Are you sure you want to wipe the available disk space on the \"%s\" "
+"partition or device?"
+msgstr ""
+"Sind sie sicher, dass Sie den verfügbaren Speicherplatz auf \"%s\" sicher "
+"löschen möchten?"
 
 #: nautilus-wipe/nw-extension.c:205
 #, c-format
-msgid "Available disk space on the partition or device \"%s\" has been successfully wiped."
-msgstr "Der verfügbare Speicherplatz auf \"%s\" wurde erfolgreich gelöscht."
+msgid ""
+"Available disk space on the partition or device \"%s\" has been successfully "
+"wiped."
+msgstr ""
+"Der verfügbare Speicherplatz auf \"%s\" wurde erfolgreich sicher gelöscht."
 
 #: nautilus-wipe/nw-extension.c:213
 msgid "Wipe Available Disk Space"
@@ -130,11 +146,11 @@ msgstr "Sichereres Löschen des verfügbaren Festplattenplatzes"
 
 #: nautilus-wipe/nw-extension.c:216
 msgid "This operation may take a while."
-msgstr "Diese Operation könnte einige Zeit lang dauern."
+msgstr "Dieser Vorgang kann einige Zeit in Anspruch nehmen."
 
 #: nautilus-wipe/nw-extension.c:220
 msgid "Wiping available disk space..."
-msgstr "Lösche den verfügbaren Festplattenplatz..."
+msgstr "Sicheres Löschen des verfügbaren Festplattenplatzes..."
 
 #: nautilus-wipe/nw-extension.c:224
 msgid "Wipe failed"
@@ -165,15 +181,16 @@ msgstr "Sichereres Löschen des verfügbaren Festplattenplatzes"
 # Hier: "Überschreibe"?
 # besser: "Lösche endgültig"?
 #: nautilus-wipe/nw-extension.c:291
-#, fuzzy
 msgid "Wipe available disk space on this partition or device"
 msgid_plural "Wipe available disk space on these partitions or devices"
-msgstr[0] "Überschreibe den verfügbaren Festplattenplatz auf diesem Gerät"
-msgstr[1] "Überschreibe den verfügbaren Festplattenplatz auf diesen Geräten"
+msgstr[0] ""
+"Überschreibe den verfügbaren Festplattenplatz auf diesem Datenträger"
+msgstr[1] ""
+"Überschreibe den verfügbaren Festplattenplatz auf diesen Datenträgern"
 
 #: nautilus-wipe/nw-operation-manager.c:212
 msgid "However, the following warning was issued during the operation:"
-msgstr "Wie auch immer. Die folgende Warnung ist aufgetreten:"
+msgstr "Allerdings ist folgende Warnung ist aufgetreten:"
 
 #: nautilus-wipe/nw-operation-manager.c:232
 msgid "_Details"
@@ -205,7 +222,9 @@ msgstr "(schützt nur vor Software Angriffen)"
 
 #: nautilus-wipe/nw-operation-manager.c:475
 msgid "_Fast and insecure mode (no /dev/urandom, no synchronize mode)"
-msgstr "_Schneller und unsicherer Modus (ohne /dev/urandom, kein Synchronisationsmodus)"
+msgstr ""
+"_Schneller und unsicherer Modus (ohne /dev/urandom, kein "
+"Synchronisationsmodus)"
 
 #: nautilus-wipe/nw-operation-manager.c:487
 msgid "Last pass with _zeros instead of random data"
@@ -213,24 +232,31 @@ msgstr "Letzter Durchgang mit _Nullen statt mit Zufallszahlen"
 
 #: nautilus-wipe/nw-operation-manager.c:522
 msgid "Are you sure you want to cancel this operation?"
-msgstr "Sind Sie sicher, dass Sie die Operation abbrechen möchten?"
+msgstr "Sind Sie sicher, dass Sie den Vorgang abbrechen möchten?"
 
 #: nautilus-wipe/nw-operation-manager.c:523
-msgid "Canceling this operation might leave some item(s) in an intermediate state."
-msgstr "Das Abbrechen dieser Operation könnten einige Elemente in einem Zwischenzustand zurücklassen."
+msgid ""
+"Canceling this operation might leave some item(s) in an intermediate state."
+msgstr ""
+"Das Abbrechen dieses Vorgangs könnten einige Elemente in einem "
+"Zwischenzustand zurücklassen."
 
 #: nautilus-wipe/nw-operation-manager.c:525
 msgid "Resume operation"
-msgstr "Operation fortsetzen"
+msgstr "Vorgang fortsetzen"
 
 #: nautilus-wipe/nw-operation-manager.c:526
 msgid "Cancel operation"
-msgstr "Operation abbrechen"
+msgstr "Vorgang abbrechen"
 
 #: nautilus-wipe/nw-operation-manager.c:632
 #, c-format
-msgid "%s. Please make sure you have the secure-delete package properly installed on your system."
-msgstr "%s. Stellen Sie bitte sicher, dass das secure-delete Paket auf Ihrem System installiert ist."
+msgid ""
+"%s. Please make sure you have the secure-delete package properly installed "
+"on your system."
+msgstr ""
+"%s. Stellen Sie bitte sicher, dass das secure-delete Paket auf Ihrem System "
+"installiert ist."
 
 #: nautilus-wipe/nw-progress-dialog.c:757
 msgid "Pause"
@@ -239,4 +265,3 @@ msgstr "Pause"
 #: nautilus-wipe/nw-progress-dialog.c:763
 msgid "Resume"
 msgstr "Fortsetzen"
-
