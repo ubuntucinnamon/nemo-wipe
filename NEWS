@@ -1,3 +1,15 @@
+0.3 (2016-11-21):
+
+  * Experimental support for Caja and Nemo
+  * Fix resolving path to virtual (desktop shortcut) locations
+  * Add support for pausing operations
+  * Add progress text
+  * Report operations' non-fatal warnings
+  * Add more meaningful titles to the dialogs
+  * Update translations: de, fr
+  * New help translations: fr
+
+
 0.2.1 (2014-01-23):
 
   Minor maintenance release.
