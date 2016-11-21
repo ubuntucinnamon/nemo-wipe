@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-wipe 0.2.1\n"
 "Report-Msgid-Bugs-To: bugs@wipetools.tuxfamily.org\n"
-"POT-Creation-Date: 2016-07-18 20:38+0200\n"
+"POT-Creation-Date: 2016-11-21 11:33+0100\n"
 "PO-Revision-Date: 2016-11-18 10:56+0100\n"
 "Last-Translator: u <u@451f.org>\n"
 "Language-Team: German\n"
@@ -45,7 +45,7 @@ msgid "No mount point found for path \"%s\""
 msgstr "Kein Einhängepunkt gefunden für den Pfad \"%s\""
 
 #. TRANSLATORS: singular is not really used, N is strictly >1
-#: nautilus-wipe/nw-extension.c:113
+#: nautilus-wipe/nw-extension.c:112
 #, c-format
 msgid "Are you sure you want to wipe the %u selected items?"
 msgid_plural "Are you sure you want to wipe the %u selected items?"
@@ -54,59 +54,59 @@ msgstr[0] ""
 msgstr[1] ""
 "Sind Sie sicher, dass Sie die %u ausgewählten Elemente sicher löschen wollen?"
 
-#: nautilus-wipe/nw-extension.c:126
+#: nautilus-wipe/nw-extension.c:125
 #, c-format
 msgid "Are you sure you want to wipe \"%s\"?"
 msgstr "Sind Sie sicher, dass Sie  \"%s\" sicher löschen wollen?"
 
-#: nautilus-wipe/nw-extension.c:133
+#: nautilus-wipe/nw-extension.c:132
 msgid "Wipe Files"
 msgstr "Lösche Dateien"
 
-#: nautilus-wipe/nw-extension.c:136
+#: nautilus-wipe/nw-extension.c:135
 msgid "If you wipe an item, it will not be recoverable."
 msgstr ""
 "Wenn Sie ein Element sicher löschen kann es nicht wieder hergestellt werden."
 
-#: nautilus-wipe/nw-extension.c:137 nautilus-wipe/nw-extension.c:217
+#: nautilus-wipe/nw-extension.c:136 nautilus-wipe/nw-extension.c:216
 msgid "_Wipe"
 msgstr "_Sicher löschen"
 
-#: nautilus-wipe/nw-extension.c:140
+#: nautilus-wipe/nw-extension.c:139
 msgid "Wiping files..."
 msgstr "Lösche Dateien…"
 
-#: nautilus-wipe/nw-extension.c:144
+#: nautilus-wipe/nw-extension.c:143
 msgid "Wipe failed."
 msgstr "Sicheres Löschen ist fehlgeschlagen."
 
-#: nautilus-wipe/nw-extension.c:146
+#: nautilus-wipe/nw-extension.c:145
 msgid "Wipe successful."
 msgstr "Sicheres Löschen war erfolgreich."
 
-#: nautilus-wipe/nw-extension.c:148
+#: nautilus-wipe/nw-extension.c:147
 msgid "The item has been successfully wiped."
 msgid_plural "The items have been successfully wiped."
 msgstr[0] "Das Element wurde erfolgreich sicher gelöscht."
 msgstr[1] "Die Elemente wurden erfolgreich sicher gelöscht."
 
 #. TRANSLATORS: this is the last device names separator
-#: nautilus-wipe/nw-extension.c:178
+#: nautilus-wipe/nw-extension.c:177
 msgid " and "
 msgstr " und "
 
 #. TRANSLATORS: this is the device names separator (except last)
-#: nautilus-wipe/nw-extension.c:181
+#: nautilus-wipe/nw-extension.c:180
 msgid ", "
 msgstr ", "
 
 #. TRANSLATORS: this is the device name
-#: nautilus-wipe/nw-extension.c:185
+#: nautilus-wipe/nw-extension.c:184
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
-#: nautilus-wipe/nw-extension.c:188
+#: nautilus-wipe/nw-extension.c:187
 #, c-format
 msgid ""
 "Are you sure you want to wipe the available disk space on the %s partitions "
@@ -115,7 +115,7 @@ msgstr ""
 "Sind sie sicher, dass Sie den verfügbaren Speicherplatz auf %s sicher "
 "löschen möchten?"
 
-#: nautilus-wipe/nw-extension.c:192
+#: nautilus-wipe/nw-extension.c:191
 #, c-format
 msgid ""
 "Available disk space on the partitions or devices %s have been successfully "
@@ -123,7 +123,7 @@ msgid ""
 msgstr "Der verfügbare Speicherplatz auf %s wurde erfolgreich sicher gelöscht."
 
 # partition/device?
-#: nautilus-wipe/nw-extension.c:201
+#: nautilus-wipe/nw-extension.c:200
 #, c-format
 msgid ""
 "Are you sure you want to wipe the available disk space on the \"%s\" "
@@ -132,7 +132,7 @@ msgstr ""
 "Sind sie sicher, dass Sie den verfügbaren Speicherplatz auf \"%s\" sicher "
 "löschen möchten?"
 
-#: nautilus-wipe/nw-extension.c:205
+#: nautilus-wipe/nw-extension.c:204
 #, c-format
 msgid ""
 "Available disk space on the partition or device \"%s\" has been successfully "
@@ -140,47 +140,47 @@ msgid ""
 msgstr ""
 "Der verfügbare Speicherplatz auf \"%s\" wurde erfolgreich sicher gelöscht."
 
-#: nautilus-wipe/nw-extension.c:213
+#: nautilus-wipe/nw-extension.c:212
 msgid "Wipe Available Disk Space"
 msgstr "Sichereres Löschen des verfügbaren Festplattenplatzes"
 
-#: nautilus-wipe/nw-extension.c:216
+#: nautilus-wipe/nw-extension.c:215
 msgid "This operation may take a while."
 msgstr "Dieser Vorgang kann einige Zeit in Anspruch nehmen."
 
-#: nautilus-wipe/nw-extension.c:220
+#: nautilus-wipe/nw-extension.c:219
 msgid "Wiping available disk space..."
 msgstr "Sicheres Löschen des verfügbaren Festplattenplatzes..."
 
-#: nautilus-wipe/nw-extension.c:224
+#: nautilus-wipe/nw-extension.c:223
 msgid "Wipe failed"
 msgstr "Sicheres Löschen ist fehlgeschlagen"
 
-#: nautilus-wipe/nw-extension.c:226
+#: nautilus-wipe/nw-extension.c:225
 msgid "Wipe successful"
 msgstr "Sicheres Löschen war erfolgreich"
 
-#: nautilus-wipe/nw-extension.c:251
+#: nautilus-wipe/nw-extension.c:250
 msgid "Wipe"
 msgstr "Sicher löschen"
 
-#: nautilus-wipe/nw-extension.c:252
+#: nautilus-wipe/nw-extension.c:251
 msgid "Delete each selected item and overwrite its data"
 msgstr "Lösche jedes ausgewählte Element und überschreibe seine Daten"
 
-#: nautilus-wipe/nw-extension.c:285
+#: nautilus-wipe/nw-extension.c:284
 #, c-format
 msgid "File filtering failed: %s"
 msgstr "Dateifilterung ist fehlgeschlagen: %s"
 
-#: nautilus-wipe/nw-extension.c:289
+#: nautilus-wipe/nw-extension.c:288
 msgid "Wipe available disk space"
 msgstr "Sichereres Löschen des verfügbaren Festplattenplatzes"
 
 # Wipe:
 # Hier: "Überschreibe"?
 # besser: "Lösche endgültig"?
-#: nautilus-wipe/nw-extension.c:291
+#: nautilus-wipe/nw-extension.c:290
 msgid "Wipe available disk space on this partition or device"
 msgid_plural "Wipe available disk space on these partitions or devices"
 msgstr[0] ""
