@@ -5,10 +5,10 @@
 # Colomban Wendling <ban@herbesfolles.org>, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: nautilus-wipe 0.2\n"
+"Project-Id-Version: nautilus-wipe 0.3\n"
 "Report-Msgid-Bugs-To: bugs@wipetools.tuxfamily.org\n"
 "POT-Creation-Date: 2016-11-21 11:33+0100\n"
-"PO-Revision-Date: 2016-07-18 18:31+0200\n"
+"PO-Revision-Date: 2017-06-28 21:35+0000\n"
 "Last-Translator: Colomban Wendling <ban@herbesfolles.org>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -163,7 +163,7 @@ msgstr "Écraser"
 
 #: nautilus-wipe/nw-extension.c:251
 msgid "Delete each selected item and overwrite its data"
-msgstr "Supprime chaque élément sélectionné et écraser son contenu"
+msgstr "Supprime chaque élément sélectionné et écrase son contenu"
 
 #: nautilus-wipe/nw-extension.c:284
 #, c-format
@@ -178,9 +178,9 @@ msgstr "Écraser l'espace disque disponible"
 msgid "Wipe available disk space on this partition or device"
 msgid_plural "Wipe available disk space on these partitions or devices"
 msgstr[0] ""
-"Écrase l'espace disque disponible sur cette partition ou périphérique"
+"Écrase l'espace disque disponible sur cette partition ou ce périphérique"
 msgstr[1] ""
-"Écrase l'espace disque disponible sur ces partitions ou périphérique"
+"Écrase l'espace disque disponible sur ces partitions ou périphériques"
 
 #: nautilus-wipe/nw-operation-manager.c:212
 msgid "However, the following warning was issued during the operation:"
