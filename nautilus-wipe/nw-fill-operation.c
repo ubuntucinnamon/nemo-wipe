@@ -32,7 +32,7 @@
 #if HAVE_GIO_UNIX
 # include <gio/gunixmounts.h>
 #endif
-#include <gsecuredelete/gsecuredelete.h>
+#include <gsecuredelete.h>
 
 #include "nw-operation.h"
 #include "nw-path-list.h"

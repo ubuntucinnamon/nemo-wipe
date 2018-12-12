@@ -30,7 +30,7 @@
 #include <glib/gi18n-lib.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
-#include <gsecuredelete/gsecuredelete.h>
+#include <gsecuredelete.h>
 
 #include "nw-progress-dialog.h"
 #include "nw-compat.h"

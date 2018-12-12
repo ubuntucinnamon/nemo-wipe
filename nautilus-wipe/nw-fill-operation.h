@@ -24,7 +24,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include <gsecuredelete/gsecuredelete.h>
+#include <gsecuredelete.h>
 
 #include "nw-operation.h"
 

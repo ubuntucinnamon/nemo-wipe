@@ -32,7 +32,7 @@
 #include <gtk/gtk.h>
 #include <gio/gio.h>
 
-#include <gsecuredelete/gsecuredelete.h>
+#include <gsecuredelete.h>
 
 #include "nw-path-list.h"
 #include "nw-operation-manager.h"

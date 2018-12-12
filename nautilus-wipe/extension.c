@@ -33,7 +33,7 @@
 
 #include "nw-api-impl.h"
 
-#include <gsecuredelete/gsecuredelete.h>
+#include <gsecuredelete.h>
 
 
 static GType provider_types[1];

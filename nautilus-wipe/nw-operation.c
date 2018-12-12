@@ -24,7 +24,7 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#include <gsecuredelete/gsecuredelete.h>
+#include <gsecuredelete.h>
 
 
 static void   nw_operation_real_add_files           (NwOperation *self,
