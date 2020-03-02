@@ -1,3 +1,10 @@
+0.3.1 (2020-03-02):
+
+  * Build fix on less standard installations
+  * Update translations: fr
+  * New translations: da
+
+
 0.3 (2016-11-21):
 
   * Experimental support for Caja and Nemo
