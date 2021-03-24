@@ -21,10 +21,6 @@ GETTEXT_PACKAGE="${PACKAGE}"
 AC_SUBST([GETTEXT_PACKAGE])
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["${GETTEXT_PACKAGE}"], [GNU gettext package])
 
-# when working in a test environment, nemo is typically installed in
-# a non-standard location ; lets specify this here
-NW_NEMO_EXTDIR([$with_nemo])
-
 # Output
 AC_CONFIG_FILES([Makefile
                  po/Makefile.in

@@ -1,10 +1,4 @@
-nemo_extensiondir = $(NEMO_EXTENSIONS_DIR)
-
 nemo_extension_LTLIBRARIES = libnemo-wipe.la
-
-localedir = $(datadir)/locale
-
-EXTRA_DIST = nw-api-impl.i
 
 libnemo_wipe_la_SOURCES  = extension.c \
                                nw-api-impl.h \
@@ -32,10 +26,3 @@ libnemo_wipe_la_CFLAGS   = @GLIB_CFLAGS@ \
                                @LIBNEMO_EXTENSION_CFLAGS@ \
                                @GSECUREDELETE_CFLAGS@ \
                                @GIO_UNIX_CFLAGS@
-libnemo_wipe_la_LDFLAGS  = -module -avoid-version \
-                               @GLIB_LIBS@ \
-                               @GTK_LIBS@ \
-                               @GCONF_LIBS@ \
-                               @LIBNEMO_EXTENSION_LIBS@ \
-                               @GSECUREDELETE_LIBS@ \
-                               @GIO_UNIX_LIBS@
