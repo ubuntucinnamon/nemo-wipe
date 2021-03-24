@@ -1,5 +1,5 @@
 /*
- *  nautilus-wipe - a nautilus extension to wipe file(s)
+ *  nemo-wipe - a nemo extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -43,13 +43,13 @@
 
 
 /* private prototypes */
-static GList *nw_extension_real_get_file_items        (NautilusMenuProvider *provider,
+static GList *nw_extension_real_get_file_items        (NemoMenuProvider *provider,
                                                        GtkWidget            *window,
                                                        GList                *files);
-static GList *nw_extension_real_get_background_items  (NautilusMenuProvider *provider,
+static GList *nw_extension_real_get_background_items  (NemoMenuProvider *provider,
                                                        GtkWidget            *window,
-                                                       NautilusFileInfo     *current_folder);
-static void   nw_extension_menu_provider_iface_init   (NautilusMenuProviderIface *iface);
+                                                       NemoFileInfo     *current_folder);
+static void   nw_extension_menu_provider_iface_init   (NemoMenuProviderIface *iface);
 
 
 #define ITEM_DATA_MOUNTPOINTS_KEY "Nw::Extension::mountpoints"
@@ -75,13 +75,13 @@ nw_extension_error_quark (void)
 NW_DEFINE_TYPE_MODULE_WITH_CODE (NwExtension,
                                  nw_extension,
                                  G_TYPE_OBJECT,
-                                 NW_TYPE_MODULE_IMPLEMENT_INTERFACE (NAUTILUS_TYPE_MENU_PROVIDER,
+                                 NW_TYPE_MODULE_IMPLEMENT_INTERFACE (NEMO_TYPE_MENU_PROVIDER,
                                                                      nw_extension_menu_provider_iface_init))
 
 
 
 static void
-nw_extension_menu_provider_iface_init (NautilusMenuProviderIface *iface)
+nw_extension_menu_provider_iface_init (NemoMenuProviderIface *iface)
 {
   iface->get_file_items       = nw_extension_real_get_file_items;
   iface->get_background_items = nw_extension_real_get_background_items;
@@ -238,15 +238,15 @@ wipe_menu_item_activate_handler (GObject *item,
                                      g_object_get_data (item, ITEM_DATA_PATHS_KEY));
 }
 
-static NautilusMenuItem *
-create_wipe_menu_item (NautilusMenuProvider *provider,
+static NemoMenuItem *
+create_wipe_menu_item (NemoMenuProvider *provider,
                        const gchar          *item_name,
                        GtkWidget            *window,
                        GList                *paths)
 {
-  NautilusMenuItem *item;
+  NemoMenuItem *item;
   
-  item = nautilus_menu_item_new (item_name,
+  item = nemo_menu_item_new (item_name,
                                  _("Wipe"),
                                  _("Delete each selected item and overwrite its data"),
                                  GTK_STOCK_DELETE);
@@ -269,13 +269,13 @@ fill_menu_item_activate_handler (GObject *item,
                                    g_object_get_data (item, ITEM_DATA_MOUNTPOINTS_KEY));
 }
 
-static NautilusMenuItem *
-create_fill_menu_item (NautilusMenuProvider *provider,
+static NemoMenuItem *
+create_fill_menu_item (NemoMenuProvider *provider,
                        const gchar          *item_name,
                        GtkWidget            *window,
                        GList                *files)
 {
-  NautilusMenuItem *item        = NULL;
+  NemoMenuItem *item        = NULL;
   GList            *mountpoints = NULL;
   GList            *folders     = NULL;
   GError           *err         = NULL;
@@ -284,7 +284,7 @@ create_fill_menu_item (NautilusMenuProvider *provider,
     g_warning (_("File filtering failed: %s"), err->message);
     g_error_free (err);
   } else {
-    item = nautilus_menu_item_new (item_name,
+    item = nemo_menu_item_new (item_name,
                                    _("Wipe available disk space"),
                                    g_dngettext(GETTEXT_PACKAGE,
                                                "Wipe available disk space on "
@@ -310,16 +310,16 @@ create_fill_menu_item (NautilusMenuProvider *provider,
 /* adds @item to the #GList @items if not %NULL */
 #define ADD_ITEM(items, item)                         \
   G_STMT_START {                                      \
-    NautilusMenuItem *ADD_ITEM__item = (item);        \
+    NemoMenuItem *ADD_ITEM__item = (item);        \
                                                       \
     if (ADD_ITEM__item != NULL) {                     \
       items = g_list_append (items, ADD_ITEM__item);  \
     }                                                 \
   } G_STMT_END
 
-/* populates Nautilus' file menu */
+/* populates Nemo' file menu */
 static GList *
-nw_extension_real_get_file_items (NautilusMenuProvider *provider,
+nw_extension_real_get_file_items (NemoMenuProvider *provider,
                                   GtkWidget            *window,
                                   GList                *files)
 {
@@ -329,10 +329,10 @@ nw_extension_real_get_file_items (NautilusMenuProvider *provider,
   paths = nw_path_list_new_from_nfi_list (files);
   if (paths) {
     ADD_ITEM (items, create_wipe_menu_item (provider,
-                                            "nautilus-wipe::files-items::wipe",
+                                            "nemo-wipe::files-items::wipe",
                                             window, paths));
     ADD_ITEM (items, create_fill_menu_item (provider,
-                                            "nautilus-wipe::files-items::fill",
+                                            "nemo-wipe::files-items::fill",
                                             window, paths));
   }
   nw_path_list_free (paths);
@@ -340,11 +340,11 @@ nw_extension_real_get_file_items (NautilusMenuProvider *provider,
   return items;
 }
 
-/* populates Nautilus' background menu */
+/* populates Nemo' background menu */
 static GList *
-nw_extension_real_get_background_items (NautilusMenuProvider *provider,
+nw_extension_real_get_background_items (NemoMenuProvider *provider,
                                         GtkWidget            *window,
-                                        NautilusFileInfo     *current_folder)
+                                        NemoFileInfo     *current_folder)
 {
   GList *items = NULL;
   GList *paths = NULL;
@@ -352,7 +352,7 @@ nw_extension_real_get_background_items (NautilusMenuProvider *provider,
   paths = g_list_append (paths, nw_path_from_nfi (current_folder));
   if (paths && paths->data) {
     ADD_ITEM (items, create_fill_menu_item (provider,
-                                            "nautilus-wipe::background-items::fill",
+                                            "nemo-wipe::background-items::fill",
                                             window, paths));
   }
   nw_path_list_free (paths);

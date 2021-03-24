@@ -1,5 +1,5 @@
 /*
- *  nautilus-wipe - a nautilus extension to wipe file(s)
+ *  nemo-wipe - a nemo extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -33,32 +33,32 @@
 #endif
 
 
-/* gets the Nautilus' desktop path (to handle x-nautilus-desktop:// URIs)
- * heavily based on the implementation from nautilus-open-terminal */
+/* gets the Nemo' desktop path (to handle x-nemo-desktop:// URIs)
+ * heavily based on the implementation from nemo-open-terminal */
 static gchar *
 get_desktop_path (void)
 {
   gchar *path = NULL;
   
-#if defined(NW_NAUTILUS_IS_NAUTILUS)
+#if defined(NW_NEMO_IS_NEMO)
 # ifdef HAVE_GCONF
   if (! path) {
     GConfClient *conf_client;
     
     conf_client = gconf_client_get_default ();
     if (gconf_client_get_bool (conf_client,
-                               "/apps/nautilus/preferences/desktop_is_home_dir",
+                               "/apps/nemo/preferences/desktop_is_home_dir",
                                NULL)) {
       path = g_strdup (g_get_home_dir ());
     }
     g_object_unref (conf_client);
   }
 # endif /* HAVE_GCONF */
-#elif defined(NW_NAUTILUS_IS_CAJA) || defined(NW_NAUTILUS_IS_NEMO)
+#elif defined(NW_NEMO_IS_CAJA) || defined(NW_NEMO_IS_NEMO)
   if (! path) {
-# if defined(NW_NAUTILUS_IS_CAJA)
+# if defined(NW_NEMO_IS_CAJA)
     const gchar *const schema = "org.mate.caja.preferences";
-# elif defined(NW_NAUTILUS_IS_NEMO)
+# elif defined(NW_NEMO_IS_NEMO)
     const gchar *const schema = "org.nemo.preferences";
 # endif /* Caja/Nemo */
     GSettings *settings = g_settings_new(schema);
@@ -69,7 +69,7 @@ get_desktop_path (void)
     
     g_object_unref (settings);
   }
-#endif /* Nautilus/Caja/Nemo */
+#endif /* Nemo/Caja/Nemo */
   
   if (! path) {
     path = g_strdup (g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP));
@@ -78,33 +78,33 @@ get_desktop_path (void)
   return path;
 }
 
-/* gets the path of a #NautilusFileInfo.
+/* gets the path of a #NemoFileInfo.
  * this is different from getting if GFile then getting the path since it tries
- * handle x-nautilus-desktop */
+ * handle x-nemo-desktop */
 gchar *
-nw_path_from_nfi (NautilusFileInfo *nfi)
+nw_path_from_nfi (NemoFileInfo *nfi)
 {
   GFile *file;
   gchar *path;
   
   g_object_ref (nfi);
   
-  file = nautilus_file_info_get_location (nfi);
+  file = nemo_file_info_get_location (nfi);
   path = g_file_get_path (file);
   if (! path) {
     /* if we don't have a path, let's see if it's got a different activation
      * URI, and if so what it points to */
-    gchar *activation_uri = nautilus_file_info_get_activation_uri (nfi);
+    gchar *activation_uri = nemo_file_info_get_activation_uri (nfi);
     
     g_object_unref (nfi);
     g_object_unref (file);
-    nfi = nautilus_file_info_create_for_uri (activation_uri);
-    file = nautilus_file_info_get_location (nfi);
+    nfi = nemo_file_info_create_for_uri (activation_uri);
+    file = nemo_file_info_get_location (nfi);
     path = g_file_get_path (file);
     
     if (! path) {
       /* if we still don't have a path, handle some specific URIs manually */
-      if (g_strcmp0 (activation_uri, NW_NAUTILUS_DESKTOP_URI) == 0) {
+      if (g_strcmp0 (activation_uri, NW_NEMO_DESKTOP_URI) == 0) {
         path = get_desktop_path ();
       }
       /* TODO: implement trash:/// */
@@ -143,7 +143,7 @@ nw_path_list_copy (GList *src)
   return paths;
 }
 
-/* converts a list of #NautilusFileInfo to a list of paths.
+/* converts a list of #NemoFileInfo to a list of paths.
  * free the returned list with nw_path_list_free()
  * 
  * Returns: The list of paths on success, or %NULL on failure. This function

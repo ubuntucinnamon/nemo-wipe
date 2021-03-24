@@ -1,12 +1,12 @@
-# German translations for nautilus-wipe package
-# Deutsche Übersetzung für das Paket nautilus-wipe.
+# German translations for nemo-wipe package
+# Deutsche Übersetzung für das Paket nemo-wipe.
 # Copyright (C) 2010-2011 Christian Meyer <c2h5oh@web.de>
-# This file is distributed under the same license as the nautilus-wipe package.
+# This file is distributed under the same license as the nemo-wipe package.
 # u <u@451f.org>, 2016.
 # Christian Meyer <c2h5oh@web.de>, 2013.
 msgid ""
 msgstr ""
-"Project-Id-Version: nautilus-wipe 0.2.1\n"
+"Project-Id-Version: nemo-wipe 0.2.1\n"
 "Report-Msgid-Bugs-To: bugs@wipetools.tuxfamily.org\n"
 "POT-Creation-Date: 2016-11-21 11:33+0100\n"
 "PO-Revision-Date: 2016-11-18 10:56+0100\n"
@@ -19,33 +19,33 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 1.6.10\n"
 
-#: nautilus-wipe/nw-delete-operation.c:87
+#: nemo-wipe/nw-delete-operation.c:87
 #, c-format
 msgid "File %u out of %u, pass %u out of %u"
 msgstr "Datei %u von %u, Durchgang %u von %u"
 
-#: nautilus-wipe/nw-fill-operation.c:164
+#: nemo-wipe/nw-fill-operation.c:164
 #, c-format
 msgid "Device \"%s\" (%u out of %u), pass %u out of %u"
 msgstr "Datenträger \"%s\" (%u von %u), Durchgang %u von %u"
 
-#: nautilus-wipe/nw-fill-operation.c:169
+#: nemo-wipe/nw-fill-operation.c:169
 #, c-format
 msgid "Device \"%s\", pass %u out of %u"
 msgstr "Datenträger \"%s\", Durchgang %u von %u"
 
-#: nautilus-wipe/nw-fill-operation.c:375
+#: nemo-wipe/nw-fill-operation.c:375
 #, c-format
 msgid "Mount \"%s\" is not local"
 msgstr "Speicherort \"%s\" ist nicht lokal"
 
-#: nautilus-wipe/nw-fill-operation.c:391
+#: nemo-wipe/nw-fill-operation.c:391
 #, c-format
 msgid "No mount point found for path \"%s\""
 msgstr "Kein Einhängepunkt gefunden für den Pfad \"%s\""
 
 #. TRANSLATORS: singular is not really used, N is strictly >1
-#: nautilus-wipe/nw-extension.c:112
+#: nemo-wipe/nw-extension.c:112
 #, c-format
 msgid "Are you sure you want to wipe the %u selected items?"
 msgid_plural "Are you sure you want to wipe the %u selected items?"
@@ -54,59 +54,59 @@ msgstr[0] ""
 msgstr[1] ""
 "Sind Sie sicher, dass Sie die %u ausgewählten Elemente sicher löschen wollen?"
 
-#: nautilus-wipe/nw-extension.c:125
+#: nemo-wipe/nw-extension.c:125
 #, c-format
 msgid "Are you sure you want to wipe \"%s\"?"
 msgstr "Sind Sie sicher, dass Sie  \"%s\" sicher löschen wollen?"
 
-#: nautilus-wipe/nw-extension.c:132
+#: nemo-wipe/nw-extension.c:132
 msgid "Wipe Files"
 msgstr "Lösche Dateien"
 
-#: nautilus-wipe/nw-extension.c:135
+#: nemo-wipe/nw-extension.c:135
 msgid "If you wipe an item, it will not be recoverable."
 msgstr ""
 "Wenn Sie ein Element sicher löschen kann es nicht wieder hergestellt werden."
 
-#: nautilus-wipe/nw-extension.c:136 nautilus-wipe/nw-extension.c:216
+#: nemo-wipe/nw-extension.c:136 nemo-wipe/nw-extension.c:216
 msgid "_Wipe"
 msgstr "_Sicher löschen"
 
-#: nautilus-wipe/nw-extension.c:139
+#: nemo-wipe/nw-extension.c:139
 msgid "Wiping files..."
 msgstr "Lösche Dateien…"
 
-#: nautilus-wipe/nw-extension.c:143
+#: nemo-wipe/nw-extension.c:143
 msgid "Wipe failed."
 msgstr "Sicheres Löschen ist fehlgeschlagen."
 
-#: nautilus-wipe/nw-extension.c:145
+#: nemo-wipe/nw-extension.c:145
 msgid "Wipe successful."
 msgstr "Sicheres Löschen war erfolgreich."
 
-#: nautilus-wipe/nw-extension.c:147
+#: nemo-wipe/nw-extension.c:147
 msgid "The item has been successfully wiped."
 msgid_plural "The items have been successfully wiped."
 msgstr[0] "Das Element wurde erfolgreich sicher gelöscht."
 msgstr[1] "Die Elemente wurden erfolgreich sicher gelöscht."
 
 #. TRANSLATORS: this is the last device names separator
-#: nautilus-wipe/nw-extension.c:177
+#: nemo-wipe/nw-extension.c:177
 msgid " and "
 msgstr " und "
 
 #. TRANSLATORS: this is the device names separator (except last)
-#: nautilus-wipe/nw-extension.c:180
+#: nemo-wipe/nw-extension.c:180
 msgid ", "
 msgstr ", "
 
 #. TRANSLATORS: this is the device name
-#: nautilus-wipe/nw-extension.c:184
+#: nemo-wipe/nw-extension.c:184
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
-#: nautilus-wipe/nw-extension.c:187
+#: nemo-wipe/nw-extension.c:187
 #, c-format
 msgid ""
 "Are you sure you want to wipe the available disk space on the %s partitions "
@@ -115,7 +115,7 @@ msgstr ""
 "Sind sie sicher, dass Sie den verfügbaren Speicherplatz auf %s sicher "
 "löschen möchten?"
 
-#: nautilus-wipe/nw-extension.c:191
+#: nemo-wipe/nw-extension.c:191
 #, c-format
 msgid ""
 "Available disk space on the partitions or devices %s have been successfully "
@@ -123,7 +123,7 @@ msgid ""
 msgstr "Der verfügbare Speicherplatz auf %s wurde erfolgreich sicher gelöscht."
 
 # partition/device?
-#: nautilus-wipe/nw-extension.c:200
+#: nemo-wipe/nw-extension.c:200
 #, c-format
 msgid ""
 "Are you sure you want to wipe the available disk space on the \"%s\" "
@@ -132,7 +132,7 @@ msgstr ""
 "Sind sie sicher, dass Sie den verfügbaren Speicherplatz auf \"%s\" sicher "
 "löschen möchten?"
 
-#: nautilus-wipe/nw-extension.c:204
+#: nemo-wipe/nw-extension.c:204
 #, c-format
 msgid ""
 "Available disk space on the partition or device \"%s\" has been successfully "
@@ -140,47 +140,47 @@ msgid ""
 msgstr ""
 "Der verfügbare Speicherplatz auf \"%s\" wurde erfolgreich sicher gelöscht."
 
-#: nautilus-wipe/nw-extension.c:212
+#: nemo-wipe/nw-extension.c:212
 msgid "Wipe Available Disk Space"
 msgstr "Sichereres Löschen des verfügbaren Festplattenplatzes"
 
-#: nautilus-wipe/nw-extension.c:215
+#: nemo-wipe/nw-extension.c:215
 msgid "This operation may take a while."
 msgstr "Dieser Vorgang kann einige Zeit in Anspruch nehmen."
 
-#: nautilus-wipe/nw-extension.c:219
+#: nemo-wipe/nw-extension.c:219
 msgid "Wiping available disk space..."
 msgstr "Sicheres Löschen des verfügbaren Festplattenplatzes..."
 
-#: nautilus-wipe/nw-extension.c:223
+#: nemo-wipe/nw-extension.c:223
 msgid "Wipe failed"
 msgstr "Sicheres Löschen ist fehlgeschlagen"
 
-#: nautilus-wipe/nw-extension.c:225
+#: nemo-wipe/nw-extension.c:225
 msgid "Wipe successful"
 msgstr "Sicheres Löschen war erfolgreich"
 
-#: nautilus-wipe/nw-extension.c:250
+#: nemo-wipe/nw-extension.c:250
 msgid "Wipe"
 msgstr "Sicher löschen"
 
-#: nautilus-wipe/nw-extension.c:251
+#: nemo-wipe/nw-extension.c:251
 msgid "Delete each selected item and overwrite its data"
 msgstr "Lösche jedes ausgewählte Element und überschreibe seine Daten"
 
-#: nautilus-wipe/nw-extension.c:284
+#: nemo-wipe/nw-extension.c:284
 #, c-format
 msgid "File filtering failed: %s"
 msgstr "Dateifilterung ist fehlgeschlagen: %s"
 
-#: nautilus-wipe/nw-extension.c:288
+#: nemo-wipe/nw-extension.c:288
 msgid "Wipe available disk space"
 msgstr "Sichereres Löschen des verfügbaren Festplattenplatzes"
 
 # Wipe:
 # Hier: "Überschreibe"?
 # besser: "Lösche endgültig"?
-#: nautilus-wipe/nw-extension.c:290
+#: nemo-wipe/nw-extension.c:290
 msgid "Wipe available disk space on this partition or device"
 msgid_plural "Wipe available disk space on these partitions or devices"
 msgstr[0] ""
@@ -188,68 +188,68 @@ msgstr[0] ""
 msgstr[1] ""
 "Überschreibe den verfügbaren Festplattenplatz auf diesen Datenträgern"
 
-#: nautilus-wipe/nw-operation-manager.c:212
+#: nemo-wipe/nw-operation-manager.c:212
 msgid "However, the following warning was issued during the operation:"
 msgstr "Allerdings ist folgende Warnung ist aufgetreten:"
 
-#: nautilus-wipe/nw-operation-manager.c:232
+#: nemo-wipe/nw-operation-manager.c:232
 msgid "_Details"
 msgstr "_Details"
 
-#: nautilus-wipe/nw-operation-manager.c:333
+#: nemo-wipe/nw-operation-manager.c:333
 msgid "Failed to open help"
 msgstr "Kann die Hilfe nicht öffnen"
 
-#: nautilus-wipe/nw-operation-manager.c:409
+#: nemo-wipe/nw-operation-manager.c:409
 msgid "_Options"
 msgstr "_Optionen"
 
-#: nautilus-wipe/nw-operation-manager.c:423
+#: nemo-wipe/nw-operation-manager.c:423
 msgid "Number of _passes:"
 msgstr "Anzahl der _Durchgänge :"
 
-#: nautilus-wipe/nw-operation-manager.c:458
+#: nemo-wipe/nw-operation-manager.c:458
 msgid "(Gutmann method for old disks)"
 msgstr "(Gutmann Methode für alte Festplatten)"
 
-#: nautilus-wipe/nw-operation-manager.c:460
+#: nemo-wipe/nw-operation-manager.c:460
 msgid "(advised for modern hard disks)"
 msgstr "(empfohlen für moderne Festplatten)"
 
-#: nautilus-wipe/nw-operation-manager.c:462
+#: nemo-wipe/nw-operation-manager.c:462
 msgid "(only protects against software attacks)"
 msgstr "(schützt nur vor Software Angriffen)"
 
-#: nautilus-wipe/nw-operation-manager.c:475
+#: nemo-wipe/nw-operation-manager.c:475
 msgid "_Fast and insecure mode (no /dev/urandom, no synchronize mode)"
 msgstr ""
 "_Schneller und unsicherer Modus (ohne /dev/urandom, kein "
 "Synchronisationsmodus)"
 
-#: nautilus-wipe/nw-operation-manager.c:487
+#: nemo-wipe/nw-operation-manager.c:487
 msgid "Last pass with _zeros instead of random data"
 msgstr "Letzter Durchgang mit _Nullen statt mit Zufallszahlen"
 
-#: nautilus-wipe/nw-operation-manager.c:522
+#: nemo-wipe/nw-operation-manager.c:522
 msgid "Are you sure you want to cancel this operation?"
 msgstr "Sind Sie sicher, dass Sie den Vorgang abbrechen möchten?"
 
-#: nautilus-wipe/nw-operation-manager.c:523
+#: nemo-wipe/nw-operation-manager.c:523
 msgid ""
 "Canceling this operation might leave some item(s) in an intermediate state."
 msgstr ""
 "Das Abbrechen dieses Vorgangs könnten einige Elemente in einem "
 "Zwischenzustand zurücklassen."
 
-#: nautilus-wipe/nw-operation-manager.c:525
+#: nemo-wipe/nw-operation-manager.c:525
 msgid "Resume operation"
 msgstr "Vorgang fortsetzen"
 
-#: nautilus-wipe/nw-operation-manager.c:526
+#: nemo-wipe/nw-operation-manager.c:526
 msgid "Cancel operation"
 msgstr "Vorgang abbrechen"
 
-#: nautilus-wipe/nw-operation-manager.c:632
+#: nemo-wipe/nw-operation-manager.c:632
 #, c-format
 msgid ""
 "%s. Please make sure you have the secure-delete package properly installed "
@@ -258,10 +258,10 @@ msgstr ""
 "%s. Stellen Sie bitte sicher, dass das secure-delete Paket auf Ihrem System "
 "installiert ist."
 
-#: nautilus-wipe/nw-progress-dialog.c:757
+#: nemo-wipe/nw-progress-dialog.c:757
 msgid "Pause"
 msgstr "Pause"
 
-#: nautilus-wipe/nw-progress-dialog.c:763
+#: nemo-wipe/nw-progress-dialog.c:763
 msgid "Resume"
 msgstr "Fortsetzen"

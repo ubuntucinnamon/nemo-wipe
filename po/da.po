@@ -1,10 +1,10 @@
-# Danish translation for nautilus-wipe
+# Danish translation for nemo-wipe
 # Copyright (C) YEAR Colomban Wendling <ban@herbesfolles.org>
-# This file is distributed under the same license as the nautilus-wipe package.
+# This file is distributed under the same license as the nemo-wipe package.
 # scootergrisen, 2018.
 msgid ""
 msgstr ""
-"Project-Id-Version: nautilus-wipe 0.3\n"
+"Project-Id-Version: nemo-wipe 0.3\n"
 "Report-Msgid-Bugs-To: bugs@wipetools.tuxfamily.org\n"
 "POT-Creation-Date: 2016-11-21 11:33+0100\n"
 "PO-Revision-Date: 2018-12-12 09:53+0200\n"
@@ -16,91 +16,91 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: nautilus-wipe/nw-delete-operation.c:87
+#: nemo-wipe/nw-delete-operation.c:87
 #, c-format
 msgid "File %u out of %u, pass %u out of %u"
 msgstr "Fil %u ud af %u, gennemløb %u ud af %u"
 
-#: nautilus-wipe/nw-fill-operation.c:164
+#: nemo-wipe/nw-fill-operation.c:164
 #, c-format
 msgid "Device \"%s\" (%u out of %u), pass %u out of %u"
 msgstr "Enhed \"%s\" (%u ud af %u), gennemløb %u ud af %u"
 
-#: nautilus-wipe/nw-fill-operation.c:169
+#: nemo-wipe/nw-fill-operation.c:169
 #, c-format
 msgid "Device \"%s\", pass %u out of %u"
 msgstr "Enhed \"%s\", gennemløb %u ud af %u"
 
-#: nautilus-wipe/nw-fill-operation.c:375
+#: nemo-wipe/nw-fill-operation.c:375
 #, c-format
 msgid "Mount \"%s\" is not local"
 msgstr "Monteringen \"%s\" er ikke lokal"
 
-#: nautilus-wipe/nw-fill-operation.c:391
+#: nemo-wipe/nw-fill-operation.c:391
 #, c-format
 msgid "No mount point found for path \"%s\""
 msgstr "Der blev ikke fundet noget monteringspunkt til stien \"%s\""
 
 #. TRANSLATORS: singular is not really used, N is strictly >1
-#: nautilus-wipe/nw-extension.c:112
+#: nemo-wipe/nw-extension.c:112
 #, c-format
 msgid "Are you sure you want to wipe the %u selected items?"
 msgid_plural "Are you sure you want to wipe the %u selected items?"
 msgstr[0] "Er du sikker på, at du vil rydde %u valgte elementer?"
 msgstr[1] "Er du sikker på, at du vil rydde %u valgte elementer?"
 
-#: nautilus-wipe/nw-extension.c:125
+#: nemo-wipe/nw-extension.c:125
 #, c-format
 msgid "Are you sure you want to wipe \"%s\"?"
 msgstr "Er du sikker på, at du vil rydde \"%s\"?"
 
-#: nautilus-wipe/nw-extension.c:132
+#: nemo-wipe/nw-extension.c:132
 msgid "Wipe Files"
 msgstr "Ryd filer"
 
-#: nautilus-wipe/nw-extension.c:135
+#: nemo-wipe/nw-extension.c:135
 msgid "If you wipe an item, it will not be recoverable."
 msgstr "Hvis du rydder et element, så kan det ikke gendannes."
 
-#: nautilus-wipe/nw-extension.c:136 nautilus-wipe/nw-extension.c:216
+#: nemo-wipe/nw-extension.c:136 nemo-wipe/nw-extension.c:216
 msgid "_Wipe"
 msgstr "_Ryd"
 
-#: nautilus-wipe/nw-extension.c:139
+#: nemo-wipe/nw-extension.c:139
 msgid "Wiping files..."
 msgstr "Rydder filer..."
 
-#: nautilus-wipe/nw-extension.c:143
+#: nemo-wipe/nw-extension.c:143
 msgid "Wipe failed."
 msgstr "Rydning mislykkedes."
 
-#: nautilus-wipe/nw-extension.c:145
+#: nemo-wipe/nw-extension.c:145
 msgid "Wipe successful."
 msgstr "Rydning lykkedes."
 
-#: nautilus-wipe/nw-extension.c:147
+#: nemo-wipe/nw-extension.c:147
 msgid "The item has been successfully wiped."
 msgid_plural "The items have been successfully wiped."
 msgstr[0] "Elementet er blevet ryddet."
 msgstr[1] "Elementerne er blevet ryddet."
 
 #. TRANSLATORS: this is the last device names separator
-#: nautilus-wipe/nw-extension.c:177
+#: nemo-wipe/nw-extension.c:177
 msgid " and "
 msgstr " og "
 
 #. TRANSLATORS: this is the device names separator (except last)
-#: nautilus-wipe/nw-extension.c:180
+#: nemo-wipe/nw-extension.c:180
 msgid ", "
 msgstr ", "
 
 #. TRANSLATORS: this is the device name
-#: nautilus-wipe/nw-extension.c:184
+#: nemo-wipe/nw-extension.c:184
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
-#: nautilus-wipe/nw-extension.c:187
+#: nemo-wipe/nw-extension.c:187
 #, c-format
 msgid ""
 "Are you sure you want to wipe the available disk space on the %s partitions "
@@ -109,7 +109,7 @@ msgstr ""
 "Er du sikker på, at du vil rydde den tilgængelige diskplads på %s-"
 "partitionerne eller enhederne?"
 
-#: nautilus-wipe/nw-extension.c:191
+#: nemo-wipe/nw-extension.c:191
 #, c-format
 msgid ""
 "Available disk space on the partitions or devices %s have been successfully "
@@ -118,7 +118,7 @@ msgstr ""
 "Den tilgængelige diskplads på partitionerne eller enhederne %s er blevet "
 "ryddet."
 
-#: nautilus-wipe/nw-extension.c:200
+#: nemo-wipe/nw-extension.c:200
 #, c-format
 msgid ""
 "Are you sure you want to wipe the available disk space on the \"%s\" "
@@ -127,7 +127,7 @@ msgstr ""
 "Er du sikker på, at du vil rydde den tilgængelige diskplads på \"%s\"-"
 "partitionen eller enheden?"
 
-#: nautilus-wipe/nw-extension.c:204
+#: nemo-wipe/nw-extension.c:204
 #, c-format
 msgid ""
 "Available disk space on the partition or device \"%s\" has been successfully "
@@ -136,111 +136,111 @@ msgstr ""
 "Den tilgængelige diskplads på partitionen eller enheden \"%s\" er blevet "
 "ryddet."
 
-#: nautilus-wipe/nw-extension.c:212
+#: nemo-wipe/nw-extension.c:212
 msgid "Wipe Available Disk Space"
 msgstr "Ryd den tilgængelige diskplads"
 
-#: nautilus-wipe/nw-extension.c:215
+#: nemo-wipe/nw-extension.c:215
 msgid "This operation may take a while."
 msgstr "Handlingen kan tage noget tid."
 
-#: nautilus-wipe/nw-extension.c:219
+#: nemo-wipe/nw-extension.c:219
 msgid "Wiping available disk space..."
 msgstr "Rydder den tilgængelige diskplads..."
 
-#: nautilus-wipe/nw-extension.c:223
+#: nemo-wipe/nw-extension.c:223
 msgid "Wipe failed"
 msgstr "Rydning mislykkedes"
 
-#: nautilus-wipe/nw-extension.c:225
+#: nemo-wipe/nw-extension.c:225
 msgid "Wipe successful"
 msgstr "Rydning lykkedes"
 
-#: nautilus-wipe/nw-extension.c:250
+#: nemo-wipe/nw-extension.c:250
 msgid "Wipe"
 msgstr "Ryd"
 
-#: nautilus-wipe/nw-extension.c:251
+#: nemo-wipe/nw-extension.c:251
 msgid "Delete each selected item and overwrite its data"
 msgstr "Slet de valgte elementer og overskriv dets data"
 
-#: nautilus-wipe/nw-extension.c:284
+#: nemo-wipe/nw-extension.c:284
 #, c-format
 msgid "File filtering failed: %s"
 msgstr "Filfiltrering mislykkedes: %s"
 
-#: nautilus-wipe/nw-extension.c:288
+#: nemo-wipe/nw-extension.c:288
 msgid "Wipe available disk space"
 msgstr "Ryd den tilgængelige diskplads"
 
-#: nautilus-wipe/nw-extension.c:290
+#: nemo-wipe/nw-extension.c:290
 msgid "Wipe available disk space on this partition or device"
 msgid_plural "Wipe available disk space on these partitions or devices"
 msgstr[0] "Ryd den tilgængelige diskplads på partitionen eller enheden"
 msgstr[1] "Ryd den tilgængelige diskplads på disse partitioner eller enheder"
 
-#: nautilus-wipe/nw-operation-manager.c:212
+#: nemo-wipe/nw-operation-manager.c:212
 msgid "However, the following warning was issued during the operation:"
 msgstr "Dog blev følgende advarsel udstedt under handlingen:"
 
-#: nautilus-wipe/nw-operation-manager.c:232
+#: nemo-wipe/nw-operation-manager.c:232
 msgid "_Details"
 msgstr "_Detaljer"
 
-#: nautilus-wipe/nw-operation-manager.c:333
+#: nemo-wipe/nw-operation-manager.c:333
 msgid "Failed to open help"
 msgstr "Kunne ikke åbne hjælp"
 
-#: nautilus-wipe/nw-operation-manager.c:409
+#: nemo-wipe/nw-operation-manager.c:409
 msgid "_Options"
 msgstr "_Valgmuligheder"
 
-#: nautilus-wipe/nw-operation-manager.c:423
+#: nemo-wipe/nw-operation-manager.c:423
 msgid "Number of _passes:"
 msgstr "Antal _gennemløb:"
 
-#: nautilus-wipe/nw-operation-manager.c:458
+#: nemo-wipe/nw-operation-manager.c:458
 msgid "(Gutmann method for old disks)"
 msgstr "(Gutmann-metode til gamle diske)"
 
-#: nautilus-wipe/nw-operation-manager.c:460
+#: nemo-wipe/nw-operation-manager.c:460
 msgid "(advised for modern hard disks)"
 msgstr "(anbefales til moderne harddiske)"
 
-#: nautilus-wipe/nw-operation-manager.c:462
+#: nemo-wipe/nw-operation-manager.c:462
 msgid "(only protects against software attacks)"
 msgstr "(beskytter kun mod softwareangreb)"
 
-#: nautilus-wipe/nw-operation-manager.c:475
+#: nemo-wipe/nw-operation-manager.c:475
 msgid "_Fast and insecure mode (no /dev/urandom, no synchronize mode)"
 msgstr ""
 "_Hurtig og usikker tilstand (ingen /dev/urandom, ingen "
 "synkroniseringstilstand)"
 
-#: nautilus-wipe/nw-operation-manager.c:487
+#: nemo-wipe/nw-operation-manager.c:487
 msgid "Last pass with _zeros instead of random data"
 msgstr "Sidste gennemløb med _nuller i stedet for tilfældige data"
 
-#: nautilus-wipe/nw-operation-manager.c:522
+#: nemo-wipe/nw-operation-manager.c:522
 msgid "Are you sure you want to cancel this operation?"
 msgstr "Er du sikker på, at du vil annullere handlingen?"
 
-#: nautilus-wipe/nw-operation-manager.c:523
+#: nemo-wipe/nw-operation-manager.c:523
 msgid ""
 "Canceling this operation might leave some item(s) in an intermediate state."
 msgstr ""
 "Hvis handlingen annulleres kan det efterlade nogle elementer i en "
 "mellemliggende tilstand."
 
-#: nautilus-wipe/nw-operation-manager.c:525
+#: nemo-wipe/nw-operation-manager.c:525
 msgid "Resume operation"
 msgstr "Genoptag handling"
 
-#: nautilus-wipe/nw-operation-manager.c:526
+#: nemo-wipe/nw-operation-manager.c:526
 msgid "Cancel operation"
 msgstr "Annuller handling"
 
-#: nautilus-wipe/nw-operation-manager.c:632
+#: nemo-wipe/nw-operation-manager.c:632
 #, c-format
 msgid ""
 "%s. Please make sure you have the secure-delete package properly installed "
@@ -249,10 +249,10 @@ msgstr ""
 "%s. Sørg venligst for at du har secure-delete-pakken ordentligt installeret "
 "på dit system."
 
-#: nautilus-wipe/nw-progress-dialog.c:757
+#: nemo-wipe/nw-progress-dialog.c:757
 msgid "Pause"
 msgstr "Pause"
 
-#: nautilus-wipe/nw-progress-dialog.c:763
+#: nemo-wipe/nw-progress-dialog.c:763
 msgid "Resume"
 msgstr "Genoptag"

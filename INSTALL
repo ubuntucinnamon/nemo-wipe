@@ -143,9 +143,9 @@ using the `lipo' tool if you have problems.
 Installation Names
 ==================
 
-   As this package is a nautilus extension, it will be installed where
-nautilus expects to find extensions. You can override this directory with
---with-nautilus-extdir=DIR but nautilus may not find the extension if
+   As this package is a nemo extension, it will be installed where
+nemo expects to find extensions. You can override this directory with
+--with-nemo-extdir=DIR but nemo may not find the extension if
 that directory is not in its extension search path.
 
    By default, `make install' installs the package's commands under

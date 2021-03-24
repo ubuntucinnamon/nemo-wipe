@@ -1,12 +1,12 @@
-nautilus_extensiondir = $(NAUTILUS_EXTENSIONS_DIR)
+nemo_extensiondir = $(NEMO_EXTENSIONS_DIR)
 
-nautilus_extension_LTLIBRARIES = libnautilus-wipe.la
+nemo_extension_LTLIBRARIES = libnemo-wipe.la
 
 localedir = $(datadir)/locale
 
 EXTRA_DIST = nw-api-impl.i
 
-libnautilus_wipe_la_SOURCES  = extension.c \
+libnemo_wipe_la_SOURCES  = extension.c \
                                nw-api-impl.h \
                                nw-compat.h \
                                nw-delete-operation.c \
@@ -24,18 +24,18 @@ libnautilus_wipe_la_SOURCES  = extension.c \
                                nw-progress-dialog.c \
                                nw-progress-dialog.h \
                                nw-type-utils.h
-libnautilus_wipe_la_CPPFLAGS = -DG_LOG_DOMAIN=\"$(PACKAGE)\" \
+libnemo_wipe_la_CPPFLAGS = -DG_LOG_DOMAIN=\"$(PACKAGE)\" \
                                -DLOCALEDIR=\"$(localedir)\"
-libnautilus_wipe_la_CFLAGS   = @GLIB_CFLAGS@ \
+libnemo_wipe_la_CFLAGS   = @GLIB_CFLAGS@ \
                                @GTK_CFLAGS@ \
                                @GCONF_CFLAGS@ \
-                               @LIBNAUTILUS_EXTENSION_CFLAGS@ \
+                               @LIBNEMO_EXTENSION_CFLAGS@ \
                                @GSECUREDELETE_CFLAGS@ \
                                @GIO_UNIX_CFLAGS@
-libnautilus_wipe_la_LDFLAGS  = -module -avoid-version \
+libnemo_wipe_la_LDFLAGS  = -module -avoid-version \
                                @GLIB_LIBS@ \
                                @GTK_LIBS@ \
                                @GCONF_LIBS@ \
-                               @LIBNAUTILUS_EXTENSION_LIBS@ \
+                               @LIBNEMO_EXTENSION_LIBS@ \
                                @GSECUREDELETE_LIBS@ \
                                @GIO_UNIX_LIBS@

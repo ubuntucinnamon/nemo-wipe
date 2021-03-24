@@ -30,8 +30,8 @@
   Minor improvements release with major code changes.
 
   * Code refactoring and cleanup
-  * Build for Nautilus 3.x by default
-  * Drop GConf dependency for Nautilus 3.x
+  * Build for Nemo 3.x by default
+  * Drop GConf dependency for Nemo 3.x
   * New translations: de, ru
 
 
@@ -39,7 +39,7 @@
 
   Minor improvements of 0.1 release.
 
-  * Support for GTK 3.x (and thus Nautilus 3.x)
+  * Support for GTK 3.x (and thus Nemo 3.x)
   * Minor UI cleanup of the progress dialog
 
 

@@ -1,5 +1,5 @@
 /*
- *  nautilus-wipe - a nautilus extension to wipe file(s)
+ *  nemo-wipe - a nemo extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -321,7 +321,7 @@ help_button_clicked_handler (GtkWidget *widget,
   GError     *err = NULL;
   
   if (! gtk_show_uri (gtk_widget_get_screen (widget),
-                      "help:nautilus-wipe/nautilus-wipe-config",
+                      "help:nemo-wipe/nemo-wipe-config",
                       gtk_get_current_event_time (),
                       &err)) {
     /* display the error.

@@ -1,6 +1,6 @@
 # List of source files which contain translatable strings.
-nautilus-wipe/nw-delete-operation.c
-nautilus-wipe/nw-fill-operation.c
-nautilus-wipe/nw-extension.c
-nautilus-wipe/nw-operation-manager.c
-nautilus-wipe/nw-progress-dialog.c
+nemo-wipe/nw-delete-operation.c
+nemo-wipe/nw-fill-operation.c
+nemo-wipe/nw-extension.c
+nemo-wipe/nw-operation-manager.c
+nemo-wipe/nw-progress-dialog.c

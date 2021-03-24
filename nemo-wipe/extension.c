@@ -1,6 +1,6 @@
 /*
- *  nautilus-wipe - a nautilus extension to wipe file(s)
- * 
+ *  nemo-wipe - a nemo extension to wipe file(s)
+ *
  *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
  *
  */
 
-/* Nautilus extension */
+/* Nemo extension */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -40,7 +40,7 @@ static GType provider_types[1];
 
 /* initialization */
 void
-nautilus_module_initialize (GTypeModule *module)
+nemo_module_initialize (GTypeModule *module)
 {
   g_message ("Initializing");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
@@ -50,7 +50,7 @@ nautilus_module_initialize (GTypeModule *module)
 
 /* extension points types registration */
 void
-nautilus_module_list_types (const GType **types,
+nemo_module_list_types (const GType **types,
                             int          *num_types)
 {
   *types = provider_types;
@@ -59,6 +59,6 @@ nautilus_module_list_types (const GType **types,
 
 /* cleanup */
 void
-nautilus_module_shutdown (void)
+nemo_module_shutdown (void)
 {
 }

@@ -1,5 +1,5 @@
 /*
- *  nautilus-wipe - a nautilus extension to wipe file(s)
+ *  nemo-wipe - a nemo extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -69,7 +69,7 @@ typedef enum
 /**
  * NW_FILL_OPERATION_ERROR:
  * 
- * Domain for error coming from a NautilusWipe's fill operation.
+ * Domain for error coming from a NemoWipe's fill operation.
  */
 #define NW_FILL_OPERATION_ERROR (nw_fill_operation_error_quark ())
 

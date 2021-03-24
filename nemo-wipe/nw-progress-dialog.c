@@ -1,5 +1,5 @@
 /*
- *  nautilus-wipe - a nautilus extension to wipe file(s)
+ *  nemo-wipe - a nemo extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
  *

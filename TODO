@@ -20,7 +20,7 @@
   * the trash itself (trash:///) could be done by "simply" finding out the
     various trash locations.  Easier said than done, but doable.
   * Individual items in it (e.g. trash:///foo.txt).  that's even harder,
-    because Nautilus doesn't seem able to give a local path for those.
+    because Nemo doesn't seem able to give a local path for those.
     The best I can think of right now is try and find an item in one of the
     trash locations (as in first point above) that matches (e.g. in case of
     trash:///foo.txt, find /foo.txt in any of the trash locations).  It's not

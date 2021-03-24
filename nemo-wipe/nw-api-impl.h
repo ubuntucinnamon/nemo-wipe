@@ -1,7 +1,7 @@
 /*
- *  nautilus-wipe - a nautilus extension to wipe file(s)
- * 
- *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
+ *  nemo-wipe - a nemo extension to wipe file(s)
+ *
+ *  Copyright (C) 2016 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -19,21 +19,18 @@
  *
  */
 
-#ifndef NW_PATH_LIST_H
-#define NW_PATH_LIST_H
+/* Selects the Nemo API implementation */
 
-#include <glib.h>
+#ifndef NW_API_IMPL_H
+#define NW_API_IMPL_H
 
-#include "nw-api-impl.h"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-G_BEGIN_DECLS
-
-
-gchar  *nw_path_from_nfi                (NautilusFileInfo *nfi);
-GList  *nw_path_list_new_from_nfi_list  (GList *nfis);
-void    nw_path_list_free               (GList *paths);
-GList  *nw_path_list_copy               (GList *src);
-
+# include <libnemo-extension/nemo-menu-provider.h>
+# include <libnemo-extension/nemo-file-info.h>
+# define NW_NEMO_DESKTOP_URI "x-nemo-desktop:///"
 
 G_END_DECLS
 

@@ -1,5 +1,5 @@
 /*
- *  nautilus-wipe - a nautilus extension to wipe file(s)
+ *  nemo-wipe - a nemo extension to wipe file(s)
  * 
  *  Copyright (C) 2009-2011 Colomban Wendling <ban@herbesfolles.org>
  *
@@ -19,7 +19,7 @@
  *
  */
 
-/* Contains compatibility things for old GLib, GTK and Nautilus */
+/* Contains compatibility things for old GLib, GTK and Nemo */
 
 #ifndef NW_COMPAT_H
 #define NW_COMPAT_H
@@ -79,23 +79,23 @@ gtk_show_uri (GdkScreen    *screen,
 #endif
 
 
-/* Nautilus stuff */
+/* Nemo stuff */
 
-#if ! (defined (HAVE_NAUTILUS_FILE_INFO_GET_LOCATION) && \
-       HAVE_NAUTILUS_FILE_INFO_GET_LOCATION)
-# undef HAVE_NAUTILUS_FILE_INFO_GET_LOCATION
-# define HAVE_NAUTILUS_FILE_INFO_GET_LOCATION 1
+#if ! (defined (HAVE_NEMO_FILE_INFO_GET_LOCATION) && \
+       HAVE_NEMO_FILE_INFO_GET_LOCATION)
+# undef HAVE_NEMO_FILE_INFO_GET_LOCATION
+# define HAVE_NEMO_FILE_INFO_GET_LOCATION 1
 
 #include <gio/gio.h>
 #include "nw-api-impl.h"
 
 static GFile *
-nautilus_file_info_get_location (NautilusFileInfo *nfi)
+nemo_file_info_get_location (NemoFileInfo *nfi)
 {
   GFile *file;
   gchar *uri;
   
-  uri = nautilus_file_info_get_uri (nfi);
+  uri = nemo_file_info_get_uri (nfi);
   file = g_file_new_for_uri (uri);
   g_free (uri);
   
@@ -104,7 +104,7 @@ nautilus_file_info_get_location (NautilusFileInfo *nfi)
 
 /* 
  * Workaround for the buggy behavior of g_file_get_path() on the GFile returned
- * by our nautilus_file_info_get_location().
+ * by our nemo_file_info_get_location().
  * Should be harmless in general, and at least for us.
  * 
  * The buggy behavior made g_file_get_path() return the remote path for remote
@@ -113,7 +113,7 @@ nautilus_file_info_get_location (NautilusFileInfo *nfi)
  * the user thinks we use the remote one).
  */
 static gchar *
-NAUTILUS_WIPE_g_file_get_path (GFile *file)
+NEMO_WIPE_g_file_get_path (GFile *file)
 {
   gchar *path = NULL;
   
@@ -124,9 +124,9 @@ NAUTILUS_WIPE_g_file_get_path (GFile *file)
   return path;
 }
 /* overwrite the GIO implementation */
-#define g_file_get_path NAUTILUS_WIPE_g_file_get_path
+#define g_file_get_path NEMO_WIPE_g_file_get_path
 
-#endif /* HAVE_NAUTILUS_FILE_INFO_GET_LOCATION */
+#endif /* HAVE_NEMO_FILE_INFO_GET_LOCATION */
 
 
 G_END_DECLS
