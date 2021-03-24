@@ -1,6 +1,6 @@
 /*
  *  nemo-wipe - a nemo extension to wipe file(s)
- * 
+ *
  *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
@@ -39,12 +39,12 @@ static gchar *
 get_desktop_path (void)
 {
   gchar *path = NULL;
-  
+
 #if defined(NW_NEMO_IS_NEMO)
 # ifdef HAVE_GCONF
   if (! path) {
     GConfClient *conf_client;
-    
+
     conf_client = gconf_client_get_default ();
     if (gconf_client_get_bool (conf_client,
                                "/apps/nemo/preferences/desktop_is_home_dir",
@@ -53,28 +53,22 @@ get_desktop_path (void)
     }
     g_object_unref (conf_client);
   }
-# endif /* HAVE_GCONF */
-#elif defined(NW_NEMO_IS_CAJA) || defined(NW_NEMO_IS_NEMO)
+
   if (! path) {
-# if defined(NW_NEMO_IS_CAJA)
-    const gchar *const schema = "org.mate.caja.preferences";
-# elif defined(NW_NEMO_IS_NEMO)
     const gchar *const schema = "org.nemo.preferences";
-# endif /* Caja/Nemo */
     GSettings *settings = g_settings_new(schema);
-    
+
     if (g_settings_get_boolean(settings, "desktop-is-home-dir")) {
       path = g_strdup (g_get_home_dir ());
     }
-    
+
     g_object_unref (settings);
   }
-#endif /* Nemo/Caja/Nemo */
-  
+
   if (! path) {
     path = g_strdup (g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP));
   }
-  
+
   return path;
 }
 
@@ -86,22 +80,22 @@ nw_path_from_nfi (NemoFileInfo *nfi)
 {
   GFile *file;
   gchar *path;
-  
+
   g_object_ref (nfi);
-  
+
   file = nemo_file_info_get_location (nfi);
   path = g_file_get_path (file);
   if (! path) {
     /* if we don't have a path, let's see if it's got a different activation
      * URI, and if so what it points to */
     gchar *activation_uri = nemo_file_info_get_activation_uri (nfi);
-    
+
     g_object_unref (nfi);
     g_object_unref (file);
     nfi = nemo_file_info_create_for_uri (activation_uri);
     file = nemo_file_info_get_location (nfi);
     path = g_file_get_path (file);
-    
+
     if (! path) {
       /* if we still don't have a path, handle some specific URIs manually */
       if (g_strcmp0 (activation_uri, NW_NEMO_DESKTOP_URI) == 0) {
@@ -109,13 +103,13 @@ nw_path_from_nfi (NemoFileInfo *nfi)
       }
       /* TODO: implement trash:/// */
     }
-    
+
     g_free (activation_uri);
   }
-  
+
   g_object_unref (file);
   g_object_unref (nfi);
-  
+
   return path;
 }
 
@@ -133,19 +127,19 @@ GList *
 nw_path_list_copy (GList *src)
 {
   GList *paths = NULL;
-  
+
   while (src) {
     paths = g_list_prepend (paths, g_strdup (src->data));
     src = g_list_next (src);
   }
   paths = g_list_reverse (paths);
-  
+
   return paths;
 }
 
 /* converts a list of #NemoFileInfo to a list of paths.
  * free the returned list with nw_path_list_free()
- * 
+ *
  * Returns: The list of paths on success, or %NULL on failure. This function
  *          will always fail on non-local-mounted (then without paths) files */
 GList *
@@ -153,10 +147,10 @@ nw_path_list_new_from_nfi_list (GList *nfis)
 {
   gboolean  success = TRUE;
   GList    *paths   = NULL;
-  
+
   while (nfis && success) {
     gchar *path;
-    
+
     path = nw_path_from_nfi (nfis->data);
     if (path) {
       paths = g_list_prepend (paths, path);
@@ -171,6 +165,6 @@ nw_path_list_new_from_nfi_list (GList *nfis)
   } else {
     paths = g_list_reverse (paths);
   }
-  
+
   return paths;
 }
