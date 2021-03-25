@@ -1,7 +1,7 @@
 /*
  *  nemo-wipe - a nemo extension to wipe file(s)
  *
- *  Copyright (C) 2016 Colomban Wendling <ban@herbesfolles.org>
+ *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public
@@ -19,19 +19,46 @@
  *
  */
 
-/* Selects the Nemo API implementation */
-
-#ifndef NW_API_IMPL_H
-#define NW_API_IMPL_H
+/* Nemo extension */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
-# include <libnemo-extension/nemo-menu-provider.h>
-# include <libnemo-extension/nemo-file-info.h>
-# define NW_NEMO_DESKTOP_URI "x-nemo-desktop:///"
+#include "nw-extension.h"
 
-G_END_DECLS
+#include <glib.h>
+#include <glib/gi18n-lib.h>
+#include <glib-object.h>
 
-#endif /* guard */
+#include "nw-api-impl.h"
+
+#include <gsecuredelete.h>
+
+
+static GType provider_types[1];
+
+/* initialization */
+void
+nemo_module_initialize (GTypeModule *module)
+{
+  g_message ("Initializing");
+  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+  gsd_intl_init ();
+  provider_types[0] = nw_extension_register_type (module);
+}
+
+/* extension points types registration */
+void
+nemo_module_list_types (const GType **types,
+                            int          *num_types)
+{
+  *types = provider_types;
+  *num_types = G_N_ELEMENTS (provider_types);
+}
+
+/* cleanup */
+void
+nemo_module_shutdown (void)
+{
+}

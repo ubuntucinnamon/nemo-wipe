@@ -1,1 +1,1 @@
-SUBDIRS = nemo-wipe po help
+SUBDIRS = po help

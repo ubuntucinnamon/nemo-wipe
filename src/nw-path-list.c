@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include "nw-path-list.h"
@@ -29,7 +29,7 @@
 #include <glib.h>
 #include "nw-api-impl.h"
 #ifdef HAVE_GCONF
-# include <gconf/gconf-client.h>
+#include <gconf/gconf-client.h>
 #endif
 
 
@@ -40,8 +40,7 @@ get_desktop_path (void)
 {
   gchar *path = NULL;
 
-#if defined(NW_NEMO_IS_NEMO)
-# ifdef HAVE_GCONF
+  #ifdef HAVE_GCONF
   if (! path) {
     GConfClient *conf_client;
 
@@ -53,6 +52,7 @@ get_desktop_path (void)
     }
     g_object_unref (conf_client);
   }
+  #endif /* HAVE_GCONF */
 
   if (! path) {
     const gchar *const schema = "org.nemo.preferences";

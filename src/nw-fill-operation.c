@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include "config.h"
+#include "config.h"
 #endif
 
 #include "nw-fill-operation.h"
@@ -30,7 +30,7 @@
 #include <glib-object.h>
 #include <gio/gio.h>
 #if HAVE_GIO_UNIX
-# include <gio/gunixmounts.h>
+#include <gio/gunixmounts.h>
 #endif
 #include <gsecuredelete.h>
 
