@@ -357,11 +357,6 @@ operation_confirm_dialog (GtkWindow                    *parent,
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                               "%s", secondary_text);
   }
-  gtk_box_pack_start (GTK_BOX (action_area), button, FALSE, TRUE, 0);
-  if (GTK_IS_BUTTON_BOX (action_area)) {
-    gtk_button_box_set_child_secondary (GTK_BUTTON_BOX (action_area), button, TRUE);
-  }
-  gtk_widget_show (button);
   /* cancel button */
   gtk_dialog_add_button (GTK_DIALOG (dialog),
                          GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT);
