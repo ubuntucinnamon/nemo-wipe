@@ -1,18 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
 "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-  <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY appversion "0.1">
   <!ENTITY manrevision "0.1">
   <!ENTITY date "April 2011">
   <!ENTITY appname "Nemo Wipe">
   <!ENTITY app "<application>&appname;</application>">
-  <!-- Information about the entities
-       The legal.xml file contains legal information, there is no need to edit the file.
-       Use the appversion entity to specify the version of the application.
-       Use the manrevision entity to specify the revision number of this manual.
-       Use the date entity to specify the release date of this manual.
-       Use the app entity to specify the name of the application. -->
 ]>
 <!--
       (Do not remove this comment block.)
@@ -51,11 +44,6 @@
     <publisher>
       <publishername> GNOME Documentation Project </publishername>
     </publisher>
-
-   &legal;
-   <!-- This file  contains link to license for the documentation (GNU FDL), and
-        other legal stuff such as "NO WARRANTY" statement. Please do not change
-    any of this. -->
 
     <authorgroup>
       <!-- XXX -->
