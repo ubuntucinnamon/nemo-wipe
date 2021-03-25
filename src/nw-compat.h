@@ -45,16 +45,6 @@ G_BEGIN_DECLS
 
 
 /* GTK stuff */
-
-#if ! GTK_CHECK_VERSION(2, 14, 0)
-# define gtk_dialog_get_action_area(dialog)   ((dialog)->action_area)
-# define gtk_dialog_get_content_area(dialog)  ((dialog)->vbox)
-#endif /* ! GTK_CHECK_VERSION(2, 14, 0) */
-
-#if ! GTK_CHECK_VERSION (2, 18, 0)
-# define gtk_widget_get_sensitive(w) (GTK_WIDGET_SENSITIVE (w))
-#endif /* ! GTK_CHECK_VERSION (2, 18, 0) */
-
 #if ! GTK_CHECK_VERSION (2, 13, 1)
 
 static gboolean
@@ -83,31 +73,6 @@ gtk_show_uri (GdkScreen    *screen,
 
 #include <gio/gio.h>
 #include "nw-api-impl.h"
-
-/*
- * Workaround for the buggy behavior of g_file_get_path() on the GFile returned
- * by our nemo_file_info_get_location().
- * Should be harmless in general, and at least for us.
- *
- * The buggy behavior made g_file_get_path() return the remote path for remote
- * locations, such as "/foo" for "ftp://name.domain.tld/foo", obviously leading
- * to really bad things such as unexpected data loss (by using a local file when
- * the user thinks we use the remote one).
- */
-static gchar *
-NEMO_WIPE_g_file_get_path (GFile *file)
-{
-  gchar *path = NULL;
-
-  if (g_file_has_uri_scheme (file, "file")) {
-    path = g_file_get_path (file);
-  }
-
-  return path;
-}
-/* overwrite the GIO implementation */
-#define g_file_get_path NEMO_WIPE_g_file_get_path
-
 
 G_END_DECLS
 

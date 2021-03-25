@@ -1,6 +1,6 @@
 /*
  *  nemo-wipe - a nemo extension to wipe file(s)
- * 
+ *
  *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
@@ -61,7 +61,7 @@ static GtkResponseType  display_dialog     (GtkWindow       *parent,
  * @first_button_text: Text of the first button, or %NULL
  * @...: (starting at @first_button_text) %NULL-terminated list of buttons text
  *       and response-id.
- * 
+ *
  * Returns: The dialog's response or %GTK_RESPONSE_NONE if @wait_for_response
  *          is %FALSE.
  */
@@ -78,7 +78,7 @@ display_dialog (GtkWindow       *parent,
   GtkResponseType response = GTK_RESPONSE_NONE;
   GtkWidget      *dialog;
   va_list         ap;
-  
+
   dialog = gtk_message_dialog_new (parent,
                                    GTK_DIALOG_DESTROY_WITH_PARENT,
                                    type, GTK_BUTTONS_NONE,
@@ -91,7 +91,7 @@ display_dialog (GtkWindow       *parent,
   va_start (ap, first_button_text);
   while (first_button_text) {
     GtkResponseType button_response = va_arg (ap, GtkResponseType);
-    
+
     gtk_dialog_add_button (GTK_DIALOG (dialog), first_button_text, button_response);
     first_button_text = va_arg (ap, const gchar *);
   }
@@ -107,7 +107,7 @@ display_dialog (GtkWindow       *parent,
     g_signal_connect (dialog, "response", G_CALLBACK (gtk_widget_destroy), NULL);
     gtk_widget_show (dialog);
   }
-  
+
   return response;
 }
 
@@ -124,7 +124,7 @@ string_last_line (const gchar *str)
   const gchar  *prev_eol  = str;
   const gchar  *eol       = str;
   gsize         i;
-  
+
   for (i = 0; str[i] != 0; i++) {
     if (str[i] == '\n') {
       prev_eol = eol;
@@ -136,7 +136,7 @@ string_last_line (const gchar *str)
   } else {
     last_line = g_strndup (prev_eol, (gsize)(eol - 1 - prev_eol));
   }
-  
+
   return last_line;
 }
 
@@ -195,7 +195,7 @@ display_operation_error (struct NwOperationData  *opdata,
   GtkWidget      *view;
   GtkTextBuffer  *buffer;
   gchar          *short_error;
-  
+
   dialog = gtk_message_dialog_new (opdata->window,
                                    GTK_DIALOG_DESTROY_WITH_PARENT,
                                    is_warning ? GTK_MESSAGE_WARNING
@@ -211,7 +211,7 @@ display_operation_error (struct NwOperationData  *opdata,
   if (is_warning) {
     const gchar *conditional = _("However, the following warning was issued "
                                  "during the operation:");
-    
+
     if (opdata->success_secondary_text) {
       gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                                 "%s\n\n%s\n%s",
@@ -256,7 +256,7 @@ operation_finished_handler (GsdAsyncOperation  *operation,
                             gpointer            data)
 {
   struct NwOperationData *opdata = data;
-  
+
   gtk_widget_destroy (GTK_WIDGET (opdata->progress_dialog));
   if (! success || error) {
     display_operation_error (opdata, success, error);
@@ -275,11 +275,11 @@ update_operation_progress (struct NwOperationData  *opdata,
                            gdouble                  fraction)
 {
   gchar *step = nw_operation_get_progress_step (opdata->operation);
-  
+
   nw_progress_dialog_set_fraction (opdata->progress_dialog, fraction);
   nw_progress_dialog_set_progress_text (opdata->progress_dialog,
                                         step ? "%s" : NULL, step);
-  
+
   g_free (step);
 }
 
@@ -305,10 +305,10 @@ pref_enum_combo_changed_handler (GtkComboBox *combo,
                                  gint        *pref)
 {
   GtkTreeIter   iter;
-  
+
   if (gtk_combo_box_get_active_iter (combo, &iter)) {
     GtkTreeModel *model = gtk_combo_box_get_model (combo);
-    
+
     gtk_tree_model_get (model, &iter, 0, pref, -1);
   }
 }
@@ -319,11 +319,11 @@ help_button_clicked_handler (GtkWidget *widget,
 {
   GtkWindow  *parent = data;
   GError     *err = NULL;
-  
-  if (! gtk_show_uri (gtk_widget_get_screen (widget),
-                      "help:nemo-wipe/nemo-wipe-config",
-                      gtk_get_current_event_time (),
-                      &err)) {
+
+  if (! gtk_show_uri_on_window (parent,
+                                "help:nemo-wipe/nemo-wipe-config",
+                                gtk_get_current_event_time (),
+                                &err)) {
     /* display the error.
      * here we cannot use non-blocking dialog since we are called from a
      * dialog ran by gtk_dialog_run(), then the dialog must be ran the same way
@@ -371,7 +371,7 @@ operation_confirm_dialog (GtkWindow                    *parent,
   GtkWidget      *button;
   GtkWidget      *dialog;
   GtkWidget      *action_area;
-  
+
   dialog = gtk_message_dialog_new (parent,
                                    GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
@@ -405,24 +405,25 @@ operation_confirm_dialog (GtkWindow                    *parent,
     GtkWidget *content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
     GtkWidget *expander;
     GtkWidget *box;
-    
+
     expander = gtk_expander_new_with_mnemonic (_("_Options"));
     gtk_container_add (GTK_CONTAINER (content_area), expander);
-    box = gtk_vbox_new (FALSE, 0);
+    box = gtk_box_new (FALSE, 0);
     gtk_container_add (GTK_CONTAINER (expander), box);
     /* delete mode option */
     if (delete_mode) {
-      GtkWidget        *hbox;
+      GtkWidget        *box;
       GtkWidget        *label;
       GtkWidget        *combo;
       GtkListStore     *store;
       GtkCellRenderer  *renderer;
-      
-      hbox = gtk_hbox_new (FALSE, 5);
-      gtk_box_pack_start (GTK_BOX (box), hbox, FALSE, TRUE, 0);
+
+      box = gtk_box_new (FALSE, 5);
+      gtk_box_pack_start (GTK_BOX (box), box, FALSE, TRUE, 0);
       label = gtk_label_new_with_mnemonic (_("Number of _passes:"));
-      gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
-      gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+      gtk_widget_set_halign (label, 0.0);
+      gtk_widget_set_valign (label, 0.5);
+      gtk_box_pack_start (GTK_BOX (box), label, TRUE, TRUE, 0);
       /* store columns: setting value     (enum)
        *                number of passes  (int)
        *                descriptive text  (string) */
@@ -460,17 +461,17 @@ operation_confirm_dialog (GtkWindow                    *parent,
                 2, _("(advised for modern hard disks)"));
       ADD_ITEM (GSD_SECURE_DELETE_OPERATION_MODE_VERY_INSECURE,
                 1, _("(only protects against software attacks)"));
-      
+
       #undef ADD_ITEM
       /* connect change & pack */
       g_signal_connect (combo, "changed",
                         G_CALLBACK (pref_enum_combo_changed_handler), delete_mode);
-      gtk_box_pack_start (GTK_BOX (hbox), combo, FALSE, TRUE, 0);
+      gtk_box_pack_start (GTK_BOX (box), combo, FALSE, TRUE, 0);
     }
     /* fast option */
     if (fast) {
       GtkWidget *check;
-      
+
       check = gtk_check_button_new_with_mnemonic (
         _("_Fast and insecure mode (no /dev/urandom, no synchronize mode)")
       );
@@ -482,7 +483,7 @@ operation_confirm_dialog (GtkWindow                    *parent,
     /* "zeroise" option */
     if (zeroise) {
       GtkWidget *check;
-      
+
       check = gtk_check_button_new_with_mnemonic (
         _("Last pass with _zeros instead of random data")
       );
@@ -496,7 +497,7 @@ operation_confirm_dialog (GtkWindow                    *parent,
   /* run the dialog */
   response = gtk_dialog_run (GTK_DIALOG (dialog));
   gtk_widget_destroy (dialog);
-  
+
   return response == GTK_RESPONSE_ACCEPT;
 }
 
@@ -506,12 +507,12 @@ progress_dialog_response_handler (GtkDialog *dialog,
                                   gpointer   data)
 {
   struct NwOperationData *opdata = data;
-  
+
   switch (response_id) {
     case GTK_RESPONSE_CANCEL:
     case GTK_RESPONSE_DELETE_EVENT: {
       gboolean was_paused = nw_progress_dialog_get_paused (NW_PROGRESS_DIALOG (dialog));
-      
+
       if (! was_paused) {
         /* we pause the operation while the user things on whether to really
          * cancel or not, so the  */
@@ -531,23 +532,23 @@ progress_dialog_response_handler (GtkDialog *dialog,
       }
       break;
     }
-    
+
     case NW_PROGRESS_DIALOG_RESPONSE_PAUSE:
       nw_progress_dialog_set_paused (NW_PROGRESS_DIALOG (dialog),
                                      gsd_async_operation_pause (GSD_ASYNC_OPERATION (opdata->operation)));
       break;
-    
+
     case NW_PROGRESS_DIALOG_RESPONSE_RESUME:
       nw_progress_dialog_set_paused (NW_PROGRESS_DIALOG (dialog),
                                      ! gsd_async_operation_resume (GSD_ASYNC_OPERATION (opdata->operation)));
       break;
-    
+
     default:
       break;
   }
 }
 
-/* 
+/*
  * nw_operation_manager_run:
  * @parent: Parent window for dialogs
  * @files: List of paths to pass to @operation_launcher_func
@@ -564,8 +565,8 @@ progress_dialog_response_handler (GtkDialog *dialog,
  *                       (secondary is the error message)
  * @success_primary_text: Primary text for the the success dialog
  * @success_secondary_text: Secondary text for the the success dialog
- * 
- * 
+ *
+ *
  */
 void
 nw_operation_manager_run (GtkWindow    *parent,
@@ -585,7 +586,7 @@ nw_operation_manager_run (GtkWindow    *parent,
   gboolean                      fast        = FALSE;
   GsdSecureDeleteOperationMode  delete_mode = GSD_SECURE_DELETE_OPERATION_MODE_INSECURE;
   gboolean                      zeroise     = FALSE;
-  
+
   if (! operation_confirm_dialog (parent, title,
                                   confirm_primary_text, confirm_secondary_text,
                                   confirm_button_text, confirm_button_icon,
@@ -594,7 +595,7 @@ nw_operation_manager_run (GtkWindow    *parent,
   } else {
     GError                 *err = NULL;
     struct NwOperationData *opdata;
-    
+
     opdata = g_slice_alloc (sizeof *opdata);
     opdata->window = parent;
     opdata->window_destroy_hid = g_signal_connect (opdata->window, "destroy",
@@ -620,13 +621,13 @@ nw_operation_manager_run (GtkWindow    *parent,
                       G_CALLBACK (operation_finished_handler), opdata);
     g_signal_connect (opdata->operation, "progress",
                       G_CALLBACK (operation_progress_handler), opdata);
-    
+
     nw_operation_add_files (opdata->operation, files);
     if (! gsd_secure_delete_operation_run (GSD_SECURE_DELETE_OPERATION (opdata->operation),
                                            &err)) {
       if (err->code == G_SPAWN_ERROR_NOENT) {
         gchar *message;
-        
+
         /* Merge the error message with our. Pretty much a hack, but should be
          * correct and more precise. */
         message = g_strdup_printf (_("%s. "
@@ -644,9 +645,8 @@ nw_operation_manager_run (GtkWindow    *parent,
     } else {
       /* update the initial progress so the step is correct, too */
       update_operation_progress (opdata, 0.0);
-      
+
       gtk_widget_show (GTK_WIDGET (opdata->progress_dialog));
     }
   }
 }
-

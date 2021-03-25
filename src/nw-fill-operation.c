@@ -1,6 +1,6 @@
 /*
  *  nemo-wipe - a nemo extension to wipe file(s)
- * 
+ *
  *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
@@ -42,13 +42,13 @@ GQuark
 nw_fill_operation_error_quark (void)
 {
   static volatile gsize quark = 0;
-  
+
   if (g_once_init_enter (&quark)) {
     GQuark q = g_quark_from_static_string ("NwFillOperationError");
-    
+
     g_once_init_leave (&quark, q);
   }
-  
+
   return (GQuark) quark;
 }
 
@@ -69,11 +69,11 @@ static void     nw_fill_operation_progress_handler        (GsdFillOperation *ope
 
 struct _NwFillOperationPrivate {
   GList    *directories;
-  
+
   guint     n_op;
   guint     n_op_done;
   GString  *message;
-  
+
   gulong    progress_hid;
   gulong    finished_hid;
 };
@@ -96,9 +96,9 @@ static void
 nw_fill_operation_class_init (NwFillOperationClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  
+
   object_class->finalize = nw_fill_operation_finalize;
-  
+
   g_type_class_add_private (klass, sizeof (NwFillOperationPrivate));
 }
 
@@ -108,12 +108,12 @@ nw_fill_operation_init (NwFillOperation *self)
   self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self,
                                             NW_TYPE_FILL_OPERATION,
                                             NwFillOperationPrivate);
-  
+
   self->priv->directories = NULL;
   self->priv->n_op = 0;
   self->priv->n_op_done = 0;
   self->priv->message = NULL;
-  
+
   self->priv->finished_hid = g_signal_connect (self, "finished",
                                                G_CALLBACK (nw_fill_operation_finished_handler),
                                                self);
@@ -126,16 +126,16 @@ static void
 nw_fill_operation_finalize (GObject *object)
 {
   NwFillOperation *self = NW_FILL_OPERATION (object);
-  
+
   g_list_foreach (self->priv->directories, (GFunc) g_free, NULL);
   g_list_free (self->priv->directories);
   self->priv->directories = NULL;
-  
+
   if (self->priv->message) {
     g_string_free (self->priv->message, TRUE);
     self->priv->message = NULL;
   }
-  
+
   G_OBJECT_CLASS (nw_fill_operation_parent_class)->finalize (object);
 }
 
@@ -144,12 +144,12 @@ nw_fill_operation_real_add_file (NwOperation *op,
                                  const gchar *path)
 {
   NwFillOperation *self = NW_FILL_OPERATION (op);
-  
+
   /* FIXME: filter file? */
   self->priv->directories = g_list_prepend (self->priv->directories,
                                             g_strdup (path));
   self->priv->n_op ++;
-  
+
   gsd_fill_operation_set_directory (GSD_FILL_OPERATION (self),
                                     self->priv->directories->data);
 }
@@ -159,7 +159,7 @@ nw_fill_operation_real_get_progress_step (NwOperation *operation)
 {
   NwFillOperation    *self  = NW_FILL_OPERATION (operation);
   GsdAsyncOperation  *op    = GSD_SECURE_DELETE_OPERATION (operation);
-  
+
   if (self->priv->n_op > 1) {
     return g_strdup_printf (_("Device \"%s\" (%u out of %u), pass %u out of %u"),
                             (const gchar *) self->priv->directories->data,
@@ -206,14 +206,14 @@ emit_final_finished (NwFillOperation *self,
                      const gchar     *message)
 {
   const gchar *full_message;
-  
+
   if (! self->priv->message) {
     full_message = message;
   } else {
     append_error_message (self, message);
     full_message = self->priv->message->str;
   }
-  
+
   g_signal_handler_block (self, self->priv->finished_hid);
   g_signal_emit_by_name (self, "finished", success, full_message);
   g_signal_handler_unblock (self, self->priv->finished_hid);
@@ -226,12 +226,12 @@ static gboolean
 launch_next_operation (NwFillOperation *self)
 {
   gboolean busy;
-  
+
   busy = gsd_async_operation_get_busy (GSD_ASYNC_OPERATION (self));
   if (! busy) {
     GError   *err = NULL;
     gboolean  success;
-    
+
     success = gsd_fill_operation_run (GSD_FILL_OPERATION (self),
                                       self->priv->directories->data,
                                       &err);
@@ -243,7 +243,7 @@ launch_next_operation (NwFillOperation *self)
       g_signal_emit_by_name (self, "progress", 0.0);
     }
   }
-  
+
   return busy; /* keeps our timeout function until lock is released */
 }
 
@@ -252,7 +252,7 @@ static void
 nw_fill_operation_pop_dir (NwFillOperation *self)
 {
   GList *tmp;
-  
+
   tmp = self->priv->directories;
   if (tmp) {
     self->priv->directories = tmp->next;
@@ -270,22 +270,22 @@ nw_fill_operation_finished_handler (GsdFillOperation *operation,
                                     NwFillOperation  *self)
 {
   gboolean last = TRUE;
-  
+
   if (success) {
     self->priv->n_op_done++;
     /* remove the directory just proceeded */
     nw_fill_operation_pop_dir (self);
-    
+
     /* if we have work left to be done... */
     if (self->priv->directories) {
       /* block signal emission, it's not the last one */
       g_signal_stop_emission_by_name (operation, "finished");
-      
+
       /* remember any warning for the final signal */
       if (message) {
         append_error_message (self, message);
       }
-      
+
       /* we can't launch the next operation right here since the previous must
        * release its lock before, which is done just after return of the current
        * function.
@@ -308,13 +308,13 @@ nw_fill_operation_finished_handler (GsdFillOperation *operation,
 /*
  * find_mountpoint_unix:
  * @path: An absolute path for which find the mountpoint.
- * 
+ *
  * Gets the UNIX mountpoint path of a given path.
  * <note>
  *  This function would actually never return %NULL since the mount point of
  *  every files is at least /.
  * </note>
- * 
+ *
  * Returns: The path of the mountpoint of @path or %NULL if not found.
  *          Free with g_free().
  */
@@ -323,17 +323,17 @@ find_mountpoint_unix (const gchar *path)
 {
   gchar    *mountpoint = g_strdup (path);
   gboolean  found = FALSE;
-  
+
   while (! found && mountpoint) {
     GUnixMountEntry *unix_mount;
-    
+
     unix_mount = g_unix_mount_at (mountpoint, NULL);
     if (unix_mount) {
       found = TRUE;
       g_unix_mount_free (unix_mount);
     } else {
       gchar *tmp = mountpoint;
-      
+
       mountpoint = g_path_get_dirname (tmp);
       /* check if dirname() changed the path to avoid infinite loop (e.g. when
        * / was reached) */
@@ -344,7 +344,7 @@ find_mountpoint_unix (const gchar *path)
       g_free (tmp);
     }
   }
-  
+
   return mountpoint;
 }
 #endif
@@ -357,18 +357,18 @@ find_mountpoint (const gchar *path,
   GFile  *file;
   GMount *mount;
   GError *err = NULL;
-  
+
   /* Try with GIO first */
   file = g_file_new_for_path (path);
   mount = g_file_find_enclosing_mount (file, NULL, &err);
   if (mount) {
     GFile *mountpoint_file;
-    
+
     mountpoint_file = g_mount_get_root (mount);
     mountpoint_path = g_file_get_path (mountpoint_file);
     if (! mountpoint_path) {
       gchar *uri = g_file_get_uri (mountpoint_file);
-      
+
       g_set_error (&err,
                    NW_FILL_OPERATION_ERROR,
                    NW_FILL_OPERATION_ERROR_REMOTE_MOUNT,
@@ -395,7 +395,7 @@ find_mountpoint (const gchar *path,
   if (! mountpoint_path) {
     g_propagate_error (error, err);
   }
-  
+
   return mountpoint_path;
 }
 
@@ -405,15 +405,15 @@ find_mountpoint (const gchar *path,
  * @work_paths_: return location for filtered paths
  * @work_mounts_: return location for filtered paths' mounts
  * @error: return location for errors, or %NULL to ignore them
- * 
+ *
  * Tries to get usable paths (local directories) and keep only one per
  * mountpoint.
- * 
+ *
  * The returned lists (@work_paths_ and @work_mounts_) have the same length, and
  * an index in a list correspond to the same in the other:
  * g_list_index(work_paths_, 0) is the path of g_list_index(work_mounts_, 0).
  * Free returned lists with nw_path_list_free().
- * 
+ *
  * Returns: %TRUE on success, %FALSE otherwise.
  */
 gboolean
@@ -425,14 +425,14 @@ nw_fill_operation_filter_files (GList    *paths,
   GList  *work_paths  = NULL;
   GError *err         = NULL;
   GList  *work_mounts = NULL;
-  
+
   g_return_val_if_fail (paths != NULL, FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  
+
   for (; ! err && paths; paths = g_list_next (paths)) {
     const gchar  *file_path = paths->data;
     gchar        *mountpoint;
-    
+
     mountpoint = find_mountpoint (file_path, &err);
     if (G_LIKELY (mountpoint)) {
       if (g_list_find_custom (work_mounts, mountpoint, (GCompareFunc)strcmp)) {
@@ -440,7 +440,7 @@ nw_fill_operation_filter_files (GList    *paths,
         g_free (mountpoint);
       } else {
         gchar *path;
-        
+
         work_mounts = g_list_prepend (work_mounts, mountpoint);
         /* if it is not a directory, gets its container directory.
          * no harm since files cannot be mountpoint themselves, then it gets
@@ -467,7 +467,7 @@ nw_fill_operation_filter_files (GList    *paths,
   if (err) {
     g_propagate_error (error, err);
   }
-  
+
   return ! err;
 }
 

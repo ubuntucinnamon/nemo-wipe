@@ -1,6 +1,6 @@
 /*
  *  nemo-wipe - a nemo extension to wipe file(s)
- * 
+ *
  *  Copyright (C) 2009-2012 Colomban Wendling <ban@herbesfolles.org>
  *
  *  This library is free software; you can redistribute it and/or
@@ -62,13 +62,13 @@ GQuark
 nw_extension_error_quark (void)
 {
   static volatile gsize quark = 0;
-  
+
   if (g_once_init_enter (&quark)) {
     GQuark q = g_quark_from_static_string ("NwExtensionError");
-    
+
     g_once_init_leave (&quark, q);
   }
-  
+
   return (GQuark) quark;
 }
 
@@ -104,7 +104,7 @@ nw_extension_run_delete_operation (GtkWindow *parent,
 {
   gchar  *confirm_primary_text = NULL;
   guint   n_items;
-  
+
   n_items = g_list_length (files);
   if (n_items > 1) {
     confirm_primary_text = g_strdup_printf (g_dngettext(GETTEXT_PACKAGE,
@@ -120,7 +120,7 @@ nw_extension_run_delete_operation (GtkWindow *parent,
                                             n_items);
   } else if (n_items > 0) {
     gchar *name;
-    
+
     name = g_filename_display_basename (files->data);
     confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe "
                                               "\"%s\"?"),
@@ -134,7 +134,7 @@ nw_extension_run_delete_operation (GtkWindow *parent,
     confirm_primary_text,
     _("If you wipe an item, it will not be recoverable."),
     _("_Wipe"),
-    gtk_image_new_from_stock (GTK_STOCK_DELETE, GTK_ICON_SIZE_BUTTON),
+    gtk_image_new_from_icon_name (GTK_STOCK_DELETE, GTK_ICON_SIZE_BUTTON),
     /* progress dialog */
     _("Wiping files..."),
     /* operation launcher */
@@ -160,16 +160,16 @@ nw_extension_run_fill_operation (GtkWindow *parent,
   gchar  *confirm_primary_text = NULL;
   gchar  *success_secondary_text = NULL;
   guint   n_items;
-  
+
   n_items = g_list_length (mountpoints);
   /* FIXME: can't truly use g_dngettext since the args are not the same */
   if (n_items > 1) {
     GList    *tmp;
     GString  *devices = g_string_new (NULL);
-    
+
     for (tmp = mountpoints; tmp; tmp = g_list_next (tmp)) {
       gchar *name;
-      
+
       name = g_filename_display_name (tmp->data);
       if (devices->len > 0) {
         if (! tmp->next) {
@@ -195,7 +195,7 @@ nw_extension_run_fill_operation (GtkWindow *parent,
     g_string_free (devices, TRUE);
   } else if (n_items > 0) {
     gchar *name;
-    
+
     name = g_filename_display_name (mountpoints->data);
     confirm_primary_text = g_strdup_printf (_("Are you sure you want to wipe "
                                               "the available disk space on the "
@@ -214,7 +214,7 @@ nw_extension_run_fill_operation (GtkWindow *parent,
     confirm_primary_text,
     _("This operation may take a while."),
     _("_Wipe"),
-    gtk_image_new_from_stock (GTK_STOCK_CLEAR, GTK_ICON_SIZE_BUTTON),
+    gtk_image_new_from_icon_name (GTK_STOCK_CLEAR, GTK_ICON_SIZE_BUTTON),
     /* progress dialog */
     _("Wiping available disk space..."),
     /* operation launcher */
@@ -245,7 +245,7 @@ create_wipe_menu_item (NemoMenuProvider *provider,
                        GList                *paths)
 {
   NemoMenuItem *item;
-  
+
   item = nemo_menu_item_new (item_name,
                                  _("Wipe"),
                                  _("Delete each selected item and overwrite its data"),
@@ -256,7 +256,7 @@ create_wipe_menu_item (NemoMenuProvider *provider,
                           (GDestroyNotify) nw_path_list_free);
   g_signal_connect (item, "activate",
                     G_CALLBACK (wipe_menu_item_activate_handler), NULL);
-  
+
   return item;
 }
 
@@ -279,7 +279,7 @@ create_fill_menu_item (NemoMenuProvider *provider,
   GList            *mountpoints = NULL;
   GList            *folders     = NULL;
   GError           *err         = NULL;
-  
+
   if (! nw_fill_operation_filter_files (files, &folders, &mountpoints, &err)) {
     g_warning (_("File filtering failed: %s"), err->message);
     g_error_free (err);
@@ -303,7 +303,7 @@ create_fill_menu_item (NemoMenuProvider *provider,
     g_signal_connect (item, "activate",
                       G_CALLBACK (fill_menu_item_activate_handler), NULL);
   }
-  
+
   return item;
 }
 
@@ -325,7 +325,7 @@ nw_extension_real_get_file_items (NemoMenuProvider *provider,
 {
   GList *items = NULL;
   GList *paths;
-  
+
   paths = nw_path_list_new_from_nfi_list (files);
   if (paths) {
     ADD_ITEM (items, create_wipe_menu_item (provider,
@@ -336,7 +336,7 @@ nw_extension_real_get_file_items (NemoMenuProvider *provider,
                                             window, paths));
   }
   nw_path_list_free (paths);
-  
+
   return items;
 }
 
@@ -348,7 +348,7 @@ nw_extension_real_get_background_items (NemoMenuProvider *provider,
 {
   GList *items = NULL;
   GList *paths = NULL;
-  
+
   paths = g_list_append (paths, nw_path_from_nfi (current_folder));
   if (paths && paths->data) {
     ADD_ITEM (items, create_fill_menu_item (provider,
@@ -356,7 +356,7 @@ nw_extension_real_get_background_items (NemoMenuProvider *provider,
                                             window, paths));
   }
   nw_path_list_free (paths);
-  
+
   return items;
 }
 
