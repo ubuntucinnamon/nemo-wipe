@@ -313,31 +313,6 @@ pref_enum_combo_changed_handler (GtkComboBox *combo,
   }
 }
 
-static void
-help_button_clicked_handler (GtkWidget *widget,
-                             gpointer   data)
-{
-  GtkWindow  *parent = data;
-  GError     *err = NULL;
-
-  if (! gtk_show_uri_on_window (parent,
-                                "help:nemo-wipe/nemo-wipe-config",
-                                gtk_get_current_event_time (),
-                                &err)) {
-    /* display the error.
-     * here we cannot use non-blocking dialog since we are called from a
-     * dialog ran by gtk_dialog_run(), then the dialog must be ran the same way
-     * to get events */
-    display_dialog (parent, GTK_MESSAGE_ERROR, TRUE,
-                    gtk_window_get_title (parent),
-                    _("Failed to open help"),
-                    err->message,
-                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-                    NULL);
-    g_error_free (err);
-  }
-}
-
 /*
  * operation_confirm_dialog:
  * @parent: Parent window, or %NULL for none
@@ -382,10 +357,6 @@ operation_confirm_dialog (GtkWindow                    *parent,
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                               "%s", secondary_text);
   }
-  /* help button. don't use response not to close the dialog on click */
-  button = gtk_button_new_from_stock (GTK_STOCK_HELP);
-  g_signal_connect (button, "clicked",
-                    G_CALLBACK (help_button_clicked_handler), dialog);
   gtk_box_pack_start (GTK_BOX (action_area), button, FALSE, TRUE, 0);
   if (GTK_IS_BUTTON_BOX (action_area)) {
     gtk_button_box_set_child_secondary (GTK_BUTTON_BOX (action_area), button, TRUE);
