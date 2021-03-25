@@ -1,5 +1,7 @@
 project('nemo-wipe', 'c', version : '4.8.0')
 
+i18n = import('i18n')
+
 conf = configuration_data()
 
 gconf = dependency('gconf-2.0', version : '>= 2.0', required : false)
@@ -34,4 +36,5 @@ configure_file(output : 'config.h',
 
 add_project_arguments('-DHAVE_CONFIG_H', language : 'c')
 
+subdir('po')
 subdir('src')
