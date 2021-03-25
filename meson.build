@@ -2,7 +2,7 @@ project('nemo-wipe', 'c', version : '4.8.0')
 
 conf = configuration_data()
 
-gconf = dependency('gconf', version : '>= 2.0', required : false)
+gconf = dependency('gconf-2.0', version : '>= 2.0', required : false)
 gio = dependency('gio-2.0', version : '>= 2.26')
 giounix = dependency('gio-unix-2.0', version : '>= 2.0', required : false)
 glib = dependency('glib-2.0', version : '>= 2.1')
