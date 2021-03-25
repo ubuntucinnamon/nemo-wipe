@@ -32,4 +32,6 @@ conf.set_quoted('VERSION', meson.project_version())
 configure_file(output : 'config.h',
                configuration : conf)
 
+add_project_arguments('-DHAVE_CONFIG_H', language : 'c')
+
 subdir('src')
