@@ -1,0 +1,20 @@
+Source: nemo-wipe
+Section: misc
+Priority: optional
+Maintainer: Clement Lefebvre <root@linuxmint.com>
+Build-Depends:
+    debhelper-compat (= 12),
+    meson,
+    libglib2.0-dev (>= 2.14.0),
+    libnemo-extension-dev (>= 1.0.0),
+Standards-Version: 3.9.6
+
+Package: nemo-wipe
+Architecture: any
+Depends: libgsecuredelete0 (>= 0.3), nemo, ${misc:Depends}, ${shlibs:Depends}
+Description: Secure deletion extension for Nautilus
+ Nemo Wipe is a Nautilus extension that adds "Securely erase" and
+ "Securely fill empty space" items to the right-click menu.
+ .
+ The progress and results of the operations are shown in a progress
+ dialog.

@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+export DEB_BUILD_MAINT_OPTIONS = hardening=+bindnow
+
+%:
+	dh $@
+
+override_dh_makeshlibs:
+  # Don't generate a shlibs file for the plugin
+  :
