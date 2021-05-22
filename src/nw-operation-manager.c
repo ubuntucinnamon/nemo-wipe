@@ -205,7 +205,7 @@ display_operation_error (struct NwOperationData  *opdata,
                                    is_warning ? opdata->success_primary_text
                                               : opdata->failed_primary_text);
   gtk_window_set_title (GTK_WINDOW (dialog), opdata->title);
-  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), "_Cancel", GTK_RESPONSE_CLOSE);
   /* we hope that the last line in the error message is meaningful */
   short_error = string_last_line (error);
   if (is_warning) {
@@ -264,7 +264,7 @@ operation_finished_handler (GsdAsyncOperation  *operation,
     display_dialog (opdata->window, GTK_MESSAGE_INFO, FALSE, opdata->title,
                     opdata->success_primary_text,
                     opdata->success_secondary_text,
-                    GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+                    "_Close", GTK_RESPONSE_CLOSE,
                     NULL);
   }
   free_opdata (opdata);
@@ -319,8 +319,7 @@ pref_enum_combo_changed_handler (GtkComboBox *combo,
  * @title: Dialog's title
  * @primary_text: Dialog's primary text
  * @secondary_text: Dialog's secondary text
- * @confirm_button_text: Text of the button to hit in order to confirm (can be a
- *                       stock item)
+ * @confirm_button_text: Text of the button to hit in order to confirm
  * @confirm_button_icon: A #GtkWidget to use as the confirmation button's icon,
  *                       or %NULL for none or the default (e.g. if
  *                       @confirm_button_text is a stock item that have an icon)
@@ -345,21 +344,19 @@ operation_confirm_dialog (GtkWindow                    *parent,
   GtkResponseType response = GTK_RESPONSE_NONE;
   GtkWidget      *button;
   GtkWidget      *dialog;
-  GtkWidget      *action_area;
 
   dialog = gtk_message_dialog_new (parent,
                                    GTK_DIALOG_DESTROY_WITH_PARENT,
                                    GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE,
                                    "%s", primary_text);
   gtk_window_set_title (GTK_WINDOW (dialog), title);
-  action_area = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
   if (secondary_text) {
     gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
                                               "%s", secondary_text);
   }
   /* cancel button */
   gtk_dialog_add_button (GTK_DIALOG (dialog),
-                         GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT);
+                         "_Cancel", GTK_RESPONSE_REJECT);
   /* launch button */
   button = gtk_dialog_add_button (GTK_DIALOG (dialog),
                                   confirm_button_text, GTK_RESPONSE_ACCEPT);

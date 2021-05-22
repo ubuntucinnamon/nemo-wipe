@@ -134,7 +134,7 @@ nw_extension_run_delete_operation (GtkWindow *parent,
     confirm_primary_text,
     _("If you wipe an item, it will not be recoverable."),
     _("_Wipe"),
-    gtk_image_new_from_icon_name (GTK_STOCK_DELETE, GTK_ICON_SIZE_BUTTON),
+    gtk_image_new_from_icon_name ("edit-delete", GTK_ICON_SIZE_BUTTON),
     /* progress dialog */
     _("Wiping files..."),
     /* operation launcher */
@@ -214,7 +214,7 @@ nw_extension_run_fill_operation (GtkWindow *parent,
     confirm_primary_text,
     _("This operation may take a while."),
     _("_Wipe"),
-    gtk_image_new_from_icon_name (GTK_STOCK_CLEAR, GTK_ICON_SIZE_BUTTON),
+    gtk_image_new_from_icon_name ("edit-clear", GTK_ICON_SIZE_BUTTON),
     /* progress dialog */
     _("Wiping available disk space..."),
     /* operation launcher */
@@ -249,7 +249,7 @@ create_wipe_menu_item (NemoMenuProvider *provider,
   item = nemo_menu_item_new (item_name,
                                  _("Wipe"),
                                  _("Delete each selected item and overwrite its data"),
-                                 GTK_STOCK_DELETE);
+                                 "edit-delete");
   g_object_set_data (G_OBJECT (item), ITEM_DATA_WINDOW_KEY, window);
   g_object_set_data_full (G_OBJECT (item), ITEM_DATA_PATHS_KEY,
                           nw_path_list_copy (paths),
@@ -292,7 +292,7 @@ create_fill_menu_item (NemoMenuProvider *provider,
                                                "Wipe available disk space on "
                                                "these partitions or devices",
                                                g_list_length (mountpoints)),
-                                   GTK_STOCK_CLEAR);
+                                   "edit-clear");
     g_object_set_data (G_OBJECT (item), ITEM_DATA_WINDOW_KEY, window);
     g_object_set_data_full (G_OBJECT (item), ITEM_DATA_PATHS_KEY,
                             folders,

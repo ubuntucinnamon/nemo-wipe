@@ -665,7 +665,7 @@ nw_progress_dialog_set_has_close_button (NwProgressDialog *dialog,
   if (has_close_button != (dialog->priv->close_button != NULL)) {
     if (has_close_button) {
       dialog->priv->close_button = gtk_dialog_add_button (GTK_DIALOG (dialog),
-                                                          GTK_STOCK_CLOSE,
+                                                          "_Close",
                                                           GTK_RESPONSE_CLOSE);
       gtk_widget_set_sensitive (dialog->priv->close_button,
                                 dialog->priv->finished || dialog->priv->canceled);
@@ -710,7 +710,7 @@ nw_progress_dialog_set_has_cancel_button (NwProgressDialog *dialog,
   if (has_cancel_button != (dialog->priv->cancel_button != NULL)) {
     if (has_cancel_button) {
       dialog->priv->cancel_button = gtk_dialog_add_button (GTK_DIALOG (dialog),
-                                                           GTK_STOCK_CANCEL,
+                                                           "_Cancel",
                                                            GTK_RESPONSE_CANCEL);
       gtk_widget_set_sensitive (dialog->priv->cancel_button,
                                 ! dialog->priv->canceled && ! dialog->priv->finished);
@@ -757,14 +757,14 @@ nw_progress_dialog_set_has_pause_button (NwProgressDialog *dialog,
                                                           _("Pause"),
                                                           NW_PROGRESS_DIALOG_RESPONSE_PAUSE);
       gtk_button_set_image (GTK_BUTTON (dialog->priv->pause_button),
-                            gtk_image_new_from_icon_name (GTK_STOCK_MEDIA_PAUSE,
-                                                      GTK_ICON_SIZE_BUTTON));
+                            gtk_image_new_from_icon_name ("media-playback-pause",
+                                                          GTK_ICON_SIZE_BUTTON));
       dialog->priv->resume_button = gtk_dialog_add_button (GTK_DIALOG (dialog),
                                                            _("Resume"),
                                                            NW_PROGRESS_DIALOG_RESPONSE_RESUME);
       gtk_button_set_image (GTK_BUTTON (dialog->priv->resume_button),
-                            gtk_image_new_from_icon_name (GTK_STOCK_MEDIA_PLAY,
-                                                      GTK_ICON_SIZE_BUTTON));
+                            gtk_image_new_from_icon_name ("media-playback-start",
+                                                          GTK_ICON_SIZE_BUTTON));
       gtk_widget_set_sensitive (dialog->priv->pause_button,
                                 ! dialog->priv->canceled &&
                                 ! dialog->priv->finished &&
